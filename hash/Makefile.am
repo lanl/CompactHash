@@ -19,11 +19,11 @@ hashTest_SOURCES = testHelper.c hashTest.c
 hashTest_LDADD = libhash.la
 
 hash.h: hash.hp hash.hm perfectHash.hm compactHash.hm
-	cpp -P -CC -x c -imacros hash.hm hash.hp | indent -linux -brf -o hash.h
+	${CPREPROCESSOR} -CC -x c -imacros hash.hm hash.hp | ${INDENT} -linux -brf -o hash.h
 
 hash.c: hash.cp hash.cm hash.cl perfectHash.cm compactHash.cm
-	cpp -P -CC -x c -imacros hash.cm hash.cp | indent -linux -brf -o hash.c
+	${CPREPROCESSOR} -CC -x c -imacros hash.cm hash.cp | ${INDENT} -linux -brf -o hash.c
 	./embed_source.pl hash.cl >> hash.c
 
 hash.cl:	hash.clp hash.cm perfectHash.cm compactHash.cm
-	cpp -P -CC -x c -imacros hash.cm hash.clp | indent -linux -brf -o hash.cl
+	${CPREPROCESSOR} -CC -x c -imacros hash.cm hash.clp | ${INDENT} -linux -brf -o hash.cl

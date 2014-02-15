@@ -632,6 +632,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+INDENT
 AM_CPPFLAGS
 found
 MPE_BIN
@@ -15245,6 +15246,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+INDENT="indent"
+CPREPROCESSOR="cpp -P"
+
 # Extract the first word of "addr2line", so it can be a program name with args.
 set dummy addr2line; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -15629,6 +15633,8 @@ case "$host" in
         ;;
     *darwin*)
         CFLAGS="-std=gnu99 -pedantic"
+        INDENT="gindent"
+        CPREPROCESSOR="cpp -P"
         if test "${enable_debug}" = "yes"; then
           CFLAGS="-g -DDEBUG=1 ${CFLAGS}"
         else
@@ -16355,6 +16361,7 @@ if test ! -z "${RPATH_LIBS}"; then
 fi
 
 LIBS="${LIBS} -lm"
+
 
 
 

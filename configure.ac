@@ -56,6 +56,9 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
+INDENT="indent"
+CPREPROCESSOR="cpp -P"
+
 AC_CHECK_PROG([HAVE_ADDR2LINE], [addr2line], [yes])
 if test "x$HAVE_ADDR2LINE" == "xyes"; then
    AC_DEFINE([HAVE_ADDR2LINE],[1],[Has addr2line program])
@@ -92,6 +95,8 @@ case "$host" in
         ;;
     *darwin*)
         CFLAGS="-std=gnu99 -pedantic"
+        INDENT="gindent"
+        CPREPROCESSOR="cpp -P"
         if test "${enable_debug}" = "yes"; then
           CFLAGS="-g -DDEBUG=1 ${CFLAGS}"
         else
@@ -322,6 +327,7 @@ AC_SUBST(CC)
 AC_SUBST(CFLAGS)
 AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(LIBS)
+AC_SUBST(INDENT)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kdtree/Makefile])

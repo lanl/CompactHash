@@ -17,6 +17,8 @@ run:
    make 
    ./neigh2d -o <trial options>
 
+On Mac OSx install gnu-indent. The Mac version does not recognize some of the options that are used.
+
 './neigh2d -h' gives further information on option keywords.
 
 The -t option refers to threshold for refinement of cells. Cells are randomly refined and a lower threshold means fewer will be fined. The default value is 2 and that was what was used in our trials.
