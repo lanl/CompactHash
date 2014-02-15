@@ -96,7 +96,7 @@ case "$host" in
     *darwin*)
         CFLAGS="-std=gnu99 -pedantic"
         INDENT="gindent"
-        CPREPROCESSOR="cpp -P"
+        CPREPROCESSOR="gcc -E -P -U__APPLE_CC__"
         if test "${enable_debug}" = "yes"; then
           CFLAGS="-g -DDEBUG=1 ${CFLAGS}"
         else
@@ -328,6 +328,7 @@ AC_SUBST(CFLAGS)
 AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(LIBS)
 AC_SUBST(INDENT)
+AC_SUBST(CPREPROCESSOR)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kdtree/Makefile])

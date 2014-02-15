@@ -632,6 +632,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+CPREPROCESSOR
 INDENT
 AM_CPPFLAGS
 found
@@ -15634,7 +15635,7 @@ case "$host" in
     *darwin*)
         CFLAGS="-std=gnu99 -pedantic"
         INDENT="gindent"
-        CPREPROCESSOR="cpp -P"
+        CPREPROCESSOR="gcc -E -P -U__APPLE_CC__"
         if test "${enable_debug}" = "yes"; then
           CFLAGS="-g -DDEBUG=1 ${CFLAGS}"
         else
@@ -16361,6 +16362,7 @@ if test ! -z "${RPATH_LIBS}"; then
 fi
 
 LIBS="${LIBS} -lm"
+
 
 
 
