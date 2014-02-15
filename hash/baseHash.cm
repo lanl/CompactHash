@@ -1,0 +1,595 @@
+/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
+ * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
+ * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
+ * for the U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
+ * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
+ * so as not to confuse it with the version available from LANL.   
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at 
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Under this license, it is required to include a reference to this work. We
+ * request that each derivative work contain a reference to LANL Copyright 
+ * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
+ * measured. In addition, it is requested that a modifier is included as in
+ * the following example:
+ *
+ * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
+ *
+ * This is LANL Copyright Disclosure C14043/LA-CC-14-003
+ */
+
+#undef UNDEFINED
+#ifdef UNDEFINED
+/**
+ * @file   hash.cm
+ * @author Peter Ahrens
+ * @date   Thu Jun 6 2013 
+ */
+#endif
+
+#define HASH_COMPARE_HASH_INIT_EXP_WRAPPER(INIT_EXP) \
+  INIT_EXP\
+  table->compareFuncData = table->hashFuncData;\
+\
+
+#define KEY_VALUE_BASE_HASH_TYPES_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  typedef struct NAME##MODIFIER##Hash_TableData{\
+    int hashID;\
+    unsigned int numBuckets;\
+    COMPRESS_FUNC_DATA compressFuncData;\
+  }NAME##MODIFIER##Hash_TableData;\
+  \
+  typedef struct NAME##MODIFIER##Hash_Bucket{\
+    KEY_TYPE key;\
+    VALUE_TYPE value;\
+  }NAME##MODIFIER##Hash_Bucket;\
+\
+ 
+#define SENTINEL_VALUE_BASE_HASH_TYPES_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  typedef struct NAME##MODIFIER##Hash_TableData{\
+    int hashID;\
+    unsigned int numBuckets;\
+    COMPRESS_FUNC_DATA compressFuncData;\
+    VALUE_TYPE emptyValue;\
+  }NAME##MODIFIER##Hash_TableData;\
+  \
+  typedef struct NAME##MODIFIER##Hash_Bucket{\
+    VALUE_TYPE value;\
+  }NAME##MODIFIER##Hash_Bucket;\
+\
+
+#define BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, FACTORY_DESTROY_EXP, CREATE_EXP, INIT_EXP, ALLOC_EXP, DESTROY_EXP, EMPTY_EXP)\
+  \
+  NAME##Hash_Table *NAME##MODIFIER##Hash_CreateTable(NAME##Hash_Factory* factory, int hashIndex, size_t keyRange, size_t numEntries, float loadFactor){\
+    NAME##Hash_Table* table = (NAME##Hash_Table*)malloc(sizeof(NAME##Hash_Table));\
+    table->destroyFunc= &NAME##MODIFIER##Hash_DestroyTable;\
+    table->emptyFunc = &NAME##MODIFIER##Hash_EmptyTable;\
+    table->queryFunc = &NAME##MODIFIER##Hash_Query;\
+    table->querySingleFunc = &NAME##MODIFIER##Hash_QuerySingle;\
+    table->insertFunc = &NAME##MODIFIER##Hash_Insert;\
+    table->insertSingleFunc = &NAME##MODIFIER##Hash_InsertSingle;\
+    table->insertNoOverwriteFunc = &NAME##MODIFIER##Hash_InsertNoOverwrite;\
+    table->insertSingleNoOverwriteFunc = &NAME##MODIFIER##Hash_InsertSingleNoOverwrite;\
+    table->tableData = (char*)malloc(sizeof(NAME##MODIFIER##Hash_TableData));\
+    ((NAME##MODIFIER##Hash_TableData*)table->tableData)->hashID = HASH_ID;\
+    CREATE_EXP\
+    INIT_EXP\
+    char* tempHashData = (char*)malloc(sizeof(NAME##MODIFIER##Hash_TableData) + ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets * sizeof(NAME##MODIFIER##Hash_Bucket));\
+    memcpy(tempHashData, table->tableData, sizeof(NAME##MODIFIER##Hash_TableData));\
+    free(table->tableData);\
+    table->tableData = tempHashData;\
+    ALLOC_EXP\
+    return table;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_CreateFactory(NAME##Hash_Factory *factory, int hashIndex){\
+    factory->createFunc[hashIndex] = &NAME##MODIFIER##Hash_CreateTable;\
+    factory->destroyFunc[hashIndex] = &NAME##MODIFIER##Hash_DestroyFactory;\
+    FACTORY_CREATE_EXP;\
+    return HASH_EXIT_CODE_NORMAL;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_DestroyFactory(NAME##Hash_Factory* factory, int hashIndex){\
+    FACTORY_DESTROY_EXP;\
+    return HASH_EXIT_CODE_NORMAL;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_DestroyTable(NAME##Hash_Table *table){\
+    int exitCode;\
+    DESTROY_EXP\
+    free(table->tableData);\
+    free(table);\
+    return exitCode;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_EmptyTable(NAME##Hash_Table *table){\
+    int exitCode;\
+    EMPTY_EXP\
+    return exitCode;\
+  }\
+\
+
+#define HASH_READ_KEY_EXP (buckets[index].key)
+
+#define CMPXCHG_HASH_READ_KEY_EXP ((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? ({buckets[index].key = key; HASH_BUCKET_STATUS_EMPTY;}) : buckets[index].key)\
+
+#define BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, CL_GLOBAL, ...) \
+  \
+  int NAME##MODIFIER##Hash_InnerQuerySingle(CL_GLOBAL char *tableData, KEY_TYPE key, CL_GLOBAL VALUE_TYPE *valueOutput){\
+    CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+    int index;\
+    int exitCode;\
+    SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, HASH_READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
+    switch(exitCode){\
+      case HASH_SEARCH_CODE_MATCH:\
+        *valueOutput = buckets[index].value;\
+        return HASH_EXIT_CODE_NORMAL;\
+      case HASH_SEARCH_CODE_MISMATCH:\
+      case HASH_SEARCH_CODE_EMPTY:\
+        return HASH_EXIT_CODE_KEY_DNE;\
+      default:\
+        return exitCode;\
+    }\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InnerQuery(CL_GLOBAL char *tableData, unsigned int numKeys, CL_GLOBAL KEY_TYPE *keys, CL_GLOBAL VALUE_TYPE *valuesOutput){\
+    CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+    KEY_TYPE key;\
+    CL_GLOBAL VALUE_TYPE *valueOutput;\
+    int index;\
+    int exitCode;\
+    int i;\
+    int resultExitCode = HASH_EXIT_CODE_NORMAL;\
+    for(i = 0; i < numKeys; i++){\
+      key = keys[i];\
+      valueOutput = &valuesOutput[i];\
+      SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, HASH_READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
+      switch(exitCode){\
+        case HASH_SEARCH_CODE_MATCH:\
+          *valueOutput = buckets[index].value;\
+          break;\
+        case HASH_SEARCH_CODE_MISMATCH:\
+        case HASH_SEARCH_CODE_EMPTY:\
+          resultExitCode = HASH_EXIT_CODE_KEY_DNE;\
+          break;\
+        default:\
+          return exitCode;\
+      }\
+    }\
+    return resultExitCode;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InnerInsertSingle(CL_GLOBAL char* tableData, KEY_TYPE key, VALUE_TYPE value){\
+    CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+    int index;\
+    int exitCode;\
+    SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
+    switch(exitCode){\
+      case HASH_SEARCH_CODE_MATCH:\
+      case HASH_SEARCH_CODE_MISMATCH:\
+        buckets[index].value = value;\
+        return HASH_EXIT_CODE_OVERWRITE;\
+      case HASH_SEARCH_CODE_EMPTY:\
+        buckets[index].value = value;\
+        return HASH_EXIT_CODE_NORMAL;\
+      default:\
+        return exitCode;\
+    }\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InnerInsert(CL_GLOBAL char *tableData, unsigned int numEntries, CL_GLOBAL KEY_TYPE *keys, CL_GLOBAL VALUE_TYPE *values){\
+    CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+    int resultExitCode = HASH_EXIT_CODE_NORMAL;\
+    KEY_TYPE key;\
+    VALUE_TYPE value;\
+    int index;\
+    int exitCode;\
+    int i;\
+    for(i = 0; i < numEntries; i++){\
+      key = keys[i];\
+      SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
+      switch(exitCode){\
+        case HASH_SEARCH_CODE_MATCH:\
+        case HASH_SEARCH_CODE_MISMATCH:\
+          resultExitCode = HASH_EXIT_CODE_OVERWRITE;\
+        case HASH_SEARCH_CODE_EMPTY:\
+          buckets[index].value = values[i];\
+          break;\
+        default:\
+          return exitCode;\
+      }\
+    }\
+    return resultExitCode;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InnerInsertSingleNoOverwrite(CL_GLOBAL char *tableData, KEY_TYPE key, VALUE_TYPE value){\
+    CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+    int index;\
+    int exitCode;\
+    SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
+    switch(exitCode){\
+      case HASH_SEARCH_CODE_MATCH:\
+      case HASH_SEARCH_CODE_MISMATCH:\
+        return HASH_EXIT_CODE_OVERWRITE;\
+      case HASH_SEARCH_CODE_EMPTY:\
+        buckets[index].value = value;\
+        return HASH_EXIT_CODE_NORMAL;\
+      default:\
+        return exitCode;\
+    }\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InnerInsertNoOverwrite(CL_GLOBAL char *tableData, unsigned int numEntries, CL_GLOBAL KEY_TYPE *keys, CL_GLOBAL VALUE_TYPE *values){\
+    CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+    int resultExitCode = HASH_EXIT_CODE_NORMAL;\
+    KEY_TYPE key;\
+    VALUE_TYPE value;\
+    int index;\
+    int exitCode;\
+    int i;\
+    for(i = 0; i < numEntries; i++){\
+      key = keys[i];\
+      SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
+      switch(exitCode){\
+        case HASH_SEARCH_CODE_MATCH:\
+        case HASH_SEARCH_CODE_MISMATCH:\
+          resultExitCode = HASH_EXIT_CODE_OVERWRITE;\
+          break;\
+        case HASH_SEARCH_CODE_EMPTY:\
+          buckets[index].value = values[i];\
+          break;\
+        default:\
+          return exitCode;\
+      }\
+    }\
+    return resultExitCode;\
+  }\
+\
+
+#define HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP)\
+  NAME##MODIFIER##Hash_Bucket *buckets = (NAME##MODIFIER##Hash_Bucket*)&table->tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+  int index;\
+  for(index = 0; index < ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets; index++){\
+    INNER_EMPTY_EXP\
+  }\
+  exitCode = HASH_EXIT_CODE_NORMAL;\
+\
+
+#define KEY_VALUE_HASH_INNER_EMPTY_EXP buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+
+#define SENTINEL_VALUE_HASH_INNER_EMPTY_EXP(NAME, MODIFIER) buckets[index].value = ((NAME##MODIFIER##Hash_TableData*)table->tableData)->emptyValue;
+
+#define BASE_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, CREATE_EXP, INIT_EXP, SEARCH_EXP, INNER_EMPTY_EXP, ...)\
+  \
+  BASE_TYPES_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , , HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
+  \
+  BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, ,##__VA_ARGS__)\
+  \
+  int NAME##MODIFIER##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
+    return NAME##MODIFIER##Hash_InnerQuerySingle(table->tableData, key, valueOutput);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput){\
+    return NAME##MODIFIER##Hash_InnerQuery(table->tableData, numKeys, keys, valuesOutput);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InsertSingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##Hash_InnerInsertSingle(table->tableData, key, value);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_Insert(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    return NAME##MODIFIER##Hash_InnerInsert(table->tableData, numEntries, keys, values);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InsertSingleNoOverwrite(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##Hash_InnerInsertSingleNoOverwrite(table->tableData, key, value);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    return NAME##MODIFIER##Hash_InnerInsertNoOverwrite(table->tableData, numEntries, keys, values);\
+  }\
+\
+
+#define CL_FACTORY_CREATE_EXP(NAME, MODIFIER, FACTORY_CREATE_EXP, UTIL_PROGRAM_SOURCE)\
+  cl_int error;\
+  cl_device_id device;\
+  error = clGetContextInfo(factory->context, CL_CONTEXT_DEVICES, sizeof(device), &device, NULL);\
+  CLHash_Utilities_HandleError(error, STRINGIFY(NAME##Hash_CreateFactory), "clGetContextInfo");\
+  factory->querySingleKernel[hashIndex] = clCreateKernel(factory->program, STRINGIFY(NAME##MODIFIER##CLHash_RangeQuerySingle), &error);\
+  CLHash_Utilities_HandleError(error, STRINGIFY(NAME##MODIFIER##CLHash_CreateFactory), "clCreateKernel");\
+  factory->insertSingleKernel[hashIndex] = clCreateKernel(factory->program, STRINGIFY(NAME##MODIFIER##CLHash_RangeInsertSingle), &error);\
+  CLHash_Utilities_HandleError(error, STRINGIFY(NAME##MODIFIER##CLHash_CreateFactory), "clCreateKernel");\
+  factory->insertSingleNoOverwriteKernel[hashIndex] = clCreateKernel(factory->program, STRINGIFY(NAME##MODIFIER##CLHash_RangeInsertSingleNoOverwrite), &error);\
+  CLHash_Utilities_HandleError(error, STRINGIFY(NAME##MODIFIER##CLHash_CreateFactory), "clCreateKernel");\
+  factory->utilProgram[hashIndex] = CLHash_Utilities_BuildProgramString(factory->context, device, UTIL_PROGRAM_SOURCE);\
+  factory->emptyKernel[hashIndex] = clCreateKernel(factory->utilProgram[hashIndex], STRINGIFY(NAME##MODIFIER##CLHash_Empty), &error);\
+  CLHash_Utilities_HandleError(error, STRINGIFY(NAME##MODIFIER##CLHash_CreateFactory), "clCreateKernel");\
+  error = clGetKernelWorkGroupInfo(factory->emptyKernel[hashIndex], device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &factory->emptyKernelLocalWorkSize[hashIndex], NULL);\
+  CLHash_Utilities_HandleError(error, STRINGIFY(NAME##MODIFIER##CLHash_CreateFactory), "clGetKernelWorkGroupInfo");\
+  FACTORY_CREATE_EXP;\
+\
+
+#define CL_FACTORY_DESTROY_EXP(NAME, MODIFIER, FACTORY_DESTROY_EXP)\
+  FACTORY_DESTROY_EXP;\
+  clReleaseKernel(factory->emptyKernel[hashIndex]);\
+  clReleaseProgram(factory->utilProgram[hashIndex]);\
+  clReleaseKernel(factory->querySingleKernel[hashIndex]);\
+  clReleaseKernel(factory->insertSingleKernel[hashIndex]);\
+  clReleaseKernel(factory->insertSingleNoOverwriteKernel[hashIndex]);\
+\
+
+#define CL_CREATE_EXP(NAME, MODIFIER, CREATE_EXP)\
+  table->context = factory->context;\
+  table->queue = factory->queue;\
+  table->program = factory->program;\
+  table->localWorkSize = factory->localWorkSize;\
+  table->utilProgram = factory->utilProgram[hashIndex];\
+  table->emptyKernel = factory->emptyKernel[hashIndex];\
+  table->emptyKernelLocalWorkSize = factory->emptyKernelLocalWorkSize[hashIndex];\
+  table->querySingleKernel = factory->querySingleKernel[hashIndex];\
+  table->insertSingleKernel = factory->insertSingleKernel[hashIndex];\
+  table->insertSingleNoOverwriteKernel = factory->insertSingleNoOverwriteKernel[hashIndex];\
+  clRetainContext(table->context);\
+  clRetainCommandQueue(table->queue);\
+  clRetainProgram(table->program);\
+  clRetainProgram(table->utilProgram);\
+  clRetainKernel(table->emptyKernel);\
+  clRetainKernel(table->querySingleKernel);\
+  clRetainKernel(table->insertSingleKernel);\
+  clRetainKernel(table->insertSingleNoOverwriteKernel);\
+  CREATE_EXP;\
+\
+
+#define CL_ALLOC_EXP(NAME, MODIFIER)\
+  cl_int err;\
+  table->tableDataBuffer = clCreateBuffer(table->context, CL_MEM_READ_WRITE, sizeof(NAME##MODIFIER##Hash_TableData) + ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets * sizeof(NAME##MODIFIER##Hash_Bucket), NULL, &err);\
+  CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_InitTable), "clCreateBuffer");\
+  err = clEnqueueWriteBuffer(table->queue, table->tableDataBuffer, CL_TRUE, 0, sizeof(NAME##MODIFIER##Hash_TableData), table->tableData, 0, NULL, NULL);\
+  CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_InitTable), "clEnqueueWriteBuffer");\
+\
+
+#define CL_EMPTY_EXP(NAME, MODIFIER, EMPTY_EXP)\
+  cl_int err;\
+  err = clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem), &table->tableDataBuffer);\
+  CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_EmptyTable), "clSetKernelArg");\
+  const size_t groupWorkSize = roundUpToNearest(((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets, table->emptyKernelLocalWorkSize);\
+  err = clEnqueueNDRangeKernel(table->queue, table->emptyKernel, 1, 0, &groupWorkSize, (const size_t*)&table->emptyKernelLocalWorkSize, 0, NULL, NULL);\
+  \
+  CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_EmptyTable), "clEnqueueNDRangeKernel");\
+  exitCode = HASH_EXIT_CODE_NORMAL;\
+  EMPTY_EXP;\
+\
+
+#define CL_DESTROY_EXP(NAME)\
+  clReleaseMemObject(table->tableDataBuffer);\
+  clReleaseContext(table->context);\
+  clReleaseCommandQueue(table->queue);\
+  clReleaseProgram(table->utilProgram);\
+  clReleaseKernel(table->emptyKernel);\
+  clReleaseProgram(table->program);\
+  clReleaseKernel(table->querySingleKernel);\
+  clReleaseKernel(table->insertSingleKernel);\
+  clReleaseKernel(table->insertSingleNoOverwriteKernel);\
+\
+
+#define KEY_VALUE_CL_HASH_INNER_EMPTY_EXP buckets[index].key = -1;/*HASH_BUCKET_STATUS_EMPTY*/
+
+#define SENTINEL_VALUE_CL_HASH_INNER_EMPTY_EXP(NAME, MODIFIER) buckets[index].value = ((__global NAME##MODIFIER##Hash_TableData*)tableData)->emptyValue;
+
+#define CL_UTIL_PROGRAM(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC_DATA, INNER_EMPTY_EXP)\
+  \
+  HASH_H_TYPES_DECLARE(NAME, KEY_TYPE)\
+  \
+  BASE_TYPES_DEFINE(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  __kernel void NAME##MODIFIER##CLHash_Empty(__global char *tableData){\
+    int index = get_global_id(0);\
+    if(index >= ((__global NAME##MODIFIER##CLHash_TableData*)tableData)->numBuckets){\
+      return;\
+    }\
+    __global NAME##MODIFIER##CLHash_Bucket *buckets = (__global NAME##MODIFIER##CLHash_Bucket*)&tableData[sizeof(NAME##MODIFIER##CLHash_TableData)];\
+    INNER_EMPTY_EXP\
+  }\
+\
+
+#define ATOMIC_CMPXCHG_HASH_READ_KEY_EXP (atomic_cmpxchg(&(buckets[index].key), HASH_BUCKET_STATUS_EMPTY, key))\
+
+#define CL_HASH_KERN_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, SEARCH_EXP, ...) \
+  \
+  BASE_TYPES_DEFINE(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  BASE_HASH_METHODS(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, __global, ##__VA_ARGS__) \
+  \
+  int NAME##MODIFIER##CLHash_QuerySingle(__global char *tableData, KEY_TYPE key, __global VALUE_TYPE *valueOutput){\
+    return NAME##MODIFIER##CLHash_InnerQuerySingle(tableData, key, valueOutput);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_Query(__global char *tableData, size_t numKeys, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
+    return NAME##MODIFIER##CLHash_InnerQuery(tableData, numKeys, keys, valuesOutput);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_InsertSingle(__global char *tableData, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##CLHash_InnerInsertSingle(tableData, key, value);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_Insert(__global char *tableData, size_t numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    return NAME##MODIFIER##CLHash_InnerInsert(tableData, numEntries, keys, values);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_InsertSingleNoOverwrite(__global char *tableData, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##CLHash_InnerInsertSingleNoOverwrite(tableData, key, value);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_InsertNoOverwrite(__global char *tableData, size_t numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    return NAME##MODIFIER##CLHash_InnerInsertNoOverwrite(tableData, numEntries, keys, values);\
+  }\
+  \
+  __kernel void NAME##MODIFIER##CLHash_RangeQuerySingle(__global char *tableData, unsigned int numQueries, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
+    int i = get_global_id(0);\
+    if(i >= numQueries){\
+      return;\
+    }\
+    NAME##MODIFIER##CLHash_InnerQuerySingle(tableData, keys[i], valuesOutput + i);\
+  }\
+  \
+  __kernel void NAME##MODIFIER##CLHash_RangeQuery(__global char *tableData, unsigned int numQueries, unsigned int numKeys, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
+    int i = get_global_id(0);\
+    if(i >= numQueries){\
+      return;\
+    }\
+    NAME##MODIFIER##CLHash_InnerQuery(tableData, numKeys, keys + (i*numKeys), valuesOutput + (i*numKeys));\
+  }\
+  \
+  __kernel void NAME##MODIFIER##CLHash_RangeInsertSingle(__global char *tableData, unsigned int numInsertions, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    int i = get_global_id(0);\
+    if(i >= numInsertions){\
+      return;\
+    }\
+    NAME##MODIFIER##CLHash_InnerInsertSingle(tableData, keys[i], values[i]);\
+  }\
+  \
+  __kernel void NAME##MODIFIER##CLHash_RangeInsert(__global char *tableData, unsigned int numInsertions, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    int i = get_global_id(0);\
+    if(i >= numInsertions){\
+      return;\
+    }\
+    NAME##MODIFIER##CLHash_InnerInsert(tableData, numEntries, keys + (i*numEntries), values + (i*numEntries));\
+  }\
+  \
+  __kernel void NAME##MODIFIER##CLHash_RangeInsertSingleNoOverwrite(__global char* tableData, unsigned int numInsertions, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    int i = get_global_id(0);\
+    if(i >= numInsertions){\
+      return;\
+    }\
+    NAME##MODIFIER##CLHash_InnerInsertSingleNoOverwrite(tableData, keys[i], values[i]);\
+  }\
+  \
+  __kernel void NAME##MODIFIER##CLHash_RangeInsertNoOverwrite(__global char *tableData, unsigned int numInsertions, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    int i = get_global_id(0);\
+    if(i >= numInsertions){\
+      return;\
+    }\
+    NAME##MODIFIER##CLHash_InnerInsertNoOverwrite(tableData, numEntries, keys + (i*numEntries), values + (i*numEntries));\
+  }\
+\
+
+#define CL_BASE_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, CREATE_EXP, INIT_EXP, INNER_EMPTY_EXP, ...)\
+  \
+  BASE_TYPES_DEFINE(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  BASE_HASH_UTIL(NAME, MODIFIER##CL, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, CL_FACTORY_CREATE_EXP(NAME, MODIFIER, FACTORY_CREATE_EXP, STRINGIFY(CL_UTIL_PROGRAM(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC_DATA, INNER_EMPTY_EXP))), CL_FACTORY_DESTROY_EXP(NAME, MODIFIER, ), CL_CREATE_EXP(NAME, MODIFIER, CREATE_EXP), INIT_EXP, CL_ALLOC_EXP(NAME, MODIFIER), CL_DESTROY_EXP(NAME), CL_EMPTY_EXP(NAME, MODIFIER, ))\
+  \
+  int NAME##MODIFIER##CLHash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
+    return NAME##MODIFIER##CLHash_Query(table, 1, &key, valueOutput);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput){\
+    cl_int err;\
+    cl_mem keysBuffer = clCreateBuffer(table->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(KEY_TYPE) * numKeys, keys, &err);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_Query), "clCreateBuffer");\
+    cl_mem valuesOutputBuffer = clCreateBuffer(table->context, CL_MEM_WRITE_ONLY, sizeof(VALUE_TYPE) * numKeys, NULL, &err);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_Query), "clCreateBuffer");\
+    NAME##MODIFIER##CLHash_BufferQuery(table, numKeys, keysBuffer, valuesOutputBuffer);\
+    err = clEnqueueReadBuffer(table->queue, valuesOutputBuffer, CL_TRUE, 0, sizeof(VALUE_TYPE) * numKeys, valuesOutput, 0, NULL, NULL);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_Query), "clEnqueueReadBuffer");\
+    clReleaseMemObject(keysBuffer);\
+    clReleaseMemObject(valuesOutputBuffer);\
+    return HASH_EXIT_CODE_NORMAL;\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_BufferQuery(NAME##Hash_Table *table, size_t numKeys, cl_mem keysBuffer, cl_mem valuesOutputBuffer){\
+    cl_int err;\
+    err = clSetKernelArg(table->querySingleKernel, 0, sizeof(cl_mem), &table->tableDataBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferQuery), "clSetKernelArg");\
+    err = clSetKernelArg(table->querySingleKernel, 1, sizeof(unsigned int), &numKeys);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferQuery), "clSetKernelArg");\
+    err = clSetKernelArg(table->querySingleKernel, 2, sizeof(cl_mem), &keysBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferQuery), "clSetKernelArg");\
+    err = clSetKernelArg(table->querySingleKernel, 3, sizeof(cl_mem), &valuesOutputBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferQuery), "clSetKernelArg");\
+    const size_t groupWorkSize = roundUpToNearest(numKeys, table->localWorkSize);\
+    err = clEnqueueNDRangeKernel(table->queue, table->querySingleKernel, 1, 0, &groupWorkSize, (const size_t*)&table->localWorkSize, 0, NULL, NULL);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferQuery), "clEnqueueNDRangeKernel");\
+    clFinish(table->queue);\
+    return HASH_EXIT_CODE_NORMAL;\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_InsertSingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##CLHash_Insert(table, 1, &key, &value);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_Insert(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    cl_int err;\
+    cl_mem keysBuffer = clCreateBuffer(table->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(KEY_TYPE) * numEntries, keys, &err);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_Insert), "clCreateBuffer");\
+    cl_mem valuesBuffer = clCreateBuffer(table->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(VALUE_TYPE) * numEntries, values, &err);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_Insert), "clCreateBuffer");\
+    NAME##MODIFIER##CLHash_BufferInsert(table, numEntries, keysBuffer, valuesBuffer);\
+    clReleaseMemObject(keysBuffer);\
+    clReleaseMemObject(valuesBuffer);\
+    return HASH_EXIT_CODE_NORMAL;\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_BufferInsert(NAME##Hash_Table *table, size_t numEntries, cl_mem keysBuffer, cl_mem valuesBuffer){\
+    cl_int err;\
+    err = clSetKernelArg(table->insertSingleKernel, 0, sizeof(cl_mem), &table->tableDataBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsert), "clSetKernelArg");\
+    err = clSetKernelArg(table->insertSingleKernel, 1, sizeof(unsigned int), &numEntries);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsert), "clSetKernelArg");\
+    err = clSetKernelArg(table->insertSingleKernel, 2, sizeof(cl_mem), &keysBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsert), "clSetKernelArg");\
+    err = clSetKernelArg(table->insertSingleKernel, 3, sizeof(cl_mem), &valuesBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsert), "clSetKernelArg");\
+    const size_t groupWorkSize = roundUpToNearest(numEntries, table->localWorkSize);\
+    err = clEnqueueNDRangeKernel(table->queue, table->insertSingleKernel, 1, 0, &groupWorkSize, (const size_t*)&table->localWorkSize, 0, NULL, NULL);\
+    CLHash_Utilities_HandleError(err, NULL, "clEnqueueNDRangeKernel");\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_InsertSingleNoOverwrite(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##CLHash_InsertNoOverwrite(table, 1, &key, &value);\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_InsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    cl_int err;\
+    cl_mem keysBuffer = clCreateBuffer(table->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(KEY_TYPE) * numEntries, keys, &err);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_InsertNoOverwrite), "clCreateBuffer");\
+    cl_mem valuesBuffer = clCreateBuffer(table->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(VALUE_TYPE) * numEntries, values, &err);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_InsertNoOverwrite), "clCreateBuffer");\
+    NAME##MODIFIER##CLHash_BufferInsertNoOverwrite(table, numEntries, keysBuffer, valuesBuffer);\
+    clReleaseMemObject(keysBuffer);\
+    clReleaseMemObject(valuesBuffer);\
+    return HASH_EXIT_CODE_NORMAL;\
+  }\
+  \
+  int NAME##MODIFIER##CLHash_BufferInsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, cl_mem keysBuffer, cl_mem valuesBuffer){\
+    cl_int err;\
+    err = clSetKernelArg(table->insertSingleNoOverwriteKernel, 0, sizeof(cl_mem), &table->tableDataBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsertNoOverwrite), "clSetKernelArg");\
+    err = clSetKernelArg(table->insertSingleNoOverwriteKernel, 1, sizeof(unsigned int), &numEntries);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsertNoOverwrite), "ClSetKernelArg");\
+    err = clSetKernelArg(table->insertSingleNoOverwriteKernel, 2, sizeof(cl_mem), &keysBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsertNoOverwrite), "clSetKernelArg");\
+    err = clSetKernelArg(table->insertSingleNoOverwriteKernel, 3, sizeof(cl_mem), &valuesBuffer);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsertNoOverwrite), "clSetKernelArg");\
+    const size_t groupWorkSize = roundUpToNearest(numEntries, table->localWorkSize);\
+    err = clEnqueueNDRangeKernel(table->queue, table->insertSingleNoOverwriteKernel, 1, 0, &groupWorkSize, (const size_t*)&table->localWorkSize, 0, NULL, NULL);\
+    CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_BufferInsertNoOverwrite), "clEnqueueNDRangeKernel");\
+  }\
+\
+

@@ -1,0 +1,9 @@
+1. make a hash library version for gpu code.
+2. get addr2line working in error detection
+3. figure out what all the options in neigh2d are doing.
+4. remove the extraneous options.
+5. tailor configure.ac to be more general.
+6. create readme
+7. create comments
+8. create use cases
+

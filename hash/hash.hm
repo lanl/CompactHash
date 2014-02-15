@@ -1,0 +1,116 @@
+/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
+ * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
+ * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
+ * for the U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
+ * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
+ * so as not to confuse it with the version available from LANL.   
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at 
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Under this license, it is required to include a reference to this work. We
+ * request that each derivative work contain a reference to LANL Copyright 
+ * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
+ * measured. In addition, it is requested that a modifier is included as in
+ * the following example:
+ *
+ * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
+ *
+ * This is LANL Copyright Disclosure C14043/LA-CC-14-003
+ */
+
+#include "perfectHash.hm"
+#include "compactHash.hm"
+
+#define HASH_H_TYPES_DECLARE(NAME, KEY_TYPE)\
+  \
+  static inline unsigned int NAME##Hash_CompressIdentity(char data, int hashCode){\
+    return hashCode;\
+  }\
+  \
+  typedef struct NAME##Hash_CompressLCGData{\
+    long unsigned int a;\
+    long unsigned int c;\
+    unsigned int m;\
+    unsigned int n;\
+  }NAME##Hash_CompressLCGData;\
+  \
+  static inline unsigned int NAME##Hash_CompressLCG(NAME##Hash_CompressLCGData compressLCGData, int hashCode){\
+    return ((compressLCGData.a * hashCode + compressLCGData.c) % compressLCGData.m) % compressLCGData.n;\
+  }\
+\
+
+#define HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  typedef struct NAME##Hash_Table_ NAME##Hash_Table;\
+  \
+  typedef struct NAME##CLHash_Table_ NAME##CLHash_Table;\
+  \
+  typedef struct NAME##Hash_Factory_ NAME##Hash_Factory;\
+  \
+  typedef struct NAME##CLHash_Factory_ NAME##CLHash_Factory;\
+  \
+  NAME##Hash_Factory* NAME##Hash_CreateFactory(int HashTypes, VALUE_TYPE *emptyValue, size_t localWorkSize, cl_context *context, cl_command_queue *queue);\
+  \
+  int NAME##Hash_DestroyFactory(NAME##Hash_Factory *factory);\
+  \
+  NAME##Hash_Table* NAME##Hash_CreateTable(NAME##Hash_Factory* factory, int hashTypes, size_t keyRange, size_t numEntries, float loadFactor);\
+  \
+  int NAME##Hash_EmptyTable(NAME##Hash_Table *table);\
+  \
+  int NAME##Hash_DestroyTable(NAME##Hash_Table *table);\
+  \
+  cl_mem NAME##Hash_GetTableDataBuffer(NAME##Hash_Table *table);\
+  \
+  cl_mem *NAME##Hash_GetTableDataBufferPtr(NAME##Hash_Table *table);\
+  \
+  int NAME##Hash_GetTableType(NAME##Hash_Table *table);\
+  \
+  int NAME##Hash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput);\
+  \
+  int NAME##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput);\
+  \
+  int NAME##Hash_Insert(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values);\
+  \
+  int NAME##Hash_InsertSingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value);\
+  \
+  int NAME##Hash_InsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values);\
+  \
+  int NAME##Hash_InsertSingleNoOverwrite(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value);\
+  \
+  int NAME##Hash_BufferQuery(NAME##Hash_Table *table, size_t numKeys, cl_mem keys, cl_mem valuesOutput);\
+  \
+  int NAME##Hash_BufferInsert(NAME##Hash_Table *table, size_t numEntries, cl_mem keys, cl_mem values);\
+  \
+  int NAME##Hash_BufferInsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, cl_mem keys, cl_mem values);\
+  \
+  HASH_H_TYPES_DECLARE(NAME, KEY_TYPE)\
+  \
+  IDENTITY_PERFECT_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_PERFECT_CL_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_SENTINEL_PERFECT_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_SENTINEL_PERFECT_CL_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_LINEAR_OPEN_COMPACT_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_LINEAR_OPEN_COMPACT_CL_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_QUADRATIC_OPEN_COMPACT_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_DECLARE(NAME, KEY_TYPE, VALUE_TYPE)\
+\
+

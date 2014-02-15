@@ -1,0 +1,360 @@
+/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
+ * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
+ * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
+ * for the U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
+ * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
+ * so as not to confuse it with the version available from LANL.   
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at 
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Under this license, it is required to include a reference to this work. We
+ * request that each derivative work contain a reference to LANL Copyright 
+ * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
+ * measured. In addition, it is requested that a modifier is included as in
+ * the following example:
+ *
+ * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
+ *
+ * This is LANL Copyright Disclosure C14043/LA-CC-14-003
+ */
+
+#include "perfectHash.cm"
+#include "compactHash.cm"
+#include "hash.hm"
+
+#define HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE) \
+  \
+  struct NAME##Hash_Table_{\
+    char* tableData;\
+    cl_mem tableDataBuffer;\
+    int (*destroyFunc)(NAME##Hash_Table*);\
+    int (*emptyFunc)(NAME##Hash_Table*);\
+    int (*queryFunc)(NAME##Hash_Table*, size_t, KEY_TYPE*, VALUE_TYPE*);\
+    int (*querySingleFunc)(NAME##Hash_Table*, KEY_TYPE, VALUE_TYPE*);\
+    int (*insertFunc)(NAME##Hash_Table*, size_t, KEY_TYPE*, VALUE_TYPE*);\
+    int (*insertSingleFunc)(NAME##Hash_Table*, KEY_TYPE, VALUE_TYPE);\
+    int (*insertNoOverwriteFunc)(NAME##Hash_Table*, size_t, KEY_TYPE*, VALUE_TYPE*);\
+    int (*insertSingleNoOverwriteFunc)(NAME##Hash_Table*, KEY_TYPE, VALUE_TYPE);\
+    int (*bufferQueryFunc)(NAME##Hash_Table*, size_t, cl_mem, cl_mem);\
+    int (*bufferInsertFunc)(NAME##Hash_Table*, size_t, cl_mem, cl_mem);\
+    int (*bufferInsertNoOverwriteFunc)(NAME##Hash_Table*, size_t, cl_mem, cl_mem);\
+    cl_context context;\
+    cl_command_queue queue;\
+    cl_program utilProgram;\
+    cl_kernel emptyKernel;\
+    size_t emptyKernelLocalWorkSize;\
+    cl_program program;\
+    cl_kernel querySingleKernel;\
+    cl_kernel insertSingleKernel;\
+    cl_kernel insertSingleNoOverwriteKernel;\
+    size_t localWorkSize;\
+  };\
+  \
+  struct NAME##Hash_Factory_{\
+    cl_context context;\
+    cl_program program;\
+    cl_command_queue queue;\
+    int hashTypesAvailable;\
+    cl_program utilProgram[HASH_NUM_CL_HASHES];\
+    cl_kernel emptyKernel[HASH_NUM_CL_HASHES];\
+    size_t emptyKernelLocalWorkSize[HASH_NUM_CL_HASHES];\
+    cl_kernel querySingleKernel[HASH_NUM_CL_HASHES];\
+    cl_kernel insertSingleKernel[HASH_NUM_CL_HASHES];\
+    cl_kernel insertSingleNoOverwriteKernel[HASH_NUM_CL_HASHES];\
+    VALUE_TYPE emptyValue;\
+    size_t localWorkSize;\
+    NAME##Hash_Table* (*createFunc[HASH_NUM_HASHES])(NAME##Hash_Factory*, int hashIndex, size_t keyRange, size_t numEntries, float loadFactor);\
+    int (*destroyFunc[HASH_NUM_HASHES])(NAME##Hash_Factory*, int hashIndex);\
+  };\
+  \
+  NAME##Hash_Factory* NAME##Hash_CreateFactory(int hashTypes, VALUE_TYPE *emptyValue, size_t localWorkSize, cl_context *context, cl_command_queue *queue){\
+    if(hashTypes == 0){\
+      hashTypes = HASH_ALL_C_HASHES;\
+    }\
+    if(!(hashTypes & HASH_ALL_HASHES)){\
+      printf("Please specify a valid hash type to create.\n");\
+      exit(1);\
+    }\
+    hashTypes &= HASH_ALL_HASHES;\
+    if((hashTypes & HASH_SENTINEL_PERFECT_HASHES) == hashTypes && emptyValue == NULL){\
+      printf("emptyValue must be valid if a sentinel perfect hash is the only option available.\n");\
+      exit(1);\
+    }\
+    NAME##Hash_Factory *factory = (NAME##Hash_Factory*)malloc(sizeof(NAME##Hash_Factory));\
+    if(emptyValue == NULL){\
+      hashTypes &= !HASH_SENTINEL_PERFECT_HASHES;\
+    }else{\
+      factory->emptyValue = *emptyValue;\
+    }\
+    factory->hashTypesAvailable = hashTypes;\
+    if(hashTypes & HASH_ALL_CL_HASHES){\
+      if(localWorkSize == 0){\
+        factory->localWorkSize = HASH_DEFAULT_LOCAL_WORK_SIZE;\
+      }else{\
+        factory->localWorkSize = 1 << intLog2(localWorkSize);\
+      }\
+      if(context == NULL){\
+        CLHash_Utilities_CreateContext(&factory->context, &factory->queue);\
+      }else{\
+        factory->context = *context;\
+        clRetainContext(*context);\
+        if(queue == NULL){\
+          printf("Please specify a command queue for your context.\n");\
+          exit(-1);\
+        }\
+        factory->queue = *queue;\
+        clRetainCommandQueue(*queue);\
+      }\
+      cl_int error;\
+      cl_device_id device;\
+      error = clGetContextInfo(factory->context, CL_CONTEXT_DEVICES, sizeof(device), &device, NULL);\
+      CLHash_Utilities_HandleError(error, STRINGIFY(NAME##Hash_CreateFactory), "clGetContextInfo");\
+      factory->program = CLHash_Utilities_BuildProgramString(factory->context, device, Hash_GetKernelSourceString());\
+    }\
+    int hashType;\
+    for(int hashIndex = 0; hashType = 1 << hashIndex; hashIndex < HASH_NUM_HASHES){\
+      switch(hashType & hashTypes){\
+        case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_CreateFactory(factory, hashIndex); break;\
+        case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_CreateFactory(factory, hashIndex); break;\
+        case IDENTITY_SENTINEL_PERFECT_HASH_ID: NAME##IdentitySentinelPerfectHash_CreateFactory(factory, hashIndex); break;\
+        case IDENTITY_SENTINEL_PERFECT_CL_HASH_ID: NAME##IdentitySentinelPerfectCLHash_CreateFactory(factory, hashIndex); break;\
+        case LCG_LINEAR_OPEN_COMPACT_HASH_ID: NAME##LCGLinearOpenCompactHash_CreateFactory(factory, hashIndex); break;\
+        case LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID: NAME##LCGLinearOpenCompactCLHash_CreateFactory(factory, hashIndex); break;\
+        case LCG_QUADRATIC_OPEN_COMPACT_HASH_ID: NAME##LCGQuadraticOpenCompactHash_CreateFactory(factory, hashIndex); break;\
+        case LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID: NAME##LCGQuadraticOpenCompactCLHash_CreateFactory(factory, hashIndex); break;\
+      }\
+      hashIndex++;\
+    }\
+    return factory;\
+  }\
+  \
+  int NAME##Hash_DestroyFactory(NAME##Hash_Factory *factory){\
+    int hashType;\
+    for(int hashIndex = 0; hashType = 1 << hashIndex; hashIndex < HASH_NUM_HASHES){\
+      switch(hashType & factory->hashTypesAvailable){\
+        case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_DestroyFactory(factory, hashIndex); break;\
+        case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_DestroyFactory(factory, hashIndex); break;\
+        case IDENTITY_SENTINEL_PERFECT_HASH_ID: NAME##IdentitySentinelPerfectHash_DestroyFactory(factory, hashIndex); break;\
+        case IDENTITY_SENTINEL_PERFECT_CL_HASH_ID: NAME##IdentitySentinelPerfectCLHash_DestroyFactory(factory, hashIndex); break;\
+        case LCG_LINEAR_OPEN_COMPACT_HASH_ID: NAME##LCGLinearOpenCompactHash_DestroyFactory(factory, hashIndex); break;\
+        case LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID: NAME##LCGLinearOpenCompactCLHash_DestroyFactory(factory, hashIndex); break;\
+        case LCG_QUADRATIC_OPEN_COMPACT_HASH_ID: NAME##LCGQuadraticOpenCompactHash_DestroyFactory(factory, hashIndex); break;\
+        case LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID: NAME##LCGQuadraticOpenCompactCLHash_DestroyFactory(factory, hashIndex); break;\
+      }\
+      hashIndex++;\
+    }\
+    if(factory->hashTypesAvailable & HASH_ALL_CL_HASHES){\
+      clReleaseContext(factory->context);\
+      clReleaseCommandQueue(factory->queue);\
+      clReleaseProgram(factory->program);\
+    }\
+    free(factory);\
+  }\
+  \
+  NAME##Hash_Table* NAME##Hash_CreateTable(NAME##Hash_Factory* factory, int hashTypes, size_t keyRange, size_t numEntries, float loadFactor){\
+    if(loadFactor > 1.0 || loadFactor < HASH_MIN_LOAD_FACTOR){\
+      loadFactor = HASH_DEFAULT_LOAD_FACTOR;\
+    }\
+    if(hashTypes == 0){\
+      hashTypes = factory->hashTypesAvailable;\
+      if((hashTypes & HASH_ALL_CL_HASHES) && (hashTypes & HASH_ALL_C_HASHES)){\
+        hashTypes &= HASH_ALL_C_HASHES;\
+      }\
+    }\
+    if(!(hashTypes & factory->hashTypesAvailable)){\
+      printf("None of the selected hash types are supported by this factory.\n");\
+      exit(1);\
+    }\
+    hashTypes &= factory->hashTypesAvailable;\
+    if((hashTypes & HASH_ALL_CL_HASHES) && (hashTypes & HASH_ALL_C_HASHES)){\
+      printf("Please decide between OpenCL or C hash.\n");\
+      exit(1);\
+    }\
+    if((hashTypes & HASH_PERFECT_HASHES) == hashTypes && keyRange == 0){\
+      printf("keyRange must be set if a perfect hash is the only option available.\n");\
+      exit(1);\
+    }\
+    if((hashTypes & HASH_COMPACT_HASHES) == hashTypes && numEntries == 0){\
+      printf("numEntries must be set if a compact hash is the only option available.\n");\
+      exit(1);\
+    }\
+    if(numEntries == 0 && keyRange == 0){\
+      printf("either numEntries or keyRange must be set.\n");\
+      exit(1);\
+    }\
+    size_t perfectNumBuckets = keyRange;\
+    size_t compactNumBuckets = (size_t)(numEntries/loadFactor);\
+    int hashIndex;\
+    if((hashTypes & HASH_SENTINEL_PERFECT_HASHES) && ((hashTypes == (hashTypes & HASH_SENTINEL_PERFECT_HASHES)) || (compactNumBuckets == 0 || (perfectNumBuckets/compactNumBuckets < HASH_PERFECT_COMPACT_SWITCH_FACTOR)))){\
+      hashIndex = intLog2(hashTypes & HASH_SENTINEL_PERFECT_HASHES);\
+    }else if((hashTypes & HASH_NOSENTINEL_PERFECT_HASHES) && ((hashTypes == (hashTypes & HASH_PERFECT_HASHES)) || (compactNumBuckets == 0 || (perfectNumBuckets/compactNumBuckets < HASH_PERFECT_COMPACT_SWITCH_FACTOR)))){\
+      hashIndex = intLog2(hashTypes & HASH_NOSENTINEL_PERFECT_HASHES);\
+    }else if((hashTypes & HASH_LINEAR_COMPACT_HASHES) && ((hashTypes == (hashTypes & (HASH_PERFECT_HASHES | HASH_LINEAR_COMPACT_HASHES))) || ((hashTypes & HASH_COMPACT_HASHES & HASH_LINEAR_COMPACT_HASHES) == (hashTypes & HASH_COMPACT_HASHES) || loadFactor > 0.5))){\
+      hashIndex = intLog2(hashTypes & HASH_LINEAR_COMPACT_HASHES);\
+    }else{\
+      hashIndex = intLog2(hashTypes & HASH_QUADRATIC_COMPACT_HASHES);\
+    }\
+    NAME##Hash_Table *table = factory->createFunc[hashIndex](factory, hashIndex, keyRange, numEntries, loadFactor);\
+    return table;\
+  }\
+  \
+  int NAME##Hash_EmptyTable(NAME##Hash_Table *table){\
+    table->emptyFunc(table);\
+  }\
+  \
+  int NAME##Hash_DestroyTable(NAME##Hash_Table *table){\
+    table->destroyFunc(table);\
+  }\
+  \
+  cl_mem NAME##Hash_GetTableDataBuffer(NAME##Hash_Table *table){\
+    return table->tableDataBuffer;\
+  }\
+  \
+  cl_mem *NAME##Hash_GetTableDataBufferPtr(NAME##Hash_Table *table){\
+    return &table->tableDataBuffer;\
+  }\
+  \
+  int NAME##Hash_GetTableType(NAME##Hash_Table *table){\
+    return ((int*)table->tableData)[0];\
+  }\
+  \
+  int NAME##Hash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput){\
+    table->queryFunc(table, numKeys, keys, valuesOutput);\
+  }\
+  \
+  int NAME##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
+    table->querySingleFunc(table, key, valueOutput);\
+  }\
+  \
+  int NAME##Hash_Insert(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    table->insertFunc(table, numEntries, keys, values);\
+  }\
+  \
+  int NAME##Hash_InsertSingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    table->insertSingleFunc(table, key, value);\
+  }\
+  \
+  int NAME##Hash_InsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    table->insertNoOverwriteFunc(table, numEntries, keys, values);\
+  }\
+  \
+  int NAME##Hash_InsertSingleNoOverwrite(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    table->insertSingleNoOverwriteFunc(table, key, value);\
+  }\
+  int NAME##Hash_BufferQuery(NAME##Hash_Table *table, size_t numKeys, cl_mem keys, cl_mem valuesOutput){\
+    table->bufferQueryFunc(table, numKeys, keys, valuesOutput);\
+  }\
+  \
+  int NAME##Hash_BufferInsert(NAME##Hash_Table *table, size_t numEntries, cl_mem keys, cl_mem values){\
+    table->bufferInsertFunc(table, numEntries, keys, values);\
+  }\
+  \
+  int NAME##Hash_BufferInsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, cl_mem keys, cl_mem values){\
+    table->bufferInsertNoOverwriteFunc(table, numEntries, keys, values);\
+  }\
+  \
+  IDENTITY_PERFECT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_PERFECT_CL_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_SENTINEL_PERFECT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_SENTINEL_PERFECT_CL_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_LINEAR_OPEN_COMPACT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE, 1)\
+  \
+  LCG_LINEAR_OPEN_COMPACT_CL_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_QUADRATIC_OPEN_COMPACT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE, 1, 0)\
+  \
+  LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+\
+
+#define KERN_SWITCH_LOOKUP_EXP(NAME, FUNCTION_NAME, ...)\
+  switch(((__global int*)tableData)[0]){\
+    case IDENTITY_PERFECT_CL_HASH_ID: return NAME##IdentityPerfectCLHash_##FUNCTION_NAME(__VA_ARGS__);\
+    case IDENTITY_SENTINEL_PERFECT_CL_HASH_ID: return NAME##IdentitySentinelPerfectCLHash_##FUNCTION_NAME(__VA_ARGS__);\
+    case LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID: return NAME##LCGLinearOpenCompactCLHash_##FUNCTION_NAME(__VA_ARGS__);\
+    case LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID: return NAME##LCGQuadraticOpenCompactCLHash_##FUNCTION_NAME(__VA_ARGS__);\
+  }\
+\
+
+#define HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  HASH_H_TYPES_DECLARE(NAME, KEY_TYPE)\
+  \
+  IDENTITY_PERFECT_CL_HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  IDENTITY_SENTINEL_PERFECT_CL_HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  LCG_LINEAR_OPEN_COMPACT_CL_HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE, 1)\
+  \
+  LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE, 1, 0)\
+  \
+  __kernel void NAME##Hash_RangeQuery(__global char *tableData, unsigned int numQueries, unsigned int numKeys, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, RangeQuery, tableData, numQueries, numKeys, keys, valuesOutput)\
+  }\
+  \
+  __kernel void NAME##Hash_RangeQuerySingle(__global char *tableData, unsigned int numQueries, __global KEY_TYPE *keys, __global VALUE_TYPE *valueOutput){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, RangeQuerySingle, tableData, numQueries, keys, valueOutput)\
+  }\
+  \
+  __kernel void NAME##Hash_RangeInsert(__global char *tableData, unsigned int numInsertions, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, RangeInsert, tableData, numInsertions, numEntries, keys, values)\
+  }\
+  \
+  __kernel void NAME##Hash_RangeInsertSingle(__global char *tableData, unsigned int numInsertions, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, RangeInsertSingle, tableData, numInsertions, keys, values)\
+  }\
+  \
+  __kernel void NAME##Hash_RangeInsertNoOverwrite(__global char *tableData, unsigned int numInsertions, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, RangeInsertNoOverwrite, tableData, numInsertions, numEntries, keys, values)\
+  }\
+  \
+  __kernel void NAME##Hash_RangeInsertSingleNoOverwrite(__global char *tableData, unsigned int numInsertions, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, RangeInsertSingleNoOverwrite, tableData, numInsertions, keys, values)\
+  }\
+  \
+  int NAME##Hash_Query(__global char *tableData, unsigned int numKeys, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, Query, tableData, numKeys, keys, valuesOutput)\
+    return HASH_EXIT_CODE_ERROR;\
+  }\
+  \
+  int NAME##Hash_QuerySingle(__global char *tableData, KEY_TYPE key, __global VALUE_TYPE *valueOutput){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, QuerySingle, tableData, key, valueOutput)\
+    return HASH_EXIT_CODE_ERROR;\
+  }\
+  \
+  int NAME##Hash_Insert(__global char *tableData, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, Insert, tableData, numEntries, keys, values)\
+    return HASH_EXIT_CODE_ERROR;\
+  }\
+  \
+  int NAME##Hash_InsertSingle(__global char *tableData, KEY_TYPE key, VALUE_TYPE value){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, InsertSingle, tableData, key, value)\
+    return HASH_EXIT_CODE_ERROR;\
+  }\
+  \
+  int NAME##Hash_InsertNoOverwrite(__global char *tableData, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, InsertNoOverwrite, tableData, numEntries, keys, values)\
+    return HASH_EXIT_CODE_ERROR;\
+  }\
+  \
+  int NAME##Hash_InsertSingleNoOverwrite(__global char *tableData, KEY_TYPE key, VALUE_TYPE value){\
+    KERN_SWITCH_LOOKUP_EXP(NAME, InsertSingleNoOverwrite, tableData, key, value)\
+    return HASH_EXIT_CODE_ERROR;\
+  }\
+\
+

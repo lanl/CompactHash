@@ -1,0 +1,203 @@
+/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
+ * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
+ * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
+ * for the U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
+ * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
+ * so as not to confuse it with the version available from LANL.   
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at 
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Under this license, it is required to include a reference to this work. We
+ * request that each derivative work contain a reference to LANL Copyright 
+ * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
+ * measured. In addition, it is requested that a modifier is included as in
+ * the following example:
+ *
+ * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
+ *
+ * This is LANL Copyright Disclosure C14043/LA-CC-14-003
+ */
+
+#undef UNDEFINED
+#ifdef UNDEFINED
+/**
+ * @file   hash.hp
+ * @author Peter Ahrens
+ * @date   Thu Jun 6 2013 
+ */
+#endif
+/**
+ * @file   hash.h
+ * @author Peter Ahrens
+ * @date   Thu Jun 6 2013 
+ */
+//
+#define DELAY(x) x
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x) STRINGIFY_(x)
+DELAY(#ifndef HASH_H)
+DELAY(#define HASH_H)
+//
+DELAY(#ifdef __APPLE_CC__)
+DELAY(#include <OpenCL/OpenCL.h>)
+DELAY(#else)
+DELAY(#include <CL/cl.h>)
+DELAY(#endif)
+//
+DELAY(#include "CLHash_Utilities.h")
+//
+//
+DELAY(#include <stdlib.h>)
+DELAY(#include <stdio.h>)
+DELAY(#include <stdarg.h>)
+DELAY(#include <string.h>)
+//
+DELAY(#include "hash.hm")
+DELAY(#include "hash.cm")
+//
+DELAY(#define HASH_REPORT_NEVER /**/ 0)
+DELAY(#define HASH_REPORT_CYCLE /**/ 1)
+DELAY(#define HASH_REPORT_END /****/ 2)
+//
+DELAY(#define HASH_EXIT_CODE_NORMAL /****************/ -1)
+DELAY(#define HASH_EXIT_CODE_ERROR /*****************/ -2)
+DELAY(#define HASH_EXIT_CODE_OVERWRITE /*************/ -3)
+DELAY(#define HASH_EXIT_CODE_KEY_DNE /***************/ -4)
+DELAY(#define HASH_EXIT_CODE_CYCLE /*****************/ -5)
+DELAY(#define HASH_EXIT_CODE_MAX_ENTRIES_EXCEEDED /**/ -6)
+DELAY(#define HASH_EXIT_CODE_BUCKET_INDEX_OOB /******/ -7)
+//
+DELAY(#define HASH_SEARCH_CODE_MATCH /*****/ 0)
+DELAY(#define HASH_SEARCH_CODE_MISMATCH /**/ 1)
+DELAY(#define HASH_SEARCH_CODE_EMPTY /*****/ 2)
+//
+DELAY(#define HASH_NUM_HASHES /**/ 8)
+DELAY(#define HASH_NUM_CL_HASHES /**/ 4)
+//
+DELAY(#define LCG_QUADRATIC_OPEN_COMPACT_HASH_ID 128)
+DELAY(#define LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID 8)
+DELAY(#define LCG_LINEAR_OPEN_COMPACT_HASH_ID 64)
+DELAY(#define LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID 4)
+DELAY(#define IDENTITY_SENTINEL_PERFECT_HASH_ID  32)
+DELAY(#define IDENTITY_SENTINEL_PERFECT_CL_HASH_ID 2)
+DELAY(#define IDENTITY_PERFECT_HASH_ID  16)
+DELAY(#define IDENTITY_PERFECT_CL_HASH_ID 1)
+//
+/**
+ * HASH_ALL_CL_HASHES hash table types that run in an OpenCL context.
+ */
+DELAY(#define HASH_ALL_CL_HASHES (IDENTITY_PERFECT_CL_HASH_ID | IDENTITY_SENTINEL_PERFECT_CL_HASH_ID | LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID | LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID))
+/**
+ * HASH_ALL_C_HASHES hash table types that run on the host.
+ */
+DELAY(#define HASH_ALL_C_HASHES  (IDENTITY_PERFECT_HASH_ID | IDENTITY_SENTINEL_PERFECT_HASH_ID | LCG_LINEAR_OPEN_COMPACT_HASH_ID | LCG_QUADRATIC_OPEN_COMPACT_HASH_ID))
+/**
+ * HASH_ALL_HASHES all hash table types.
+ */
+DELAY(#define HASH_ALL_HASHES  (HASH_ALL_CL_HASHES | HASH_ALL_C_HASHES))
+/**
+ * HASH_NOSENTINEL_PERFECT_HASHES perfect hash table types that do not use a sentinel value to mark empty buckets.
+ */
+DELAY(#define HASH_NOSENTINEL_PERFECT_HASHES  (IDENTITY_PERFECT_HASH_ID | IDENTITY_PERFECT_CL_HASH_ID))
+/**
+ * HASH_SENTINEL_PERFECT_HASHES perfect hash table types that use a sentinel value to mark empty buckets.
+ */
+DELAY(#define HASH_SENTINEL_PERFECT_HASHES  (IDENTITY_SENTINEL_PERFECT_HASH_ID | IDENTITY_SENTINEL_PERFECT_CL_HASH_ID))
+/**
+ * HASH_PERFECT_HASHES perfect hash table types.
+ */
+DELAY(#define HASH_PERFECT_HASHES  (HASH_NOSENTINEL_PERFECT_HASHES | HASH_SENTINEL_PERFECT_HASHES))
+/**
+ * HASH_QUADRATIC_COMPACT_HASHES compact hash table types that use a quadratic probe sequence.
+ */
+DELAY(#define HASH_QUADRATIC_COMPACT_HASHES  (LCG_QUADRATIC_OPEN_COMPACT_HASH_ID | LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID))
+/**
+ * HASH_LINEAR_COMPACT_HASHES compact hash table types that use a linear probe sequence.
+ */
+DELAY(#define HASH_LINEAR_COMPACT_HASHES  (LCG_LINEAR_OPEN_COMPACT_HASH_ID | LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID))
+/**
+ * HASH_COMPACT_HASHES compact hash table types that use a linear probe sequence.
+ */
+DELAY(#define HASH_COMPACT_HASHES  (HASH_QUADRATIC_COMPACT_HASHES | HASH_LINEAR_COMPACT_HASHES))
+//
+DELAY(#define HASH_DEFAULT_LOCAL_WORK_SIZE /*******/ 64)
+DELAY(#define HASH_DEFAULT_LOAD_FACTOR /*******/ 0.3)
+DELAY(#define HASH_MIN_LOAD_FACTOR /*******/ 0.0009)
+DELAY(#define HASH_PERFECT_COMPACT_SWITCH_FACTOR /*******/ 20)
+DELAY(#define HASH_LCG_A /*******/ 2147483629)
+DELAY(#define HASH_LCG_C /*******/ 2147483587)
+DELAY(#define HASH_LCG_M /*******/ 2147483647)
+//
+DELAY(#define HASH_BUCKET_STATUS_EMPTY /**/ -1)
+DELAY(#define HASH_BUCKET_STATUS_FULL /***/ -2)
+DELAY(#define HASH_BUCKET_STATUS_LOCK /***/ -3)
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/**
+ * Hash_ExitCodeString will return a string representation of the given exit
+ * code.
+ * 
+ * @param exitCode
+ * 
+ * @return A string representation of that exit code.
+ */
+char* Hash_ExitCodeString(int exitCode);
+
+/**
+ * Hash_ExitCodeDebug will print a string representation of the given exit code
+ * if it is not EXIT_CODE_NORMAL.
+ * 
+ * @param exitCode
+ */
+void Hash_ExitCodeDebug(int exitCode);
+
+/**
+ * Hash_SetReportLevel sets a static report level variable in hash.c. It should 
+ * be called before hash tables are created. 
+ *
+ * @param level The level of data collection desired.
+ */
+void Hash_SetReportLevel(int level);
+
+/**
+ * Hash_GetReportLevel gets this variable.
+ *
+ * @return The current report level.
+ *         Special Values: Meaning
+ *         HASH_REPORT_NEVER: The hash table will not collect data. This is the
+ *                       default. A call to Hash_Report will return an empty 
+ *                       string.
+ *         HASH_REPORT_END: The hash table will collect data and calls to
+ *                     Hash_Report will return summary information.
+ *         HASH_REPORT_CYCLE: The hash table will collect data and calls to 
+ *                       Hash_Report will return information related to the
+ *                       last important call.
+ */
+int Hash_GetReportLevel();
+
+const char *Hash_GetKernelSourceString();
+int smallestProthPrimeAbove(int N);
+int largestProthPrimeUnder(int N);
+
+HASH_DECLARE(intint, int, int)
+
+#ifdef __cplusplus
+}
+#endif
+DELAY(#endif)

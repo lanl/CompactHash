@@ -1,0 +1,159 @@
+This code uses autoconf/automake/libtool for builds. To build the code:
+
+./configure
+make
+
+A statically-loaded library will be built: libhash.la
+If you specify the targets (all, test) an executable will be built: hashTest
+
+You can run hashTest like this:
+
+./hashTest
+
+TESTING:
+  The output should look like this:
+
+    HashTest STARTED
+    intintIdentityPerfectHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintIdentityPerfectHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintIdentitySentinelPerfectHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintIdentitySentinelPerfectHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintLCGLinearOpenCompactHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintLCGLinearOpenCompactHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintLCGQuadraticOpenCompactHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintLCGQuadraticOpenCompactHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintIdentityPerfectCLHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintIdentityPerfectCLHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintIdentitySentinelPerfectCLHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintIdentitySentinelPerfectCLHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintLCGLinearOpenCompactCLHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintLCGLinearOpenCompactHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    intintLCGQuadraticOpenCompactCLHash Test STARTED
+    Correct Hash Type Check: PASSED
+    QuerySingle after Insert Check 1: PASSED
+    QuerySingle after Insert Check 2: PASSED
+    QuerySingle after Insert Check 3: PASSED
+    QuerySingle after Insert Check 4: PASSED
+    QuerySingle after Insert Check 5: PASSED
+    QuerySingle after Insert Check 6: PASSED
+    Query after InsertSingleNoOverwrite Check: PASSED
+    Query after InsertSingle Check: PASSED
+    Query after InsertNoOverwrite Check: PASSED
+    intintLCGQuadraticOpenCompactHash Test FINISHED
+    100% (10/10) TESTS PASSED
+
+    hashTest FINISHED
+    100% (8/8) TESTS PASSED
+
+  If an error occurs, the expected and observed values will be printed.
+
+USAGE:
+  There are many ways to use this library.
+
+  Terms:
+    Entry: A key-value pair to be inserted into the hash table
+    Key: In this library, a 32-bit or 64-bit integer greater than or equal to 0 used to access some associated value
+    Value: Any data type (except for a pointer) accessed by some associated key.
+
+  Function Names:
+    Function names in this library are preceeded by a name related to the types of data they can hash. The convention within the library is to use the type of keys followed by the type of values as the name. For example, if you wanted to insert an integer key and character value into the appropriate table, you would call intcharHash_InsertSingle. For the remainder of this document, the example name will be keyval. 
+
+  Key-Value Types Supported:
+    int-int
+
+  Factories:
+    In order to avoid compiling code on OpenCL devices an unnecessary number of times, the program files and related info necessary to create a hash table on an OpenCL device are stored in a factory. The type of the factory is keyvalHash_Factory. 
+    To create a hash table, one must first create a factory. To create a factory, call keyvalHash_CreateFactory. For example:
+      keyvalHash_Factory *factory = keyvalHash_CreateFactory(HASH_ALL_HASH_TYPES, NULL, 0, NULL, NULL);
+    To destroy the factory, call keyvalHash_DestroyFactory.
+
+  Hash Tables:
+    When one creates a hash table, they must supply a factory to create it. Memory for the buckets is allocated during creation, so some arguments specifying the size of the table must also be supplied. The type of the hash tables is keyvalHash_Table. To create a hash table, call keyvalHash_CreateTable. For example:
+      keyvalHash_Table *table = keyvalHash_CreateTable(factory, HASH_COMPACT_HASHES, 0, 4, 0.5);
+    To destroy the hash table, call keyvalHash_DestroyTable.
+   
+  

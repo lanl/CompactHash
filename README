@@ -1,0 +1,73 @@
+Compact Hash Algorithms for Computational Meshes: Data from Neighbors 2D Testbed 
+
+This code is a set of hash functions applied to a sample mesh. It supports the paper "Compact Hash Algorithms for Computational Meshes," submitted to the SIAM Journal of Scientific Computing.
+
+Authors:
+
+Bob Robey XCP-2 (brobey@lanl.gov)
+Peter Ahrens XCP-2 (peter.ahrens@lanl.gov, ptrahrens@gmail.com)
+Sara Hartse XCP-2 (sara@lanl.gov, sara.hartse@gmail.com)
+Rebecka Tumblin (rtumblin@lanl.gov, rebeckatumblin@gmail.com)
+
+On a machine with at least one OpenCL compliant device:
+
+Enter the 'parallel_hash' directory
+run:
+   ./configure
+   make 
+   ./neigh2d -o <trial options>
+
+'./neigh2d -h' gives further information on option keywords.
+
+The -t option refers to threshold for refinement of cells. Cells are randomly refined and a lower threshold means fewer will be fined. The default value is 2 and that was what was used in our trials.
+
+The keywords for corresponding options are as follows:
+
+br    Brute
+kd    kdtree
+hc    Hash CPU
+hlc   Hash Lib CPU
+hc1   Hash CPU 1
+hlc1  Hash Lib CPU 1
+hc2   Hash CPU 2
+hlc2  Hash Lib CPU 2
+hc3   Hash CPU 3
+hlc3  Hash Lib CPU 3
+holc3 Hash OldLib CPU 3
+hg    Hash GPU
+hg1   Hash GPU 1
+hg2   Hash GPU 2
+hg3   Hash GPU 3
+hlg   Hash Lib GPU
+hlg1  Hash Lib GPU 1
+hlg2  Hash Lib GPU 2
+hlg3  Hash Lib GPU 3
+holg3 Hash OldLib GPU 3
+  
+Our figures:
+
+Memory optimizations figure (each run on a Kepler)
+hg
+hg1
+hg2
+hg3
+holg3
+
+Compact versus perfect figure (hg run on Kepler, holg3 run on various cards)
+hg 
+holg3
+
+Table construction* (each run on Kepler)
+hc
+hg
+holg3
+*relative timings obtained by turning off randomization in adaptiveMeshConstructorWij
+(comment out lines 2882 to 2923)
+
+Output file features:
+
+Hardware detection report - an overview of the CL devices and their information
+Local work size - the size of the workgroup size
+Size - side length of mesh at coarsest level 
+ncells - total number of cells, accounting for refined cells
+compression - The number of possible cells at most refined level/ncells

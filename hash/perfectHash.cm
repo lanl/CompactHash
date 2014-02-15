@@ -1,0 +1,133 @@
+/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
+ * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
+ * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
+ * for the U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
+ * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
+ * so as not to confuse it with the version available from LANL.   
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at 
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Under this license, it is required to include a reference to this work. We
+ * request that each derivative work contain a reference to LANL Copyright 
+ * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
+ * measured. In addition, it is requested that a modifier is included as in
+ * the following example:
+ *
+ * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
+ *
+ * This is LANL Copyright Disclosure C14043/LA-CC-14-003
+ */
+
+#undef UNDEFINED
+#ifdef UNDEFINED
+/**
+ * @file   perfectHash.cm
+ * @author Peter Ahrens
+ * @date   Thu Jun 6 2013 
+ */
+#endif
+#include "baseHash.cm"
+
+#define PERFECT_HASH_SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL) \
+  index = COMPRESS_FUNC(((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)tableData)->compressFuncData, key);\
+  if(READ_KEY_EXP != HASH_BUCKET_STATUS_EMPTY){\
+    if(key == buckets[index].key){\
+      exitCode = HASH_SEARCH_CODE_MATCH;\
+    }else{\
+      exitCode = HASH_SEARCH_CODE_MISMATCH;\
+    }\
+  }else{\
+    exitCode = HASH_SEARCH_CODE_EMPTY;\
+  }\
+
+#define SENTINEL_PERFECT_HASH_SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL) \
+  index = COMPRESS_FUNC(((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)tableData)->compressFuncData, key);\
+  if(buckets[index].value != ((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)tableData)->emptyValue){\
+    exitCode = HASH_SEARCH_CODE_MATCH;\
+  }else{\
+    exitCode = HASH_SEARCH_CODE_EMPTY;\
+  }\
+
+#define PERFECT_HASH_INIT_EXP(NAME, MODIFIER, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE) \
+  INIT_EXP\
+  ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets = keyRange + 1;\
+
+#define SENTINEL_PERFECT_HASH_INIT_EXP(NAME, MODIFIER, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE) \
+  \
+  ((NAME##MODIFIER##Hash_TableData*)table->tableData)->emptyValue = factory->emptyValue;\
+  \
+  PERFECT_HASH_INIT_EXP(NAME, MODIFIER, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE) \
+  \
+
+#define PERFECT_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, INIT_EXP)\
+  \
+  BASE_HASH_DEFINE(NAME, MODIFIER##Perfect, HASH_ID, KEY_TYPE, VALUE_TYPE, KEY_VALUE_BASE_HASH_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA,,, PERFECT_HASH_INIT_EXP(NAME, MODIFIER##Perfect, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE), PERFECT_HASH_SEARCH_EXP, KEY_VALUE_HASH_INNER_EMPTY_EXP)\
+\
+
+#define PERFECT_CL_HASH_KERN_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA)\
+  \
+  CL_HASH_KERN_DEFINE(NAME, MODIFIER##Perfect, KEY_TYPE, VALUE_TYPE, KEY_VALUE_BASE_HASH_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, CMPXCHG_HASH_READ_KEY_EXP, PERFECT_HASH_SEARCH_EXP)\
+\
+
+#define PERFECT_CL_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, INIT_EXP)\
+  \
+  CL_BASE_HASH_DEFINE(NAME, MODIFIER##Perfect, HASH_ID, KEY_TYPE, VALUE_TYPE, KEY_VALUE_BASE_HASH_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA,,, PERFECT_HASH_INIT_EXP(NAME, MODIFIER##PerfectCL, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE), KEY_VALUE_CL_HASH_INNER_EMPTY_EXP)\
+\
+
+#define SENTINEL_PERFECT_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, INIT_EXP)\
+  \
+  BASE_HASH_DEFINE(NAME, MODIFIER##SentinelPerfect, HASH_ID, KEY_TYPE, VALUE_TYPE, SENTINEL_VALUE_BASE_HASH_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA,,, SENTINEL_PERFECT_HASH_INIT_EXP(NAME, MODIFIER##SentinelPerfect, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE), SENTINEL_PERFECT_HASH_SEARCH_EXP, SENTINEL_VALUE_HASH_INNER_EMPTY_EXP(NAME, MODIFIER##SentinelPerfect))\
+\
+
+#define SENTINEL_PERFECT_CL_HASH_KERN_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA)\
+  \
+  CL_HASH_KERN_DEFINE(NAME, MODIFIER##SentinelPerfect, KEY_TYPE, VALUE_TYPE, SENTINEL_VALUE_BASE_HASH_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, CMPXCHG_HASH_READ_KEY_EXP, SENTINEL_PERFECT_HASH_SEARCH_EXP)\
+\
+
+#define SENTINEL_PERFECT_CL_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, INIT_EXP)\
+  \
+  CL_BASE_HASH_DEFINE(NAME, MODIFIER##SentinelPerfect, HASH_ID, KEY_TYPE, VALUE_TYPE, SENTINEL_VALUE_BASE_HASH_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA,,, SENTINEL_PERFECT_HASH_INIT_EXP(NAME, MODIFIER##SentinelPerfectCL, INIT_EXP, COMPRESS_FUNC, COMPRESS_FUNC_DATA, KEY_TYPE), SENTINEL_VALUE_CL_HASH_INNER_EMPTY_EXP(NAME, MODIFIER##SentinelPerfectCL))\
+\
+
+#define IDENTITY_PERFECT_CL_HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  PERFECT_CL_HASH_KERN_DEFINE(NAME, Identity, KEY_TYPE, VALUE_TYPE, NAME##Hash_CompressIdentity, char)\
+\
+
+#define IDENTITY_PERFECT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  PERFECT_HASH_DEFINE(NAME, Identity, IDENTITY_PERFECT_HASH_ID, KEY_TYPE, VALUE_TYPE, NAME##Hash_CompressIdentity, char, )\
+\
+
+#define IDENTITY_PERFECT_CL_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  PERFECT_CL_HASH_DEFINE(NAME, Identity, IDENTITY_PERFECT_CL_HASH_ID, KEY_TYPE, VALUE_TYPE, NAME##Hash_CompressIdentity, char, )\
+\
+
+#define IDENTITY_SENTINEL_PERFECT_CL_HASH_KERN_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  SENTINEL_PERFECT_CL_HASH_KERN_DEFINE(NAME, Identity, KEY_TYPE, VALUE_TYPE, NAME##Hash_CompressIdentity, char)\
+\
+
+#define IDENTITY_SENTINEL_PERFECT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  SENTINEL_PERFECT_HASH_DEFINE(NAME, Identity, IDENTITY_SENTINEL_PERFECT_HASH_ID, KEY_TYPE, VALUE_TYPE, NAME##Hash_CompressIdentity, char, )\
+\
+
+#define IDENTITY_SENTINEL_PERFECT_CL_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
+  \
+  SENTINEL_PERFECT_CL_HASH_DEFINE(NAME, Identity, IDENTITY_SENTINEL_PERFECT_CL_HASH_ID, KEY_TYPE, VALUE_TYPE, NAME##Hash_CompressIdentity, char, )\
+\
+
