@@ -1,3 +1,4 @@
+
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -29,13 +30,13 @@
  *
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
-
 /**
  * @file   hash.h
  * @author Peter Ahrens
  * @date   Thu Jun 6 2013 
  */
 //
+
 #ifndef HASH_H
 #define HASH_H
 //
@@ -132,6 +133,7 @@
 #define HASH_BUCKET_STATUS_EMPTY /**/ -1
 #define HASH_BUCKET_STATUS_FULL /***/ -2
 #define HASH_BUCKET_STATUS_LOCK /***/ -3
+
 /**
  * Hash_ExitCodeString will return a string representation of the given exit
  * code.
@@ -141,6 +143,7 @@
  * @return A string representation of that exit code.
  */
 char *Hash_ExitCodeString(int exitCode);
+
 /**
  * Hash_ExitCodeDebug will print a string representation of the given exit code
  * if it is not EXIT_CODE_NORMAL.
@@ -148,6 +151,7 @@ char *Hash_ExitCodeString(int exitCode);
  * @param exitCode
  */
 void Hash_ExitCodeDebug(int exitCode);
+
 /**
  * Hash_SetReportLevel sets a static report level variable in hash.c. It should 
  * be called before hash tables are created. 
@@ -155,6 +159,7 @@ void Hash_ExitCodeDebug(int exitCode);
  * @param level The level of data collection desired.
  */
 void Hash_SetReportLevel(int level);
+
 /**
  * Hash_GetReportLevel gets this variable.
  *
@@ -170,9 +175,11 @@ void Hash_SetReportLevel(int level);
  *                       last important call.
  */
 int Hash_GetReportLevel();
+
 const char *Hash_GetKernelSourceString();
 int smallestProthPrimeAbove(int N);
 int largestProthPrimeUnder(int N);
+
 typedef struct intintHash_Table_ intintHash_Table;
 typedef struct intintCLHash_Table_ intintCLHash_Table;
 typedef struct intintHash_Factory_ intintHash_Factory;
@@ -532,4 +539,5 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 								keysBuffer,
 								cl_mem
 								valuesBuffer);
+
 #endif
