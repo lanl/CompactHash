@@ -30,8 +30,16 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
+#ifndef _HASH_H
+#define _HASH_H
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef unsigned int uint;
 typedef unsigned long ulong;
@@ -51,7 +59,7 @@ void write_hash_primejump(uint ic, ulong hashkey, int *hash);
 void write_hash_primejump_report_level_1(uint ic, ulong hashkey, int *hash);
 void write_hash_primejump_report_level_2(uint ic, ulong hashkey, int *hash);
 void write_hash_primejump_report_level_3(uint ic, ulong hashkey, int *hash);
-void (*write_hash)(uint ic, ulong hashkey, int *hash);
+extern void (*write_hash)(uint ic, ulong hashkey, int *hash); // declared in hash.c
 
 int read_hash_perfect(ulong hashkey, int *hash);
 int read_hash_linear(ulong hashkey, int *hash);
@@ -66,9 +74,15 @@ int read_hash_primejump(ulong hashkey, int *hash);
 int read_hash_primejump_report_level_1(ulong hashkey, int *hash);
 int read_hash_primejump_report_level_2(ulong hashkey, int *hash);
 int read_hash_primejump_report_level_3(ulong hashkey, int *hash);
-int (*read_hash)(ulong, int *);
+extern int (*read_hash)(ulong hashkey, int *hash); // declared in hash.c
+
+void compact_hash_delete(int *hash);
 
 void read_hash_collision_report(void);
-void compact_hash_delete(int *hash);
 void final_hash_collision_report(void);
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif // _HASH_H

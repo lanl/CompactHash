@@ -50,6 +50,8 @@
 #define DEBUG 0
 #endif
 
+typedef unsigned int uint;
+
 char *program_name = NULL;
 
 void CLHash_Init(const char *program_name_in)
@@ -60,7 +62,7 @@ void CLHash_Init(const char *program_name_in)
 /* Find a GPU or CPU associated with the first available platform */
 void CLHash_Utilities_CreateContext_p(cl_context *context, cl_command_queue *command_queue, const char *file , int line) {
 
-   int num_platforms;
+   uint num_platforms;
    cl_platform_id *platforms;
    cl_device_id device;
    int err;

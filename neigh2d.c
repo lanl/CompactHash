@@ -78,7 +78,6 @@ typedef cl_float4 cl_real4;
 #endif
 
 #define SQR(x) (( (x)*(x) ))
-typedef unsigned int uint;
 
 #define HASH_TYPE HASH_PERFECT_HASHES
 #define HASH_LOAD_FACTOR 0.3333333
@@ -126,10 +125,10 @@ void swap_int(int** a, int** b) {
 }
 
 struct neighbor2d {
-   uint left;
-   uint right;
-   uint bottom;
-   uint top;
+   int left;
+   int right;
+   int bottom;
+   int top;
 };
 
 int is_nvidia = 0;
@@ -3077,10 +3076,17 @@ int adaptiveMeshConstructorWij(const int n, const int l,
   nlc = 0;
   for(int ii = 0; ii < 7; ii++) {
     for(ic = 0; ic < ncells; ic++) {
-      int jj = (int)( ((real)ncells*rand()) / (RAND_MAX+ONE) );
+    
+      int jj = (int)( (real)ncells*((real)rand() / (real)(RAND_MAX+ONE) ) );
+      // occasionally jj will be ncells and random ratio is 1.0
+      if (jj >= ncells) jj=ncells-1;
       nlc = random[jj];
       random[jj] = random[ic];
       random[ic] = nlc;
+       if (random[ic] >= ncells) {
+         printf("DEBUG -- ic %d file %s line %d\n",ic,__FILE__,__LINE__);
+         exit(0);
+       }
     }
     //printf(".");
     //fflush(stdout);

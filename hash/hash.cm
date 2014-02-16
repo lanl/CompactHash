@@ -124,7 +124,7 @@
       factory->program = CLHash_Utilities_BuildProgramString(factory->context, device, Hash_GetKernelSourceString());\
     }\
     int hashType;\
-    for(int hashIndex = 0; hashType = 1 << hashIndex; hashIndex < HASH_NUM_HASHES){\
+    for(int hashIndex = 0; hashIndex < HASH_NUM_HASHES; hashType = 1 << hashIndex){\
       switch(hashType & hashTypes){\
         case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_CreateFactory(factory, hashIndex); break;\
         case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_CreateFactory(factory, hashIndex); break;\
@@ -142,7 +142,7 @@
   \
   int NAME##Hash_DestroyFactory(NAME##Hash_Factory *factory){\
     int hashType;\
-    for(int hashIndex = 0; hashType = 1 << hashIndex; hashIndex < HASH_NUM_HASHES){\
+    for(int hashIndex = 0; hashIndex < HASH_NUM_HASHES; hashType = 1 << hashIndex){\
       switch(hashType & factory->hashTypesAvailable){\
         case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_DestroyFactory(factory, hashIndex); break;\
         case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_DestroyFactory(factory, hashIndex); break;\

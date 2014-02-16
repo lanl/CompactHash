@@ -593,8 +593,8 @@ intintHash_Factory *intintHash_CreateFactory(int hashTypes, int *emptyValue,
 							());
 	}
 	int hashType;
-	for (int hashIndex = 0; hashType = 1 << hashIndex;
-	     hashIndex < HASH_NUM_HASHES) {
+	for (int hashIndex = 0; hashIndex < HASH_NUM_HASHES;
+	     hashType = 1 << hashIndex) {
 		switch (hashType & hashTypes) {
 		case IDENTITY_PERFECT_HASH_ID:
 			intintIdentityPerfectHash_CreateFactory(factory,
@@ -635,8 +635,8 @@ intintHash_Factory *intintHash_CreateFactory(int hashTypes, int *emptyValue,
 }
 int intintHash_DestroyFactory(intintHash_Factory * factory) {
 	int hashType;
-	for (int hashIndex = 0; hashType = 1 << hashIndex;
-	     hashIndex < HASH_NUM_HASHES) {
+	for (int hashIndex = 0; hashIndex < HASH_NUM_HASHES;
+	     hashType = 1 << hashIndex) {
 		switch (hashType & factory->hashTypesAvailable) {
 		case IDENTITY_PERFECT_HASH_ID:
 			intintIdentityPerfectHash_DestroyFactory(factory,

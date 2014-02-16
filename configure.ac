@@ -94,7 +94,7 @@ case "$host" in
 
         ;;
     *darwin*)
-        CFLAGS="-std=gnu99 -pedantic"
+        CFLAGS="-std=gnu99 -pedantic -Wno-overlength-strings"
         INDENT="gindent"
         CPREPROCESSOR="gcc -E -P -U__APPLE_CC__"
         if test "${enable_debug}" = "yes"; then

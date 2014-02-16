@@ -178,7 +178,7 @@ TestData *Test_CreateTest(char *nameOfTestGroup){
 
 void Test_FinishTest(TestData *currentTest){
   printf("%s FINISHED\n", currentTest->nameOfTestGroup);
-  printf("%d\% (%d/%d) TESTS PASSED\n\n", 
+  printf("%d%% (%d/%d) TESTS PASSED\n\n", 
          ((currentTest->numPassed * 100) / (currentTest->numPassed + currentTest->numFailed)),
          currentTest->numPassed,
          currentTest->numPassed + currentTest->numFailed);

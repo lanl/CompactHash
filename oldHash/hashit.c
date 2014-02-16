@@ -58,6 +58,9 @@ void compact_hash_delete(int *hash){
       free(hash);
 }
 
+int (*read_hash)(ulong, int *);
+void (*write_hash)(uint, ulong, int *);
+
 int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
 
    hash_ncells = 0;
