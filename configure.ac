@@ -296,7 +296,7 @@ dnl ---------------------------------------------------------------
 
    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
       [
-       [#ifdef __APPLE_CC__block]
+       [#ifdef __APPLE_CC__]
        [#include <OpenCL/OpenCL.h>]
        [#else]
        [#include <CL/cl.h>]

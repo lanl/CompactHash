@@ -65,4 +65,4 @@ while(<>) {
    print '"',$_,'\n','"',"\n";
 }
 
-print ";"
+print ";\n"

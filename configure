@@ -16320,7 +16320,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-       #ifdef __APPLE_CC__block
+       #ifdef __APPLE_CC__
        #include <OpenCL/OpenCL.h>
        #else
        #include <CL/cl.h>
