@@ -53,8 +53,9 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 AC_PROG_LIBTOOL
+
+AC_CONFIG_MACRO_DIR([m4])
 
 INDENT="indent"
 CPREPROCESSOR="cpp -P"
@@ -150,7 +151,7 @@ if test "${enable_opencl}" != "no"; then
       found="no"
       AC_CHECK_PROG(found, lspci, yes)
       if test ! -z "${OPENCL_INCLUDE}" ; then 
-        INCLUDES="${INCLUDES} -I/${OPENCL_INCLUDE}"
+        INCLUDES="${INCLUDES} -I${OPENCL_INCLUDE}"
         if test ! -z "${OPENCL_LIBS}" ; then
           LIBS="${LIBS} -L${OPENCL_LIBS} -lOpenCL"
           if test "${RPATH_LIBS}x" = "x"; then
@@ -326,6 +327,7 @@ LIBS="${LIBS} -lm"
 AC_SUBST(CC)
 AC_SUBST(CFLAGS)
 AC_SUBST(AM_CPPFLAGS)
+AC_SUBST(INCLUDES)
 AC_SUBST(LIBS)
 AC_SUBST(INDENT)
 AC_SUBST(CPREPROCESSOR)

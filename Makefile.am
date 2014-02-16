@@ -1,5 +1,7 @@
 bin_PROGRAMS = neigh2d # neigh2d_memopts
 
+ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS = kdtree hash oldHash timer
 
 neigh2d_C_SRCS = neigh2d.c gpu.c

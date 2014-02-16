@@ -62,9 +62,9 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_pr
   //cl_program program;
   cl_int error = 0;
   
-  error = clGetPlatformIDs(1, NULL, &num_platforms);
+  error = clGetPlatformIDs(0, NULL, &num_platforms);
   if(error != CL_SUCCESS) {
-    printf("Error getting platform id\n");
+    printf("Error getting number of platforms\n");
     exit(error);
   }
   platform = (cl_platform_id*)malloc(num_platforms*sizeof(cl_platform_id));
