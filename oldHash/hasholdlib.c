@@ -30,6 +30,7 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
+#include <stdlib.h>
 #include "hasholdlib.h"
 #include "hasholdlib_kern.inc"
 #include "hashold_kern.inc"
