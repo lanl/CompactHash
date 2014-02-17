@@ -218,6 +218,12 @@ int main (int argc, const char * argv[])
 
   int *options;
   int threshold = 2;    
+
+  uint levmx_min = 1;
+  uint levmx_max = 6;
+  uint n_min     = 256;
+  uint n_max     = 256;
+
   if(WRITE_MEM_USAGE) fmem = fopen("memory.out", "w");
   if (argc == 1) {
     printf("Use -o to select different tests. -h for more information\n");
@@ -226,10 +232,29 @@ int main (int argc, const char * argv[])
     for (int i = 0; i < argc; i++) {
       if (strcmp(argv[i], "-h") == 0) {
         printf("Use '-t' to set threshold and '-o' to add tests: br, kd, hc, hlc, hc1, hlc1, hc2, hlc2, hc3, hlc3, holc3, hg, hg1, hg2, hg3, hg4 hlg hlg1 hlg2 hlg3 holg3\n");
+        printf("Use -n for min mesh size and -N for max mesh size [ default is 256 min to 256 max ]");
+        printf("Use -l for min levmx     and -L for max levmx     [ default is 1 min to 5 max ]");
       }
       if (strcmp(argv[i], "-t") == 0) {
         i++;
         threshold =(int)(atoi(argv[i])); 
+      } 
+      if (strcmp(argv[i], "-l") == 0) {
+        i++;
+        levmx_min =(int)(atoi(argv[i])); 
+      } 
+      if (strcmp(argv[i], "-L") == 0) {
+        i++;
+        levmx_max =(int)(atoi(argv[i])); 
+        levmx_max++;
+      } 
+      if (strcmp(argv[i], "-n") == 0) {
+        i++;
+        n_min =(int)(atoi(argv[i])); 
+      } 
+      if (strcmp(argv[i], "-N") == 0) {
+        i++;
+        n_max =(int)(atoi(argv[i])); 
       } 
       if (strcmp(argv[i], "-o") == 0) {
         i++;
@@ -328,10 +353,10 @@ int main (int argc, const char * argv[])
 
   printf("\nThreshold for refinement is %d\n",threshold); 
   printf("\nWork group size is %d\n",TILE_SIZE); 
-  for (uint levmx = 1; levmx < 6; levmx++ ){
+  for (uint levmx = levmx_min; levmx < levmx_max; levmx++ ){
     printf("\nMax levels is %d\n",levmx); 
     if(WRITE_MEM_USAGE) fprintf(fmem,"\nMax levels is %d\n",levmx); 
-    for( uint i = 256; i <= 256; i*=2 ) {
+    for( uint i = n_min; i <= n_max; i*=2 ) {
       if (levmx > 3 && i > 512) continue;
       printf("%d,     ", i);
       if(WRITE_MEM_USAGE) fprintf(fmem,"%d,     ", i);

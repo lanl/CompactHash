@@ -17,9 +17,16 @@ run:
    make 
    ./neigh2d -o <trial options>
 
+Configure options
+   --enable-detailed-timing
+   --disable-write-mem-usage
+
 On Mac OSx install gnu-indent. The Mac version does not recognize some of the options that are used.
 
 './neigh2d -h' gives further information on option keywords.
+
+The option -n sets the min mesh size and -N the max mesh size [ default is 256 min to 256 max ]
+The option -l sets the min levmx     and -L the max levmx     [ default is 1 min to 5 max ]
 
 The -t option refers to threshold for refinement of cells. Cells are randomly refined and a lower threshold means fewer will be refined. The default value is 2 and that was what was used in our trials.
 
