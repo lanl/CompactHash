@@ -680,6 +680,7 @@ int intintHash_DestroyFactory(intintHash_Factory * factory) {
 		clReleaseProgram(factory->program);
 	}
 	free(factory);
+	return (0);
 }
 intintHash_Table *intintHash_CreateTable(intintHash_Factory * factory,
 					 int hashTypes, size_t keyRange,

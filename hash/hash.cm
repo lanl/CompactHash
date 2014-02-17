@@ -161,6 +161,7 @@
       clReleaseProgram(factory->program);\
     }\
     free(factory);\
+    return(0);\
   }\
   \
   NAME##Hash_Table* NAME##Hash_CreateTable(NAME##Hash_Factory* factory, int hashTypes, size_t keyRange, size_t numEntries, float loadFactor){\
