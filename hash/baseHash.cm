@@ -152,7 +152,7 @@
     CL_GLOBAL VALUE_TYPE *valueOutput;\
     int index;\
     int exitCode;\
-    int i;\
+    uint i;\
     int resultExitCode = HASH_EXIT_CODE_NORMAL;\
     for(i = 0; i < numKeys; i++){\
       key = keys[i];\
@@ -198,7 +198,7 @@
     VALUE_TYPE value;\
     int index;\
     int exitCode;\
-    int i;\
+    uint i;\
     for(i = 0; i < numEntries; i++){\
       key = keys[i];\
       SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
@@ -240,7 +240,7 @@
     VALUE_TYPE value;\
     int index;\
     int exitCode;\
-    int i;\
+    uint i;\
     for(i = 0; i < numEntries; i++){\
       key = keys[i];\
       SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
@@ -441,7 +441,7 @@
   }\
   \
   __kernel void NAME##MODIFIER##CLHash_RangeQuerySingle(__global char *tableData, unsigned int numQueries, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
-    int i = get_global_id(0);\
+    uint i = get_global_id(0);\
     if(i >= numQueries){\
       return;\
     }\
@@ -449,7 +449,7 @@
   }\
   \
   __kernel void NAME##MODIFIER##CLHash_RangeQuery(__global char *tableData, unsigned int numQueries, unsigned int numKeys, __global KEY_TYPE *keys, __global VALUE_TYPE *valuesOutput){\
-    int i = get_global_id(0);\
+    uint i = get_global_id(0);\
     if(i >= numQueries){\
       return;\
     }\
@@ -457,7 +457,7 @@
   }\
   \
   __kernel void NAME##MODIFIER##CLHash_RangeInsertSingle(__global char *tableData, unsigned int numInsertions, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
-    int i = get_global_id(0);\
+    uint i = get_global_id(0);\
     if(i >= numInsertions){\
       return;\
     }\
@@ -465,7 +465,7 @@
   }\
   \
   __kernel void NAME##MODIFIER##CLHash_RangeInsert(__global char *tableData, unsigned int numInsertions, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
-    int i = get_global_id(0);\
+    uint i = get_global_id(0);\
     if(i >= numInsertions){\
       return;\
     }\
@@ -473,7 +473,7 @@
   }\
   \
   __kernel void NAME##MODIFIER##CLHash_RangeInsertSingleNoOverwrite(__global char* tableData, unsigned int numInsertions, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
-    int i = get_global_id(0);\
+    uint i = get_global_id(0);\
     if(i >= numInsertions){\
       return;\
     }\
@@ -481,7 +481,7 @@
   }\
   \
   __kernel void NAME##MODIFIER##CLHash_RangeInsertNoOverwrite(__global char *tableData, unsigned int numInsertions, unsigned int numEntries, __global KEY_TYPE *keys, __global VALUE_TYPE *values){\
-    int i = get_global_id(0);\
+    uint i = get_global_id(0);\
     if(i >= numInsertions){\
       return;\
     }\

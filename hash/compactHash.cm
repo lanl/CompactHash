@@ -61,7 +61,8 @@
 \
 
 #define OPEN_COMPACT_HASH_SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, JUMP_EXP, CYCLE_EXP) \
-  unsigned int c = COMPRESS_FUNC(((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)tableData)->compressFuncData, key);\
+  NAME##Hash_CompressLCGData compressFuncData = tableData->compressFuncData;\
+  unsigned int c = COMPRESS_FUNC(tableData)->compressFuncData, key);\
   unsigned long int iteration = 0;\
   for(;;){\
     index = JUMP_EXP;\

@@ -30,6 +30,176 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
+int intintIdentityPerfectCLHash_InsertSingle(__global char *tableData,
+                                                  int key, int value);
+int intintIdentityPerfectCLHash_InnerInsertSingle(__global char *tableData,
+						  int key, int value);
+int intintHash_InsertSingle(__global char *tableData, int key, int value);
+int intintIdentityPerfectCLHash_InnerQuery(__global char *tableData,
+					   unsigned int numKeys,
+					   __global int *keys,
+					   __global int *valuesOutput);
+int intintIdentityPerfectCLHash_InnerQuerySingle(__global char *tableData,
+						 int key,
+						 __global int *valueOutput);
+int intintIdentityPerfectCLHash_InnerInsert(__global char *tableData,
+					    unsigned int numEntries,
+					    __global int *keys,
+					    __global int *values);
+int intintIdentityPerfectCLHash_InnerInsertSingleNoOverwrite(__global char
+							     *tableData,
+							     int key,
+							     int value);
+int intintIdentityPerfectCLHash_InnerInsertNoOverwrite(__global char *tableData,
+						       unsigned int numEntries,
+						       __global int *keys,
+						       __global int *values);
+int intintIdentityPerfectCLHash_QuerySingle(__global char *tableData, int key,
+					    __global int *valueOutput);
+int intintIdentityPerfectCLHash_QuerySingle(__global char *tableData, int key,
+					    __global int *valueOutput);
+int intintIdentityPerfectCLHash_Query(__global char *tableData, size_t numKeys,
+				      __global int *keys,
+				      __global int *valuesOutput);
+int intintIdentityPerfectCLHash_Insert(__global char *tableData,
+				       size_t numEntries, __global int *keys,
+				       __global int *values);
+int intintIdentityPerfectCLHash_InsertSingleNoOverwrite(__global char
+							*tableData, int key,
+							int value);
+int intintIdentityPerfectCLHash_InsertNoOverwrite(__global char *tableData,
+						  size_t numEntries,
+						  __global int *keys,
+						  __global int *values);
+int intintIdentitySentinelPerfectCLHash_InnerInsertNoOverwrite(__global char *tableData,
+							       unsigned int numEntries,
+							       __global int *keys,
+							       __global int *values);
+int intintIdentitySentinelPerfectCLHash_InnerQuerySingle(__global char *tableData, int key,
+							 __global int *valueOutput);
+int intintIdentitySentinelPerfectCLHash_InnerQuery(__global char *tableData,
+						   unsigned int numKeys,
+						   __global int *keys,
+						   __global int *valuesOutput);
+int intintIdentitySentinelPerfectCLHash_InnerInsertSingle(__global char *tableData, int key,
+							  int value);
+int intintIdentitySentinelPerfectCLHash_InnerInsert(__global char *tableData,
+						    unsigned int numEntries,
+						    __global int *keys,
+						    __global int *values);
+int intintIdentitySentinelPerfectCLHash_InnerInsertSingleNoOverwrite(__global char *tableData,
+								     int key,
+								     int value);
+int intintIdentitySentinelPerfectCLHash_QuerySingle(__global char *tableData,
+						    int key,
+						    __global int *valueOutput);
+int intintIdentitySentinelPerfectCLHash_Query(__global char *tableData,
+					      size_t numKeys,
+					      __global int *keys,
+					      __global int *valuesOutput);
+int intintIdentitySentinelPerfectCLHash_InsertSingle(__global char *tableData,
+						     int key, int value);
+int intintIdentitySentinelPerfectCLHash_Insert(__global char *tableData,
+					       size_t numEntries,
+					       __global int *keys,
+					       __global int *values);
+int intintIdentitySentinelPerfectCLHash_InsertSingleNoOverwrite(__global char
+								*tableData,
+								int key,
+								int value);
+int intintIdentitySentinelPerfectCLHash_InsertNoOverwrite(__global char *tableData,
+							  size_t numEntries,
+							  __global int *keys,
+							  __global int *values);
+int intintLCGLinearOpenCompactCLHash_InnerQuerySingle(__global char *tableData,
+						      int key,
+						      __global int *valueOutput);
+int intintLCGLinearOpenCompactCLHash_QuerySingle(__global char *tableData,
+						 int key,
+						 __global int *valueOutput);
+int intintLCGLinearOpenCompactCLHash_Query(__global char *tableData,
+					   size_t numKeys, __global int *keys,
+					   __global int *valuesOutput);
+int intintLCGLinearOpenCompactCLHash_InsertSingle(__global char *tableData,
+						  int key, int value);
+int intintLCGLinearOpenCompactCLHash_Insert(__global char *tableData,
+					    size_t numEntries,
+					    __global int *keys,
+					    __global int *values);
+int intintLCGLinearOpenCompactCLHash_InsertSingleNoOverwrite(__global char
+							     *tableData,
+							     int key,
+							     int value);
+int intintLCGLinearOpenCompactCLHash_InsertNoOverwrite(__global char *tableData,
+						       size_t numEntries,
+						       __global int *keys,
+						       __global int *values);
+int intintLCGLinearOpenCompactCLHash_InnerQuery(__global char *tableData,
+						unsigned int numKeys,
+						__global int *keys,
+						__global int *valuesOutput);
+int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char *tableData,
+							    unsigned int numEntries,
+							    __global int *keys,
+							    __global int *values);
+int intintLCGLinearOpenCompactCLHash_InnerInsertSingle(__global char *tableData,
+						       int key, int value);
+int intintLCGLinearOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global char *tableData,
+								  int key, int value);
+int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
+						 unsigned int numEntries,
+						 __global int *keys,
+						 __global int *values);
+int intintLCGQuadraticOpenCompactCLHash_InnerQuerySingle(__global char *tableData, int key,
+							 __global int *valueOutput);
+int intintLCGQuadraticOpenCompactCLHash_InnerQuery(__global char *tableData,
+						   unsigned int numKeys,
+						   __global int *keys,
+						   __global int *valuesOutput);
+int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingle(__global char *tableData, int key,
+							  int value);
+int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
+						    unsigned int numEntries,
+						    __global int *keys,
+						    __global int *values);
+int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global char *tableData,
+								     int key, int value);
+int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char *tableData,
+							       unsigned int numEntries,
+							       __global int *keys,
+							       __global int *values);
+int intintLCGQuadraticOpenCompactCLHash_QuerySingle(__global char *tableData,
+						    int key,
+						    __global int *valueOutput);
+int intintLCGQuadraticOpenCompactCLHash_Query(__global char *tableData,
+					      size_t numKeys,
+					      __global int *keys,
+					      __global int *valuesOutput);
+int intintLCGQuadraticOpenCompactCLHash_InsertSingle(__global char *tableData,
+						     int key, int value);
+int intintLCGQuadraticOpenCompactCLHash_Insert(__global char *tableData,
+					       size_t numEntries,
+					       __global int *keys,
+					       __global int *values);
+int intintLCGQuadraticOpenCompactCLHash_InsertSingleNoOverwrite(__global char
+								*tableData,
+								int key,
+								int value);
+int intintLCGQuadraticOpenCompactCLHash_InsertNoOverwrite(__global char *tableData,
+							  size_t numEntries,
+							  __global int *keys,
+							  __global int *values);
+int intintHash_Query(__global char *tableData, unsigned int numKeys,
+		     __global int *keys, __global int *valuesOutput);
+int intintHash_QuerySingle(__global char *tableData, int key,
+			   __global int *valueOutput);
+int intintHash_Insert(__global char *tableData, unsigned int numEntries,
+		      __global int *keys, __global int *values);
+int intintHash_InsertNoOverwrite(__global char *tableData,
+				 unsigned int numEntries, __global int *keys,
+				 __global int *values);
+int intintHash_InsertSingleNoOverwrite(__global char *tableData, int key,
+				       int value);
 #define DELAY(X) X
 DELAY(#define HASH_REPORT_NEVER /**/ 0)
 DELAY(#define HASH_REPORT_CYCLE /**/ 1)

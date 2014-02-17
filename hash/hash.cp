@@ -54,6 +54,7 @@ DELAY(#else)
 DELAY(#include <CL/cl.h>)
 DELAY(#endif)
 DELAY(#define PRIME_NUM_CHECKS 20)
+typedef unsigned int uint;
 
 DELAY(#include <math.h>)
 #include "hash.cm"
