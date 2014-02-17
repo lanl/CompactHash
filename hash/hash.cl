@@ -1068,10 +1068,11 @@ int intintLCGLinearOpenCompactCLHash_InnerQuerySingle(__global char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
+	intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
-	    tableData->compressFuncData;
-	unsigned int c =
-	    intintHash_CompressLCG(tableData)->compressFuncData, key);
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 	unsigned long int iteration = 0;
 	for (;;) {
 		index =
@@ -1102,7 +1103,6 @@ int intintLCGLinearOpenCompactCLHash_InnerQuerySingle(__global char *tableData,
 		return exitCode;
 	}
 }
-
 int intintLCGLinearOpenCompactCLHash_InnerQuery(__global char *tableData,
 						unsigned int numKeys,
 						__global int *keys,
@@ -1119,10 +1119,11 @@ int intintLCGLinearOpenCompactCLHash_InnerQuery(__global char *tableData,
 	for (i = 0; i < numKeys; i++) {
 		key = keys[i];
 		valueOutput = &valuesOutput[i];
+		intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 		intintHash_CompressLCGData compressFuncData =
-		    tableData->compressFuncData;
-		unsigned int c =
-		    intintHash_CompressLCG(tableData)->compressFuncData, key);
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 		unsigned long int iteration = 0;
 		for (;;) {
 			index =
@@ -1157,7 +1158,6 @@ int intintLCGLinearOpenCompactCLHash_InnerQuery(__global char *tableData,
 	}
 	return resultExitCode;
 }
-
 int intintLCGLinearOpenCompactCLHash_InnerInsertSingle(__global char *tableData,
 						       int key, int value) {
 	__global intintLCGLinearOpenCompactCLHash_Bucket *buckets =
@@ -1165,10 +1165,11 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertSingle(__global char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
+	intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
-	    tableData->compressFuncData;
-	unsigned int c =
-	    intintHash_CompressLCG(tableData)->compressFuncData, key);
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 	unsigned long int iteration = 0;
 	for (;;) {
 		index =
@@ -1202,7 +1203,6 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertSingle(__global char *tableData,
 		return exitCode;
 	}
 }
-
 int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 						 unsigned int numEntries,
 						 __global int *keys,
@@ -1218,10 +1218,11 @@ int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
+		intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 		intintHash_CompressLCGData compressFuncData =
-		    tableData->compressFuncData;
-		unsigned int c =
-		    intintHash_CompressLCG(tableData)->compressFuncData, key);
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 		unsigned long int iteration = 0;
 		for (;;) {
 			index =
@@ -1257,7 +1258,6 @@ int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 	}
 	return resultExitCode;
 }
-
 int intintLCGLinearOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global char
 								  *tableData,
 								  int key,
@@ -1267,10 +1267,11 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global char
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
+	intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
-	    tableData->compressFuncData;
-	unsigned int c =
-	    intintHash_CompressLCG(tableData)->compressFuncData, key);
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 	unsigned long int iteration = 0;
 	for (;;) {
 		index =
@@ -1303,7 +1304,6 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global char
 		return exitCode;
 	}
 }
-
 int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 							    *tableData,
 							    unsigned int
@@ -1322,10 +1322,11 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
+		intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 		intintHash_CompressLCGData compressFuncData =
-		    tableData->compressFuncData;
-		unsigned int c =
-		    intintHash_CompressLCG(tableData)->compressFuncData, key);
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 		unsigned long int iteration = 0;
 		for (;;) {
 			index =
@@ -1362,27 +1363,23 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	}
 	return resultExitCode;
 }
-
 int intintLCGLinearOpenCompactCLHash_QuerySingle(__global char *tableData,
 						 int key,
 						 __global int *valueOutput) {
 	return intintLCGLinearOpenCompactCLHash_InnerQuerySingle(tableData, key,
 								 valueOutput);
 }
-
 int intintLCGLinearOpenCompactCLHash_Query(__global char *tableData,
 					   size_t numKeys, __global int *keys,
 					   __global int *valuesOutput) {
 	return intintLCGLinearOpenCompactCLHash_InnerQuery(tableData, numKeys,
 							   keys, valuesOutput);
 }
-
 int intintLCGLinearOpenCompactCLHash_InsertSingle(__global char *tableData,
 						  int key, int value) {
 	return intintLCGLinearOpenCompactCLHash_InnerInsertSingle(tableData,
 								  key, value);
 }
-
 int intintLCGLinearOpenCompactCLHash_Insert(__global char *tableData,
 					    size_t numEntries,
 					    __global int *keys,
@@ -1391,7 +1388,6 @@ int intintLCGLinearOpenCompactCLHash_Insert(__global char *tableData,
 							    numEntries, keys,
 							    values);
 }
-
 int intintLCGLinearOpenCompactCLHash_InsertSingleNoOverwrite(__global char
 							     *tableData,
 							     int key,
@@ -1400,7 +1396,6 @@ int intintLCGLinearOpenCompactCLHash_InsertSingleNoOverwrite(__global char
 	    intintLCGLinearOpenCompactCLHash_InnerInsertSingleNoOverwrite
 	    (tableData, key, value);
 }
-
 int intintLCGLinearOpenCompactCLHash_InsertNoOverwrite(__global char *tableData,
 						       size_t numEntries,
 						       __global int *keys,
@@ -1411,7 +1406,6 @@ int intintLCGLinearOpenCompactCLHash_InsertNoOverwrite(__global char *tableData,
 								    keys,
 								    values);
 }
-
 __kernel void intintLCGLinearOpenCompactCLHash_RangeQuerySingle(__global char
 								*tableData,
 								unsigned int
@@ -1427,7 +1421,6 @@ __kernel void intintLCGLinearOpenCompactCLHash_RangeQuerySingle(__global char
 	intintLCGLinearOpenCompactCLHash_InnerQuerySingle(tableData, keys[i],
 							  valuesOutput + i);
 }
-
 __kernel void intintLCGLinearOpenCompactCLHash_RangeQuery(__global char
 							  *tableData,
 							  unsigned int
@@ -1445,7 +1438,6 @@ __kernel void intintLCGLinearOpenCompactCLHash_RangeQuery(__global char
 						    valuesOutput +
 						    (i * numKeys));
 }
-
 __kernel void intintLCGLinearOpenCompactCLHash_RangeInsertSingle(__global char
 								 *tableData,
 								 unsigned int
@@ -1461,7 +1453,6 @@ __kernel void intintLCGLinearOpenCompactCLHash_RangeInsertSingle(__global char
 	intintLCGLinearOpenCompactCLHash_InnerInsertSingle(tableData, keys[i],
 							   values[i]);
 }
-
 __kernel void intintLCGLinearOpenCompactCLHash_RangeInsert(__global char
 							   *tableData,
 							   unsigned int
@@ -1469,8 +1460,8 @@ __kernel void intintLCGLinearOpenCompactCLHash_RangeInsert(__global char
 							   unsigned int
 							   numEntries,
 							   __global int *keys,
-							   __global int *values)
-{
+							   __global int
+							   *values) {
 	uint i = get_global_id(0);
 	if (i >= numInsertions) {
 		return;
@@ -1479,16 +1470,15 @@ __kernel void intintLCGLinearOpenCompactCLHash_RangeInsert(__global char
 						     keys + (i * numEntries),
 						     values + (i * numEntries));
 }
-
 __kernel void
-    intintLCGLinearOpenCompactCLHash_RangeInsertSingleNoOverwrite(__global char
-								  *tableData,
-								  unsigned int
-								  numInsertions,
-								  __global int
-								  *keys,
-								  __global int
-								  *values) {
+intintLCGLinearOpenCompactCLHash_RangeInsertSingleNoOverwrite(__global char
+							      *tableData,
+							      unsigned int
+							      numInsertions,
+							      __global int
+							      *keys,
+							      __global int
+							      *values) {
 	uint i = get_global_id(0);
 	if (i >= numInsertions) {
 		return;
@@ -1498,7 +1488,6 @@ __kernel void
 								      values
 								      [i]);
 }
-
 __kernel void intintLCGLinearOpenCompactCLHash_RangeInsertNoOverwrite(__global
 								      char
 								      *tableData,
@@ -1532,12 +1521,10 @@ typedef struct intintLCGQuadraticOpenCompactCLHash_TableData {
 	unsigned int numBuckets;
 	intintHash_CompressLCGData compressFuncData;
 } intintLCGQuadraticOpenCompactCLHash_TableData;
-
 typedef struct intintLCGQuadraticOpenCompactCLHash_Bucket {
 	int key;
 	int value;
 } intintLCGQuadraticOpenCompactCLHash_Bucket;
-
 int intintLCGQuadraticOpenCompactCLHash_InnerQuerySingle(__global char
 							 *tableData, int key,
 							 __global int
@@ -1547,10 +1534,11 @@ int intintLCGQuadraticOpenCompactCLHash_InnerQuerySingle(__global char
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
+	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
-	    tableData->compressFuncData;
-	unsigned int c =
-	    intintHash_CompressLCG(tableData)->compressFuncData, key);
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 	unsigned long int iteration = 0;
 	for (;;) {
 		index =
@@ -1585,7 +1573,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerQuerySingle(__global char
 		return exitCode;
 	}
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InnerQuery(__global char *tableData,
 						   unsigned int numKeys,
 						   __global int *keys,
@@ -1602,10 +1589,11 @@ int intintLCGQuadraticOpenCompactCLHash_InnerQuery(__global char *tableData,
 	for (i = 0; i < numKeys; i++) {
 		key = keys[i];
 		valueOutput = &valuesOutput[i];
+		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
 		intintHash_CompressLCGData compressFuncData =
-		    tableData->compressFuncData;
-		unsigned int c =
-		    intintHash_CompressLCG(tableData)->compressFuncData, key);
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 		unsigned long int iteration = 0;
 		for (;;) {
 			index =
@@ -1644,7 +1632,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerQuery(__global char *tableData,
 	}
 	return resultExitCode;
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingle(__global char
 							  *tableData, int key,
 							  int value) {
@@ -1653,10 +1640,11 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingle(__global char
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
+	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
-	    tableData->compressFuncData;
-	unsigned int c =
-	    intintHash_CompressLCG(tableData)->compressFuncData, key);
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 	unsigned long int iteration = 0;
 	for (;;) {
 		index =
@@ -1694,7 +1682,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingle(__global char
 		return exitCode;
 	}
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 						    unsigned int numEntries,
 						    __global int *keys,
@@ -1710,10 +1697,11 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
+		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
 		intintHash_CompressLCGData compressFuncData =
-		    tableData->compressFuncData;
-		unsigned int c =
-		    intintHash_CompressLCG(tableData)->compressFuncData, key);
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 		unsigned long int iteration = 0;
 		for (;;) {
 			index =
@@ -1753,22 +1741,22 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 	}
 	return resultExitCode;
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global
 								     char
 								     *tableData,
 								     int key,
-								     int value)
+								     int value) 
 {
 	__global intintLCGQuadraticOpenCompactCLHash_Bucket *buckets =
 	    (__global intintLCGQuadraticOpenCompactCLHash_Bucket *) &
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
+	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
-	    tableData->compressFuncData;
-	unsigned int c =
-	    intintHash_CompressLCG(tableData)->compressFuncData, key);
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 	unsigned long int iteration = 0;
 	for (;;) {
 		index =
@@ -1805,7 +1793,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global
 		return exitCode;
 	}
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 							       *tableData,
 							       unsigned int
@@ -1825,10 +1812,11 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
+		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
 		intintHash_CompressLCGData compressFuncData =
-		    tableData->compressFuncData;
-		unsigned int c =
-		    intintHash_CompressLCG(tableData)->compressFuncData, key);
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
 		unsigned long int iteration = 0;
 		for (;;) {
 			index =
@@ -1869,7 +1857,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	}
 	return resultExitCode;
 }
-
 int intintLCGQuadraticOpenCompactCLHash_QuerySingle(__global char *tableData,
 						    int key,
 						    __global int *valueOutput) {
@@ -1877,7 +1864,6 @@ int intintLCGQuadraticOpenCompactCLHash_QuerySingle(__global char *tableData,
 								    key,
 								    valueOutput);
 }
-
 int intintLCGQuadraticOpenCompactCLHash_Query(__global char *tableData,
 					      size_t numKeys,
 					      __global int *keys,
@@ -1886,14 +1872,12 @@ int intintLCGQuadraticOpenCompactCLHash_Query(__global char *tableData,
 							      numKeys, keys,
 							      valuesOutput);
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InsertSingle(__global char *tableData,
 						     int key, int value) {
 	return intintLCGQuadraticOpenCompactCLHash_InnerInsertSingle(tableData,
 								     key,
 								     value);
 }
-
 int intintLCGQuadraticOpenCompactCLHash_Insert(__global char *tableData,
 					       size_t numEntries,
 					       __global int *keys,
@@ -1902,7 +1886,6 @@ int intintLCGQuadraticOpenCompactCLHash_Insert(__global char *tableData,
 							       numEntries, keys,
 							       values);
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InsertSingleNoOverwrite(__global char
 								*tableData,
 								int key,
@@ -1911,18 +1894,16 @@ int intintLCGQuadraticOpenCompactCLHash_InsertSingleNoOverwrite(__global char
 	    intintLCGQuadraticOpenCompactCLHash_InnerInsertSingleNoOverwrite
 	    (tableData, key, value);
 }
-
 int intintLCGQuadraticOpenCompactCLHash_InsertNoOverwrite(__global char
 							  *tableData,
 							  size_t numEntries,
 							  __global int *keys,
-							  __global int *values)
+							  __global int *values) 
 {
 	return
 	    intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite
 	    (tableData, numEntries, keys, values);
 }
-
 __kernel void intintLCGQuadraticOpenCompactCLHash_RangeQuerySingle(__global char
 								   *tableData,
 								   unsigned int
@@ -1930,7 +1911,7 @@ __kernel void intintLCGQuadraticOpenCompactCLHash_RangeQuerySingle(__global char
 								   __global int
 								   *keys,
 								   __global int
-								   *valuesOutput)
+								   *valuesOutput) 
 {
 	uint i = get_global_id(0);
 	if (i >= numQueries) {
@@ -1939,7 +1920,6 @@ __kernel void intintLCGQuadraticOpenCompactCLHash_RangeQuerySingle(__global char
 	intintLCGQuadraticOpenCompactCLHash_InnerQuerySingle(tableData, keys[i],
 							     valuesOutput + i);
 }
-
 __kernel void intintLCGQuadraticOpenCompactCLHash_RangeQuery(__global char
 							     *tableData,
 							     unsigned int
@@ -1958,7 +1938,6 @@ __kernel void intintLCGQuadraticOpenCompactCLHash_RangeQuery(__global char
 						       valuesOutput +
 						       (i * numKeys));
 }
-
 __kernel void intintLCGQuadraticOpenCompactCLHash_RangeInsertSingle(__global
 								    char
 								    *tableData,
@@ -1976,7 +1955,6 @@ __kernel void intintLCGQuadraticOpenCompactCLHash_RangeInsertSingle(__global
 							      keys[i],
 							      values[i]);
 }
-
 __kernel void intintLCGQuadraticOpenCompactCLHash_RangeInsert(__global char
 							      *tableData,
 							      unsigned int
@@ -1996,19 +1974,15 @@ __kernel void intintLCGQuadraticOpenCompactCLHash_RangeInsert(__global char
 							values +
 							(i * numEntries));
 }
-
 __kernel void
-    intintLCGQuadraticOpenCompactCLHash_RangeInsertSingleNoOverwrite(__global
-								     char
-								     *tableData,
-								     unsigned
-								     int
-								     numInsertions,
-								     __global
-								     int *keys,
-								     __global
-								     int
-								     *values) {
+intintLCGQuadraticOpenCompactCLHash_RangeInsertSingleNoOverwrite(__global char
+								 *tableData,
+								 unsigned int
+								 numInsertions,
+								 __global int
+								 *keys,
+								 __global int
+								 *values) {
 	uint i = get_global_id(0);
 	if (i >= numInsertions) {
 		return;
@@ -2016,18 +1990,16 @@ __kernel void
 	intintLCGQuadraticOpenCompactCLHash_InnerInsertSingleNoOverwrite
 	    (tableData, keys[i], values[i]);
 }
-
 __kernel void
-    intintLCGQuadraticOpenCompactCLHash_RangeInsertNoOverwrite(__global char
-							       *tableData,
-							       unsigned int
-							       numInsertions,
-							       unsigned int
-							       numEntries,
-							       __global int
-							       *keys,
-							       __global int
-							       *values) {
+intintLCGQuadraticOpenCompactCLHash_RangeInsertNoOverwrite(__global char
+							   *tableData,
+							   unsigned int
+							   numInsertions,
+							   unsigned int
+							   numEntries,
+							   __global int *keys,
+							   __global int
+							   *values) {
 	uint i = get_global_id(0);
 	if (i >= numInsertions) {
 		return;
@@ -2041,7 +2013,6 @@ __kernel void
 								   (i *
 								    numEntries));
 }
-
 __kernel void intintHash_RangeQuery(__global char *tableData,
 				    unsigned int numQueries,
 				    unsigned int numKeys, __global int *keys,
@@ -2072,7 +2043,6 @@ __kernel void intintHash_RangeQuery(__global char *tableData,
 								      valuesOutput);
 	}
 }
-
 __kernel void intintHash_RangeQuerySingle(__global char *tableData,
 					  unsigned int numQueries,
 					  __global int *keys,
@@ -2099,7 +2069,6 @@ __kernel void intintHash_RangeQuerySingle(__global char *tableData,
 		    (tableData, numQueries, keys, valueOutput);
 	}
 }
-
 __kernel void intintHash_RangeInsert(__global char *tableData,
 				     unsigned int numInsertions,
 				     unsigned int numEntries,
@@ -2132,7 +2101,6 @@ __kernel void intintHash_RangeInsert(__global char *tableData,
 								    values);
 	}
 }
-
 __kernel void intintHash_RangeInsertSingle(__global char *tableData,
 					   unsigned int numInsertions,
 					   __global int *keys,
@@ -2157,7 +2125,6 @@ __kernel void intintHash_RangeInsertSingle(__global char *tableData,
 		    (tableData, numInsertions, keys, values);
 	}
 }
-
 __kernel void intintHash_RangeInsertNoOverwrite(__global char *tableData,
 						unsigned int numInsertions,
 						unsigned int numEntries,
@@ -2182,7 +2149,6 @@ __kernel void intintHash_RangeInsertNoOverwrite(__global char *tableData,
 		    (tableData, numInsertions, numEntries, keys, values);
 	}
 }
-
 __kernel void intintHash_RangeInsertSingleNoOverwrite(__global char *tableData,
 						      unsigned int
 						      numInsertions,
@@ -2207,7 +2173,6 @@ __kernel void intintHash_RangeInsertSingleNoOverwrite(__global char *tableData,
 		    (tableData, numInsertions, keys, values);
 	}
 }
-
 int intintHash_Query(__global char *tableData, unsigned int numKeys,
 		     __global int *keys, __global int *valuesOutput) {
 	switch (((__global int *)tableData)[0]) {
@@ -2229,7 +2194,6 @@ int intintHash_Query(__global char *tableData, unsigned int numKeys,
 	}
 	return HASH_EXIT_CODE_ERROR;
 }
-
 int intintHash_QuerySingle(__global char *tableData, int key,
 			   __global int *valueOutput) {
 	switch (((__global int *)tableData)[0]) {
@@ -2253,7 +2217,6 @@ int intintHash_QuerySingle(__global char *tableData, int key,
 	}
 	return HASH_EXIT_CODE_ERROR;
 }
-
 int intintHash_Insert(__global char *tableData, unsigned int numEntries,
 		      __global int *keys, __global int *values) {
 	switch (((__global int *)tableData)[0]) {
@@ -2275,7 +2238,6 @@ int intintHash_Insert(__global char *tableData, unsigned int numEntries,
 	}
 	return HASH_EXIT_CODE_ERROR;
 }
-
 int intintHash_InsertSingle(__global char *tableData, int key, int value) {
 	switch (((__global int *)tableData)[0]) {
 	case IDENTITY_PERFECT_CL_HASH_ID:
@@ -2298,7 +2260,6 @@ int intintHash_InsertSingle(__global char *tableData, int key, int value) {
 	}
 	return HASH_EXIT_CODE_ERROR;
 }
-
 int intintHash_InsertNoOverwrite(__global char *tableData,
 				 unsigned int numEntries, __global int *keys,
 				 __global int *values) {
@@ -2323,7 +2284,6 @@ int intintHash_InsertNoOverwrite(__global char *tableData,
 	}
 	return HASH_EXIT_CODE_ERROR;
 }
-
 int intintHash_InsertSingleNoOverwrite(__global char *tableData, int key,
 				       int value) {
 	switch (((__global int *)tableData)[0]) {
