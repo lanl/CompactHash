@@ -39,6 +39,22 @@
 
 /* neigh2d_kern.cl */
 
+void write_hash(
+            const int   hash_method,
+            const ulong hash_table_size,
+            const ulong AA,
+            const ulong BB,
+            const uint  giX,
+            const ulong hashkey,
+   __global       int   *hash);
+int read_hash(
+            const int   hash_method,
+            const ulong hash_table_size,
+            const ulong AA,
+            const ulong BB,
+            const ulong hashkey,
+   __global const int   *hash);
+
 #ifndef  __HAVE_CL_DOUBLE_DEFINED__
 #define __HAVE_CL_DOUBLE_DEFINED__
 
@@ -79,7 +95,7 @@ void write_hash(
       hashloc = (hashkey*AA+BB)%prime%hash_table_size;
       old_key = atomic_cmpxchg(&hash[2*hashloc],-1,hashkey);
 
-      for (int icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      for (int icount = 1; old_key != (int)hashkey && old_key != -1 && icount < MaxTries; icount++){
          hashloc++;
          hashloc %= hash_table_size;
      
@@ -92,7 +108,7 @@ void write_hash(
       hashloc = (hashkey*AA+BB)%prime%hash_table_size;
       old_key = atomic_cmpxchg(&hash[2*hashloc],-1,hashkey);
 
-      for (int icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      for (int icount = 1; old_key != (int)hashkey && old_key != -1 && icount < MaxTries; icount++){
          hashloc+=(icount*icount);
          hashloc %= hash_table_size;
      
@@ -106,7 +122,7 @@ void write_hash(
       hashloc = (hashkey*AA+BB)%prime%hash_table_size;
       old_key = atomic_cmpxchg(&hash[2*hashloc],-1,hashkey);
 
-      for (int icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      for (int icount = 1; old_key != (int)hashkey && old_key != -1 && icount < MaxTries; icount++){
          hashloc += (icount*jump);
          hashloc %= hash_table_size;
 
@@ -140,12 +156,12 @@ int read_hash(
 #ifndef __APPLE_CC__
       break;
    case 0:
-      for (hashloc = (hashkey*AA+BB)%prime%hash_table_size; hash[2*hashloc] != hashkey && hash[2*hashloc] != -1; hashloc++,hashloc %= hash_table_size);
+      for (hashloc = (hashkey*AA+BB)%prime%hash_table_size; hash[2*hashloc] != (int)hashkey && hash[2*hashloc] != -1; hashloc++,hashloc %= hash_table_size);
       if (hash[2*hashloc] != -1) hashval = hash[2*hashloc+1];
       return(hashval);
       break;
    case 1:
-      for (hashloc = (hashkey*AA+BB)%prime%hash_table_size; hash[2*hashloc] != hashkey && hash[2*hashloc] != -1; hashloc+=(icount*icount),hashloc %= hash_table_size){
+      for (hashloc = (hashkey*AA+BB)%prime%hash_table_size; hash[2*hashloc] != (int)hashkey && hash[2*hashloc] != -1; hashloc+=(icount*icount),hashloc %= hash_table_size){
          icount++;
       }
       if (hash[2*hashloc] != -1) hashval = hash[2*hashloc+1];
@@ -153,7 +169,7 @@ int read_hash(
       break;
    case 2:
       jump = 1+hashkey%hash_jump_prime;
-      for (hashloc = (hashkey*AA+BB)%prime%hash_table_size; hash[2*hashloc] != hashkey && hash[2*hashloc] != -1; hashloc+=(icount*jump),hashloc %= hash_table_size){
+      for (hashloc = (hashkey*AA+BB)%prime%hash_table_size; hash[2*hashloc] != (int)hashkey && hash[2*hashloc] != -1; hashloc+=(icount*jump),hashloc %= hash_table_size){
          icount++;
       }
       if (hash[2*hashloc] != -1) hashval = hash[2*hashloc+1];

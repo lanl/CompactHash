@@ -40,7 +40,7 @@
 /* neigh2d_kern.cl */
 
 #ifndef  __HAVE_CL_DOUBLE_DEFINED__
-#define __HAVE_CL_DOUBLE_DEFINED__         
+#define __HAVE_CL_DOUBLE_DEFINED__
 
 #ifdef HAVE_CL_DOUBLE
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
@@ -168,15 +168,15 @@ __kernel void neighbors2d_hashwrite_opt_2_kern(const uint isize,
   int ii = i[giX];
   int jj = j[giX];
 
-  int levdiff = levmx - lev;
+  //int levdiff = levmx - lev;
   int levmult = levtable[levmx - lev];
 
-  int iimin =  ii   *levtable[levdiff];
-  int iimax = (ii+1)*levtable[levdiff];
-  int jjmin =  jj   *levtable[levdiff];
-  int jjmax = (jj+1)*levtable[levdiff];
+  //int iimin =  ii   *levtable[levdiff];
+  //int iimax = (ii+1)*levtable[levdiff];
+  //int jjmin =  jj   *levtable[levdiff];
+  //int jjmax = (jj+1)*levtable[levdiff];
   
-  if(lev == levmx) {
+  if(lev == (int)levmx) {
     hashval(jj,ii) = giX;
     return;
   }
@@ -225,13 +225,13 @@ __kernel void neighbors2d_hashwrite_opt_3_kern(const uint isize,
   int ii = i[giX];
   int jj = j[giX];
 
-  int levdiff = levmx - lev;
+  //int levdiff = levmx - lev;
   int levmult = levtable[levmx - lev];
 
-  int iimin =  ii   *levtable[levdiff];
-  int iimax = (ii+1)*levtable[levdiff];
-  int jjmin =  jj   *levtable[levdiff];
-  int jjmax = (jj+1)*levtable[levdiff];
+  //int iimin =  ii   *levtable[levdiff];
+  //int iimax = (ii+1)*levtable[levdiff];
+  //int jjmin =  jj   *levtable[levdiff];
+  //int jjmax = (jj+1)*levtable[levdiff];
   
   jj *= levmult;
   ii *= levmult;
@@ -252,7 +252,7 @@ __kernel void neighbors2d_hasholdlibwrite_opt_3_kern(const int   isize,
                                             __global int        *hash){
   const uint giX = get_global_id(0);
 
-  if (giX >= isize) return;
+  if ((int)giX >= isize) return;
 
   int lev = level[giX];
   int ii = i[giX];
@@ -276,7 +276,7 @@ __kernel void neighbors2d_hashread_kern(const int          isize,
                                __global struct neighbor2d *neigh2d) {
   const uint giX  = get_global_id(0);
 
-  if (giX >= isize) return;
+  if ((int)giX >= isize) return;
 
   int imaxsize = mesh_size*levtable[levmx];
   int jmaxsize = mesh_size*levtable[levmx];
@@ -308,7 +308,7 @@ __kernel void neighbors2d_hashread_opt_3_kern(const int          isize,
                                      __global struct neighbor2d *neigh2d) {
   const uint giX = get_global_id(0);
 
-  if (giX >= isize) return;
+  if ((int)giX >= isize) return;
 
   int imaxsize = mesh_size*levtable[levmx];
   int jmaxsize = mesh_size*levtable[levmx];
@@ -397,7 +397,7 @@ __kernel void neighbors2d_hasholdlibread_opt_3_kern(const int          isize,
                                                     const ulong        BB) {
   const uint giX = get_global_id(0);
 
-  if (giX >= isize) return;
+  if ((int)giX >= isize) return;
 
   int imaxsize = mesh_size*levtable[levmx];
   int jmaxsize = mesh_size*levtable[levmx];
@@ -528,8 +528,7 @@ __kernel void neighbors2d_hashlibwrite_opt_1_kern(const uint isize,
   int jjmin =  jj   *levtable[levdiff];
   int jjmax = (jj+1)*levtable[levdiff];
 
-  /*
-  if (lev == levmx) {
+  if (lev == (int)levmx) {
     intintHash_InsertSingle(hashTableData, jj * imaxsize + ii, giX);
   }else{
     int width = levtable[levmx-lev] - 1;
@@ -541,7 +540,6 @@ __kernel void neighbors2d_hashlibwrite_opt_1_kern(const uint isize,
     }
   }
   return;
-  */
 
   for (int iii = iimin; iii < iimax; iii++) {
     intintHash_InsertSingle(hashTableData, jjmin*imaxsize+iii, giX);
@@ -572,15 +570,15 @@ __kernel void neighbors2d_hashlibwrite_opt_2_kern(const uint isize,
   int ii = i[giX];
   int jj = j[giX];
 
-  int levdiff = levmx - lev;
+  //int levdiff = levmx - lev;
   int levmult = levtable[levmx - lev];
 
-  int iimin =  ii   *levtable[levdiff];
-  int iimax = (ii+1)*levtable[levdiff];
-  int jjmin =  jj   *levtable[levdiff];
-  int jjmax = (jj+1)*levtable[levdiff];
+  //int iimin =  ii   *levtable[levdiff];
+  //int iimax = (ii+1)*levtable[levdiff];
+  //int jjmin =  jj   *levtable[levdiff];
+  //int jjmax = (jj+1)*levtable[levdiff];
   
-  if(lev == levmx) {
+  if(lev == (int)levmx) {
     intintHash_InsertSingle(hashTableData, jj * imaxsize + ii, giX);
     return;
   }
@@ -629,13 +627,13 @@ __kernel void neighbors2d_hashlibwrite_opt_3_kern(const uint isize,
   int ii = i[giX];
   int jj = j[giX];
 
-  int levdiff = levmx - lev;
+  //int levdiff = levmx - lev;
   int levmult = levtable[levmx - lev];
 
-  int iimin =  ii   *levtable[levdiff];
-  int iimax = (ii+1)*levtable[levdiff];
-  int jjmin =  jj   *levtable[levdiff];
-  int jjmax = (jj+1)*levtable[levdiff];
+  //int iimin =  ii   *levtable[levdiff];
+  //int iimax = (ii+1)*levtable[levdiff];
+  //int jjmin =  jj   *levtable[levdiff];
+  //int jjmax = (jj+1)*levtable[levdiff];
   
   jj *= levmult;
   ii *= levmult;
@@ -653,7 +651,7 @@ __kernel void neighbors2d_hashlibread_opt_3_kern(const int          isize,
                                         __global struct neighbor2d *neigh2d) {
   const uint giX = get_global_id(0);
 
-  if (giX >= isize) return;
+  if ((int)giX >= isize) return;
 
   int imaxsize = mesh_size*levtable[levmx];
   int jmaxsize = mesh_size*levtable[levmx];
@@ -732,7 +730,7 @@ __kernel void neighbors2d_hashlibread_kern(const int          isize,
                                   __global struct neighbor2d *neigh2d) {
   const uint giX  = get_global_id(0);
 
-  if (giX >= isize) return;
+  if ((int)giX >= isize) return;
 
   int imaxsize = mesh_size*levtable[levmx];
   int jmaxsize = mesh_size*levtable[levmx];

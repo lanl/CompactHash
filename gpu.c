@@ -184,15 +184,15 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_pr
   
   #ifdef HAVE_CL_DOUBLE
     if (*is_nvidia) {
-      error = clBuildProgram(*program, 0, NULL, "-DHAVE_CL_DOUBLE -DIS_NVIDIA", NULL, NULL);
+      error = clBuildProgram(*program, 1, device, "-DHAVE_CL_DOUBLE -DIS_NVIDIA", NULL, NULL);
     } else {
-      error = clBuildProgram(*program, 0, NULL, "-DHAVE_CL_DOUBLE", NULL, NULL);
+      error = clBuildProgram(*program, 1, device, "-DHAVE_CL_DOUBLE", NULL, NULL);
     }
   #else
     if (*is_nvidia) {
-       error = clBuildProgram(*program, 0, NULL, "-DNO_CL_DOUBLE -DIS_NVIDIA -cl-single-precision-constant", NULL, NULL);
+       error = clBuildProgram(*program, 1, device, "-DNO_CL_DOUBLE -DIS_NVIDIA -cl-single-precision-constant", NULL, NULL);
     } else {
-       error = clBuildProgram(*program, 0, NULL, "-DNO_CL_DOUBLE -cl-single-precision-constant", NULL, NULL);
+       error = clBuildProgram(*program, 1, device, "-DNO_CL_DOUBLE -cl-single-precision-constant", NULL, NULL);
     }
   #endif
   if (error != CL_SUCCESS){
