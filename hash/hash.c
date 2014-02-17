@@ -754,11 +754,13 @@ intintHash_Table *intintHash_CreateTable(intintHash_Factory * factory,
 }
 int intintHash_EmptyTable(intintHash_Table * table) {
 	table->emptyFunc(table);
-} int intintHash_DestroyTable(intintHash_Table * table) {
-
+	return (0);
+}
+int intintHash_DestroyTable(intintHash_Table * table) {
 	table->destroyFunc(table);
-} cl_mem intintHash_GetTableDataBuffer(intintHash_Table * table) {
-
+	return (0);
+}
+cl_mem intintHash_GetTableDataBuffer(intintHash_Table * table) {
 	return table->tableDataBuffer;
 }
 cl_mem *intintHash_GetTableDataBufferPtr(intintHash_Table * table) {
@@ -769,33 +771,49 @@ int intintHash_GetTableType(intintHash_Table * table) {
 } int intintHash_Query(intintHash_Table * table, size_t numKeys, int *keys,
 		       int *valuesOutput) {
 	table->queryFunc(table, numKeys, keys, valuesOutput);
-} int intintHash_QuerySingle(intintHash_Table * table, int key,
-			     int *valueOutput) {
+	return (0);
+}
+int intintHash_QuerySingle(intintHash_Table * table, int key, int *valueOutput) {
 	table->querySingleFunc(table, key, valueOutput);
-} int intintHash_Insert(intintHash_Table * table, size_t numEntries, int *keys,
-			int *values) {
+	return (0);
+}
+int intintHash_Insert(intintHash_Table * table, size_t numEntries, int *keys,
+		      int *values) {
 	table->insertFunc(table, numEntries, keys, values);
-} int intintHash_InsertSingle(intintHash_Table * table, int key, int value) {
-
+	return (0);
+}
+int intintHash_InsertSingle(intintHash_Table * table, int key, int value) {
 	table->insertSingleFunc(table, key, value);
-} int intintHash_InsertNoOverwrite(intintHash_Table * table, size_t numEntries,
-				   int *keys, int *values) {
+	return (0);
+}
+int intintHash_InsertNoOverwrite(intintHash_Table * table, size_t numEntries,
+				 int *keys, int *values) {
 	table->insertNoOverwriteFunc(table, numEntries, keys, values);
-} int intintHash_InsertSingleNoOverwrite(intintHash_Table * table, int key,
-					 int value) {
+	return (0);
+}
+int intintHash_InsertSingleNoOverwrite(intintHash_Table * table, int key,
+				       int value) {
 	table->insertSingleNoOverwriteFunc(table, key, value);
-} int intintHash_BufferQuery(intintHash_Table * table, size_t numKeys,
-			     cl_mem keys, cl_mem valuesOutput) {
+	return (0);
+}
+int intintHash_BufferQuery(intintHash_Table * table, size_t numKeys,
+			   cl_mem keys, cl_mem valuesOutput) {
 	table->bufferQueryFunc(table, numKeys, keys, valuesOutput);
-} int intintHash_BufferInsert(intintHash_Table * table, size_t numEntries,
-			      cl_mem keys, cl_mem values) {
+	return (0);
+}
+int intintHash_BufferInsert(intintHash_Table * table, size_t numEntries,
+			    cl_mem keys, cl_mem values) {
 	table->bufferInsertFunc(table, numEntries, keys, values);
-} int intintHash_BufferInsertNoOverwrite(intintHash_Table * table,
-					 size_t numEntries, cl_mem keys,
-					 cl_mem values) {
+	return (0);
+}
+int intintHash_BufferInsertNoOverwrite(intintHash_Table * table,
+				       size_t numEntries, cl_mem keys,
+				       cl_mem values) {
 	table->bufferInsertNoOverwriteFunc(table, numEntries, keys, values);
-} typedef struct intintIdentityPerfectHash_TableData {
+	return (0);
+}
 
+typedef struct intintIdentityPerfectHash_TableData {
 	int hashID;
 	unsigned int numBuckets;
 	char compressFuncData;

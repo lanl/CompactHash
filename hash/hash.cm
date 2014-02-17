@@ -213,10 +213,12 @@
   \
   int NAME##Hash_EmptyTable(NAME##Hash_Table *table){\
     table->emptyFunc(table);\
+    return(0);\
   }\
   \
   int NAME##Hash_DestroyTable(NAME##Hash_Table *table){\
     table->destroyFunc(table);\
+    return(0);\
   }\
   \
   cl_mem NAME##Hash_GetTableDataBuffer(NAME##Hash_Table *table){\
@@ -233,37 +235,46 @@
   \
   int NAME##Hash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput){\
     table->queryFunc(table, numKeys, keys, valuesOutput);\
+    return(0);\
   }\
   \
   int NAME##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
     table->querySingleFunc(table, key, valueOutput);\
+    return(0);\
   }\
   \
   int NAME##Hash_Insert(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
     table->insertFunc(table, numEntries, keys, values);\
+    return(0);\
   }\
   \
   int NAME##Hash_InsertSingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
     table->insertSingleFunc(table, key, value);\
+    return(0);\
   }\
   \
   int NAME##Hash_InsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
     table->insertNoOverwriteFunc(table, numEntries, keys, values);\
+    return(0);\
   }\
   \
   int NAME##Hash_InsertSingleNoOverwrite(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
     table->insertSingleNoOverwriteFunc(table, key, value);\
+    return(0);\
   }\
   int NAME##Hash_BufferQuery(NAME##Hash_Table *table, size_t numKeys, cl_mem keys, cl_mem valuesOutput){\
     table->bufferQueryFunc(table, numKeys, keys, valuesOutput);\
+    return(0);\
   }\
   \
   int NAME##Hash_BufferInsert(NAME##Hash_Table *table, size_t numEntries, cl_mem keys, cl_mem values){\
     table->bufferInsertFunc(table, numEntries, keys, values);\
+    return(0);\
   }\
   \
   int NAME##Hash_BufferInsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, cl_mem keys, cl_mem values){\
     table->bufferInsertNoOverwriteFunc(table, numEntries, keys, values);\
+    return(0);\
   }\
   \
   IDENTITY_PERFECT_HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE)\
