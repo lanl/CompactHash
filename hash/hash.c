@@ -1469,9 +1469,11 @@ int intintIdentityPerfectCLHash_BufferInsert(intintHash_Table * table,
 				   (const size_t *)&table->localWorkSize, 0,
 				   NULL, NULL);
 	CLHash_Utilities_HandleError(err, NULL, "clEnqueueNDRangeKernel");
-} int intintIdentityPerfectCLHash_InsertSingleNoOverwrite(intintHash_Table *
-							  table, int key,
-							  int value) {
+	return (0);
+}
+int intintIdentityPerfectCLHash_InsertSingleNoOverwrite(intintHash_Table *
+							table, int key,
+							int value) {
 	return intintIdentityPerfectCLHash_InsertNoOverwrite(table, 1, &key,
 							     &value);
 }
@@ -1541,8 +1543,10 @@ int intintIdentityPerfectCLHash_BufferInsertNoOverwrite(intintHash_Table *
 	CLHash_Utilities_HandleError(err,
 				     "intintIdentityPerfectCLHash_BufferInsertNoOverwrite",
 				     "clEnqueueNDRangeKernel");
-} typedef struct intintIdentitySentinelPerfectHash_TableData {
+	return (0);
+}
 
+typedef struct intintIdentitySentinelPerfectHash_TableData {
 	int hashID;
 	unsigned int numBuckets;
 	char compressFuncData;
@@ -2204,10 +2208,12 @@ int intintIdentitySentinelPerfectCLHash_BufferInsert(intintHash_Table * table,
 				   (const size_t *)&table->localWorkSize, 0,
 				   NULL, NULL);
 	CLHash_Utilities_HandleError(err, NULL, "clEnqueueNDRangeKernel");
-} int
-intintIdentitySentinelPerfectCLHash_InsertSingleNoOverwrite(intintHash_Table *
-							    table, int key,
-							    int value) {
+	return (0);
+}
+int intintIdentitySentinelPerfectCLHash_InsertSingleNoOverwrite(intintHash_Table
+								* table,
+								int key,
+								int value) {
 	return intintIdentitySentinelPerfectCLHash_InsertNoOverwrite(table, 1,
 								     &key,
 								     &value);
@@ -2284,8 +2290,10 @@ int intintIdentitySentinelPerfectCLHash_BufferInsertNoOverwrite(intintHash_Table
 	CLHash_Utilities_HandleError(err,
 				     "intintIdentitySentinelPerfectCLHash_BufferInsertNoOverwrite",
 				     "clEnqueueNDRangeKernel");
-} typedef struct intintLCGLinearOpenCompactHash_TableData {
+	return (0);
+}
 
+typedef struct intintLCGLinearOpenCompactHash_TableData {
 	int hashID;
 	unsigned int numBuckets;
 	intintHash_CompressLCGData compressFuncData;
@@ -3068,9 +3076,11 @@ int intintLCGLinearOpenCompactCLHash_BufferInsert(intintHash_Table * table,
 				   (const size_t *)&table->localWorkSize, 0,
 				   NULL, NULL);
 	CLHash_Utilities_HandleError(err, NULL, "clEnqueueNDRangeKernel");
-} int intintLCGLinearOpenCompactCLHash_InsertSingleNoOverwrite(intintHash_Table
-							       * table, int key,
-							       int value) {
+	return (0);
+}
+int intintLCGLinearOpenCompactCLHash_InsertSingleNoOverwrite(intintHash_Table *
+							     table, int key,
+							     int value) {
 	return intintLCGLinearOpenCompactCLHash_InsertNoOverwrite(table, 1,
 								  &key, &value);
 }
@@ -3142,8 +3152,10 @@ int intintLCGLinearOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table *
 	CLHash_Utilities_HandleError(err,
 				     "intintLCGLinearOpenCompactCLHash_BufferInsertNoOverwrite",
 				     "clEnqueueNDRangeKernel");
-} typedef struct intintLCGQuadraticOpenCompactHash_TableData {
+	return (0);
+}
 
+typedef struct intintLCGQuadraticOpenCompactHash_TableData {
 	int hashID;
 	unsigned int numBuckets;
 	intintHash_CompressLCGData compressFuncData;
@@ -3962,10 +3974,12 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsert(intintHash_Table * table,
 				   (const size_t *)&table->localWorkSize, 0,
 				   NULL, NULL);
 	CLHash_Utilities_HandleError(err, NULL, "clEnqueueNDRangeKernel");
-} int
-intintLCGQuadraticOpenCompactCLHash_InsertSingleNoOverwrite(intintHash_Table *
-							    table, int key,
-							    int value) {
+	return (0);
+}
+int intintLCGQuadraticOpenCompactCLHash_InsertSingleNoOverwrite(intintHash_Table
+								* table,
+								int key,
+								int value) {
 	return intintLCGQuadraticOpenCompactCLHash_InsertNoOverwrite(table, 1,
 								     &key,
 								     &value);
@@ -4042,6 +4056,7 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 	CLHash_Utilities_HandleError(err,
 				     "intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite",
 				     "clEnqueueNDRangeKernel");
+	return (0);
 }
 const char *hash_source =
 "\n"
