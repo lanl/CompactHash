@@ -19,28 +19,36 @@ echo "Configuring hash with $ac_configure_args"
 #
 
 AC_ARG_ENABLE( debug,
- [--enable-debug                     - Compiles code with debug flags ],
+ [  --enable-debug          compiles code with debug flags ],
  )
 
 AC_ARG_ENABLE( bounds-check,
- [--enable-bounds-check              - Compiles code with bounds check flags ],
+ [  --enable-bounds-check   compiles code with bounds check flags ],
  )
 
 AC_ARG_ENABLE( prof,
- [--enable-prof                      - Compiles code with profiling flags ],
+ [  --enable-prof           compiles code with profiling flags ],
  )
 
 AC_ARG_ENABLE( mpi, 
- [--enable-mpi                       - Compiles code with mpi library ],
+ [  --enable-mpi            compiles code with mpi library ],
  enable_mpi=no)
 
 AC_ARG_ENABLE( mpe, 
- [--enable-mpe                       - Compiles code with mpe library ],
+ [  --enable-mpe            compiles code with mpe library ],
  enable_mpe=yes)
 
 AC_ARG_ENABLE( opencl, 
- [--enable-opencl                    - Compiles code with opencl library ],
+ [  --enable-opencl         compiles code with opencl library ],
  enable_opencl=yes)
+
+AC_ARG_ENABLE( detailed-timing, 
+ [  --enable-detailed-timing compiles code with detailed timing on ],
+ )
+
+AC_ARG_ENABLE( write-mem-usage, 
+ [  --enable-write-mem-usage compiles code with write memory usage on ],
+ )
 
 #AM_WITH_DMALLOC
 
@@ -116,6 +124,14 @@ case "$host" in
         exit 1
         ;;
 esac
+
+if test "${enable_detailed_timing}" = "yes"; then
+   CFLAGS="-DDETAILED_TIMING=1 ${CFLAGS}"
+fi
+
+if test "${enable_write_mem_usage}" = "no"; then
+   CFLAGS="-DWRITE_MEM_USAGE=0 ${CFLAGS}"
+fi
 
 if test "${enable_mpe}" != "no"; then
   AC_PATH_PROG(MPE_BIN, clog2alog)

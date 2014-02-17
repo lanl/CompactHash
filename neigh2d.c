@@ -83,9 +83,15 @@ typedef cl_float4 cl_real4;
 #define HASH_LOAD_FACTOR 0.3333333
 #define TILE_SIZE 256
 
-#define CHECK 1
+#ifndef DETAILED_TIMING
 #define DETAILED_TIMING 0
+#endif
+
+#ifndef WRITE_MEM_USAGE
 #define WRITE_MEM_USAGE 1
+#endif
+
+#define CHECK 1
 #define LONG_RUNS 1
 #define PRINT_GOLD_ON_FAILED_TEST 1
 #define PRINT_GOLD_ON_RUN 0
