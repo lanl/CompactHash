@@ -383,4 +383,5 @@ void CLHash_Utilities_PrintError_p(cl_int err, const char *routine, const char *
 
 const char* CLHash_Utilities_HandleError_p(cl_int err, const char *routine, const char *cl_routine, const char *file, int line){
   if(err != CL_SUCCESS) CLHash_Utilities_PrintError_p(err, routine, cl_routine, file, line);
+  return(NULL);
 }
