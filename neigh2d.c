@@ -311,7 +311,7 @@ int main (int argc, const char * argv[])
   int emptyNeighborValue = -1;
   factory = intintHash_CreateFactory(HASH_ALL_C_HASHES, &emptyNeighborValue, 0, NULL, NULL);
   if(haveGPU){
-    char *bothsources = (char*)malloc(strlen(get_hash_kernel_source_string()) + strlen(Hash_GetKernelSourceString()));
+    char *bothsources = (char*)malloc(strlen(get_hash_kernel_source_string()) + strlen(Hash_GetKernelSourceString()) + 1);
     strcpy(bothsources, get_hash_kernel_source_string());
     strcat(bothsources, Hash_GetKernelSourceString());
     GPUInit(&context, &queue, &is_nvidia, &program, "neigh2d_kern.cl", bothsources);
@@ -407,7 +407,7 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
   printf("\t%8d,", ncells);
   if(WRITE_MEM_USAGE) fprintf(fmem,"\t%8d,", ncells);
   
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -461,7 +461,7 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
     error = clEnqueueWriteBuffer(queue, level_buffer, CL_TRUE, 0, ncells*sizeof(int), level, 0, NULL, NULL);
     if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
 
-    int *levtable = (int *)malloc(levmx+1);
+    int *levtable = (int *)malloc((levmx+1)*sizeof(int));
     for (int lev=0; lev<levmx+1; lev++){
       levtable[lev] = (int)pow(2,lev);
     }
@@ -836,7 +836,7 @@ struct neighbor2d *neighbors2d_hashcpu( uint ncells, int mesh_size, int levmx, i
 
   //Setup
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -925,7 +925,7 @@ struct neighbor2d *neighbors2d_hashlibcpu( uint ncells, int mesh_size, int levmx
 
   //Setup
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1010,7 +1010,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_1(uint ncells, int mesh_size, int lev
 
   //Setup
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1109,7 +1109,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_1( uint ncells, int mesh_size, int
 
   //Setup
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1199,7 +1199,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_2( uint ncells, int mesh_size, int le
 
   //Setup
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1308,7 +1308,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_2( uint ncells, int mesh_size, int
 
   //Setup
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1417,7 +1417,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_3(uint ncells, int mesh_size, int lev
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
   int imax = mesh_size;
   int jmax = mesh_size;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1559,7 +1559,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_3( uint ncells, int mesh_size, int
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
   int imax = mesh_size;
   int jmax = mesh_size;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1698,7 +1698,7 @@ struct neighbor2d *neighbors2d_hasholdlibcpu_opt_3( uint ncells, int mesh_size, 
   struct neighbor2d *neigh2d = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
   int imax = mesh_size;
   int jmax = mesh_size;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1831,7 +1831,7 @@ cl_mem neighbors2d_hashgpu( uint ncells, int mesh_size, int levmx, cl_mem i_buff
   //Setup
   cl_mem hash_buffer, neighbor2d_buffer=NULL;
   cl_int error = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -1952,7 +1952,7 @@ cl_mem neighbors2d_hashlibgpu( uint ncells, int mesh_size, int levmx, cl_mem i_b
   cl_mem hash_buffer, neighbor2d_buffer=NULL;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2074,7 +2074,7 @@ cl_mem neighbors2d_hashgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_mem 
   cl_mem hash_buffer, neighbor2d_buffer;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2196,7 +2196,7 @@ cl_mem neighbors2d_hashlibgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_m
   cl_mem hash_buffer, neighbor2d_buffer=NULL;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2319,7 +2319,7 @@ cl_mem neighbors2d_hashgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem 
   cl_mem hash_buffer, neighbor2d_buffer;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2442,7 +2442,7 @@ cl_mem neighbors2d_hashlibgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_m
   cl_mem hash_buffer, neighbor2d_buffer=NULL;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2565,7 +2565,7 @@ cl_mem neighbors2d_hashgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem 
   cl_mem hash_buffer, neighbor2d_buffer;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2687,7 +2687,7 @@ cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_m
   cl_mem hash_buffer, neighbor2d_buffer=NULL;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }
@@ -2815,7 +2815,7 @@ cl_mem neighbors2d_hasholdlibgpu_opt_3( uint ncells, int mesh_size, int levmx, c
   cl_mem hash_buffer, neighbor2d_buffer;
   cl_int error = 0;
   long gpu_time = 0;
-  int *levtable = (int *)malloc(levmx+1);
+  int *levtable = (int *)malloc((levmx+1)*sizeof(int));
   for (int lev=0; lev<levmx+1; lev++){
     levtable[lev] = (int)pow(2,lev);
   }

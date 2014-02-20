@@ -123,8 +123,9 @@
       CLHash_Utilities_HandleError(error, STRINGIFY(NAME##Hash_CreateFactory), "clGetContextInfo");\
       factory->program = CLHash_Utilities_BuildProgramString(factory->context, device, Hash_GetKernelSourceString());\
     }\
-    int hashType;\
-    for(int hashIndex = 0; hashIndex < HASH_NUM_HASHES; hashType = 1 << hashIndex){\
+    int hashType=1;\
+    for(int hashIndex = 0; hashIndex < HASH_NUM_HASHES; hashIndex++){\
+      hashType = 1 << hashIndex;\
       switch(hashType & hashTypes){\
         case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_CreateFactory(factory, hashIndex); break;\
         case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_CreateFactory(factory, hashIndex); break;\
@@ -135,7 +136,6 @@
         case LCG_QUADRATIC_OPEN_COMPACT_HASH_ID: NAME##LCGQuadraticOpenCompactHash_CreateFactory(factory, hashIndex); break;\
         case LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID: NAME##LCGQuadraticOpenCompactCLHash_CreateFactory(factory, hashIndex); break;\
       }\
-      hashIndex++;\
     }\
     return factory;\
   }\

@@ -30,7 +30,6 @@
  *
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
-
 int intintIdentityPerfectCLHash_InsertSingle(__global char *tableData,
 					     int key, int value);
 int intintIdentityPerfectCLHash_InnerInsertSingle(__global char *tableData,
@@ -228,7 +227,6 @@ int intintHash_InsertNoOverwrite(__global char *tableData,
 				 __global int *values);
 int intintHash_InsertSingleNoOverwrite(__global char *tableData, int key,
 				       int value);
-
 #define HASH_REPORT_NEVER /**/ 0
 #define HASH_REPORT_CYCLE /**/ 1
 #define HASH_REPORT_END /****/ 2
