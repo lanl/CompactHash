@@ -203,6 +203,7 @@ void cl_error_check(int error, char *file, int line){
   if (error != CL_SUCCESS) printf("Error is %d in file %s at line %d\n",error, file, line);
 }
    
+static bool randomize = false;
 int main (int argc, const char * argv[])
 {
   CLHash_Init(argv[0]);
@@ -232,9 +233,17 @@ int main (int argc, const char * argv[])
     for (int i = 0; i < argc; i++) {
       if (strcmp(argv[i], "-h") == 0) {
         printf("Use '-t' to set threshold and '-o' to add tests: br, kd, hc, hlc, hc1, hlc1, hc2, hlc2, hc3, hlc3, holc3, hg, hg1, hg2, hg3, hg4 hlg hlg1 hlg2 hlg3 holg3\n");
-        printf("Use -n for min mesh size and -N for max mesh size [ default is 256 min to 256 max ]");
-        printf("Use -l for min levmx     and -L for max levmx     [ default is 1 min to 5 max ]");
+        printf("Use -r for randomization of cell data to see performance without cache\n");
+        printf("Use -n for min mesh size and -N for max mesh size [ default is 256 min to 256 max ]\n");
+        printf("Use -l for min levmx     and -L for max levmx     [ default is 1 min to 5 max ]\n");
       }
+      if (strcmp(argv[i], "-r") == 0) {
+        randomize = true; 
+      } 
+      if (strcmp(argv[i], "-w") == 0) {
+        i++;
+        threshold =(int)(atoi(argv[i])); 
+      } 
       if (strcmp(argv[i], "-t") == 0) {
         i++;
         threshold =(int)(atoi(argv[i])); 
@@ -3091,59 +3100,62 @@ int adaptiveMeshConstructorWij(const int n, const int l,
   ncells += newcount;
   //printf("\tNew ncells: %d\n", ncells);
 
-  // Randomize the order of the arrays
-  int* random = (int*) malloc(sizeof(int)*ncells);
-  int* temp1 = (int*) malloc(sizeof(int)*ncells);
-  real* temp2 = (real*) malloc(sizeof(real)*ncells*2);
-  int* temp3 = (int*) malloc(sizeof(int)*ncells*2);
-  // XXX Want better randomization? XXX
-  // XXX Why is the time between printf() statements the longest part? XXX
-  //printf("Shuffling");
-  //fflush(stdout);
-  for(ic = 0; ic < ncells; ic++) {random[ic] = ic;}
-  //iseed = (unsigned int)time(NULL);
-  //srand (iseed);
-  srand(0);
-  nlc = 0;
-  for(int ii = 0; ii < 7; ii++) {
-    for(ic = 0; ic < ncells; ic++) {
-    
-      int jj = (int)( (real)ncells*((real)rand() / (real)(RAND_MAX+ONE) ) );
-      // occasionally jj will be ncells and random ratio is 1.0
-      if (jj >= ncells) jj=ncells-1;
-      nlc = random[jj];
-      random[jj] = random[ic];
-      random[ic] = nlc;
-       if (random[ic] >= ncells) {
-         printf("DEBUG -- ic %d file %s line %d\n",ic,__FILE__,__LINE__);
-         exit(0);
-       }
-    }
-    //printf(".");
+  if (randomize) {
+    // Randomize the order of the arrays
+
+    int* random = (int*) malloc(sizeof(int)*ncells);
+    int* temp1 = (int*) malloc(sizeof(int)*ncells);
+    real* temp2 = (real*) malloc(sizeof(real)*ncells*2);
+    int* temp3 = (int*) malloc(sizeof(int)*ncells*2);
+    // XXX Want better randomization? XXX
+    // XXX Why is the time between printf() statements the longest part? XXX
+    //printf("Shuffling");
     //fflush(stdout);
-  }
-  //printf("\n");
+    for(ic = 0; ic < ncells; ic++) {random[ic] = ic;}
+    //iseed = (unsigned int)time(NULL);
+    //srand (iseed);
+    srand(0);
+    nlc = 0;
+    for(int ii = 0; ii < 7; ii++) {
+      for(ic = 0; ic < ncells; ic++) {
+    
+        int jj = (int)( (real)ncells*((real)rand() / (real)(RAND_MAX+ONE) ) );
+        // occasionally jj will be ncells and random ratio is 1.0
+        if (jj >= ncells) jj=ncells-1;
+        nlc = random[jj];
+        random[jj] = random[ic];
+        random[ic] = nlc;
+         if (random[ic] >= ncells) {
+           printf("DEBUG -- ic %d file %s line %d\n",ic,__FILE__,__LINE__);
+           exit(0);
+         }
+      }
+      //printf(".");
+      //fflush(stdout);
+    }
+    //printf("\n");
 
-  for(ic = 0; ic < ncells; ic++) {
-    temp1[ic] = level[random[ic]];
-    temp2[2*ic] = x[random[ic]];
-    temp2[2*ic+1] = y[random[ic]];
-    temp3[2*ic] = i[random[ic]];
-    temp3[2*ic+1] = j[random[ic]];
-  }
-  for(ic = 0; ic < ncells; ic++) {
-    level[ic] = temp1[ic];
-    x[ic]     = temp2[2*ic];
-    y[ic]     = temp2[2*ic+1];
-    i[ic]     = temp3[2*ic];
-    j[ic]     = temp3[2*ic+1];
-  }
+    for(ic = 0; ic < ncells; ic++) {
+      temp1[ic] = level[random[ic]];
+      temp2[2*ic] = x[random[ic]];
+      temp2[2*ic+1] = y[random[ic]];
+      temp3[2*ic] = i[random[ic]];
+      temp3[2*ic+1] = j[random[ic]];
+    }
+    for(ic = 0; ic < ncells; ic++) {
+      level[ic] = temp1[ic];
+      x[ic]     = temp2[2*ic];
+      y[ic]     = temp2[2*ic+1];
+      i[ic]     = temp3[2*ic];
+      j[ic]     = temp3[2*ic+1];
+    }
 
-  free(temp1);
-  free(temp2);
-  free(temp3);
-  free(random);
-  //printf("Adaptive mesh randomized.\n");
+    free(temp1);
+    free(temp2);
+    free(temp3);
+    free(random);
+    //printf("Adaptive mesh randomized.\n");
+  } // End of if randomize
 
   *level_ptr = level;
   *x_ptr = x;

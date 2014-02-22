@@ -25,6 +25,7 @@ On Mac OSx install gnu-indent. The Mac version does not recognize some of the op
 
 './neigh2d -h' gives further information on option keywords.
 
+The option -r randomizes the cell data (default is not random)
 The option -n sets the min mesh size and -N the max mesh size [ default is 256 min to 256 max ]
 The option -l sets the min levmx     and -L the max levmx     [ default is 1 min to 5 max ]
 
@@ -56,6 +57,7 @@ holg3 Hash OldLib GPU 3
 Our figures:
 
 Memory optimizations figure (each run on a Kepler)
+Use the -r randomization flag
 hg
 hg1
 hg2
@@ -63,15 +65,15 @@ hg3
 holg3
 
 Compact versus perfect figure (hg run on Kepler, holg3 run on various cards)
+Use the -r randomization flag
 hg 
 holg3
 
-Table construction* (each run on Kepler)
+Table construction (each run on Kepler)
+No randomization of cell data in adaptiveMeshConstructorWi -- don't use -r
 hc
 hg
 holg3
-*relative timings obtained by turning off randomization in adaptiveMeshConstructorWij
-(comment out lines 2882 to 2923)
 
 Output file features:
 
