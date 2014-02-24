@@ -81,7 +81,7 @@ typedef cl_float4 cl_real4;
 
 #define HASH_TYPE HASH_PERFECT_HASHES
 #define HASH_LOAD_FACTOR 0.3333333
-#define TILE_SIZE 256
+int TILE_SIZE = 256;
 
 #ifndef DETAILED_TIMING
 #define DETAILED_TIMING 0
@@ -203,6 +203,8 @@ void cl_error_check(int error, char *file, int line){
   if (error != CL_SUCCESS) printf("Error is %d in file %s at line %d\n",error, file, line);
 }
    
+typedef int bool;
+
 static bool randomize = false;
 int main (int argc, const char * argv[])
 {
@@ -324,6 +326,7 @@ int main (int argc, const char * argv[])
     strcpy(bothsources, get_hash_kernel_source_string());
     strcat(bothsources, Hash_GetKernelSourceString());
     GPUInit(&context, &queue, &device_type, &program, "neigh2d_kern.cl", bothsources);
+    if (device_type == MIC) TILE_SIZE = 240;
     hash_lib_init(context);
     uint lws = TILE_SIZE;
     CLFactory = intintHash_CreateFactory(HASH_ALL_CL_HASHES, &emptyNeighborValue, lws, &context, &queue);

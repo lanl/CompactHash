@@ -112,18 +112,20 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_
   }
    
   *device_type = VENDOR_UNKNOWN;
+  char *device_string[] = {"Unknown", "Nvidia", "ATI", "MIC"};
+
   printf("\n");
   printf("  Device:\n");
   clGetDeviceInfo(device[0], CL_DEVICE_NAME, sizeof(info), &info, NULL);
   printf("    CL_DEVICE_NAME         : %s\n",info);
+
+  if (! strncmp(info,"Intel(R) Many Integrated Core",29) )  *device_type = MIC;
   
   clGetDeviceInfo(device[0], CL_DEVICE_VENDOR, sizeof(info), &info, NULL);
   printf("    CL_DEVICE_VENDOR       : %s\n",info);
   
-  char *device_string[] = {"Unknown", "Nvidia", "ATI", "MIC"};
   if (! strncmp(info,"NVIDIA",6) ) *device_type = NVIDIA;
   if (! strncmp(info,"ATI",5) )    *device_type = ATI;
-  if (! strncmp(info,"INTEL",5) )  *device_type = MIC;
   printf("    device vendor type set : %s\n",device_string[*device_type]);
 
   *context = clCreateContext(0, 1, device, NULL, NULL, &error);
