@@ -203,7 +203,9 @@ void cl_error_check(int error, char *file, int line){
   if (error != CL_SUCCESS) printf("Error is %d in file %s at line %d\n",error, file, line);
 }
    
+#ifndef bool
 typedef int bool;
+#endif
 
 static bool randomize = false;
 int main (int argc, const char * argv[])
