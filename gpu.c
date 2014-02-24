@@ -112,7 +112,8 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_
   }
    
   *device_type = VENDOR_UNKNOWN;
-  char *device_string[] = {"Unknown", "Nvidia", "ATI", "MIC"};
+  char *device_string[] = {"Unknown", "Nvidia", "Tesla K20Xm", "Tesla M2090",
+    "Tesla 2050/2070", "GeForce GT 650M", "ATI", "MIC"};
 
   printf("\n");
   printf("  Device:\n");
@@ -120,12 +121,24 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_
   printf("    CL_DEVICE_NAME         : %s\n",info);
 
   if (! strncmp(info,"Intel(R) Many Integrated Core",29) )  *device_type = MIC;
+  if (! strncmp(info,"Tesla K20Xm",11) )       *device_type = TESLA_K20Xm;
+  if (! strncmp(info,"Tesla M2090",11) )       *device_type = TESLA_M2090;
+  if (! strncmp(info,"Tesla 2050 / 2070",17) ) *device_type = TESLA_2050_2070;
+  if (! strncmp(info,"GeForce GT 650M",15) )   *device_type = GeFORCE_GT_650M;
   
   clGetDeviceInfo(device[0], CL_DEVICE_VENDOR, sizeof(info), &info, NULL);
   printf("    CL_DEVICE_VENDOR       : %s\n",info);
+
+  if (*device_type == VENDOR_UNKNOWN){
+     if (! strncmp(info,"ATI",5) )    *device_type = ATI;
+     if (! strncmp(info,"NVIDIA",6) ) *device_type = NVIDIA;
+  }
   
-  if (! strncmp(info,"NVIDIA",6) ) *device_type = NVIDIA;
-  if (! strncmp(info,"ATI",5) )    *device_type = ATI;
+  size_t isize;
+  clGetDeviceInfo(device[0], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(isize), &isize, NULL);
+  printf("    CL_DEVICE_MAX_WORK_GROUP_SIZE : %lu\n",isize);
+  printf("\n");
+
   printf("    device vendor type set : %s\n",device_string[*device_type]);
 
   *context = clCreateContext(0, 1, device, NULL, NULL, &error);
@@ -187,19 +200,22 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_
   size_t nReportSize;
   char* BuildReport;
   
+  char CompileString[80];
+  CompileString[0]='\0';
+
   #ifdef HAVE_CL_DOUBLE
-    if (*device_type == NVIDIA) {
-      error = clBuildProgram(*program, 1, device, "-DHAVE_CL_DOUBLE -DIS_NVIDIA", NULL, NULL);
-    } else {
-      error = clBuildProgram(*program, 1, device, "-DHAVE_CL_DOUBLE", NULL, NULL);
-    }
+    strcat(CompileString,"-DHAVE_CL_DOUBLE");
   #else
-    if (*is_nvidia) {
-       error = clBuildProgram(*program, 1, device, "-DNO_CL_DOUBLE -DIS_NVIDIA -cl-single-precision-constant", NULL, NULL);
-    } else {
-       error = clBuildProgram(*program, 1, device, "-DNO_CL_DOUBLE -cl-single-precision-constant", NULL, NULL);
-    }
+    strcat(CompileString,"-DNO_CL_DOUBLE -cl-single-precision-constant");
   #endif
+  if (*device_type == NVIDIA) strcat(CompileString, " -DIS_NVIDIA");
+  if (*device_type == TESLA_K20Xm)     strcat(CompileString, " -DIS_NVIDIA");
+  if (*device_type == TESLA_M2090)     strcat(CompileString, " -DIS_NVIDIA");
+  if (*device_type == TESLA_2050_2070) strcat(CompileString, " -DIS_NVIDIA");
+  if (*device_type == GeFORCE_GT_650M) strcat(CompileString, " -DIS_NVIDIA");
+
+  error = clBuildProgram(*program, 1, device, CompileString, NULL, NULL);
+
   if (error != CL_SUCCESS){
     printf("clBuildProgram returned an error %d at line %d in file %s\n", error,__LINE__,__FILE__);
     error = clGetProgramBuildInfo(*program, device[0], CL_PROGRAM_BUILD_LOG, 0, NULL, &nReportSize);

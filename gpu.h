@@ -52,6 +52,10 @@
 enum device_vendor_type {
    VENDOR_UNKNOWN = 0,
    NVIDIA,
+   TESLA_K20Xm,
+   TESLA_M2090,
+   TESLA_2050_2070,
+   GeFORCE_GT_650M,
    ATI,
    MIC,
 };
