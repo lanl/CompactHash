@@ -36,6 +36,9 @@
 
 /* Modified from LANL Copyright Disclosure C13002/LA-CC-12-022 */
 
+#ifndef __GPU_H__
+#define __GPU_H__
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -46,6 +49,15 @@
 #include <CL/cl.h>
 #endif
 
+enum device_vendor_type {
+   VENDOR_UNKNOWN = 0,
+   NVIDIA,
+   ATI,
+   MIC,
+};
+
 cl_kernel interpolate_kernel;
 
-void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_program *program, char *filename, char *addlibsource);
+void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_program *program, char *filename, char *addlibsource);
+
+#endif // __GPU_H__

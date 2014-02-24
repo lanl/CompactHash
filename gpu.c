@@ -52,7 +52,7 @@ typedef cl_float cl_real;
 typedef cl_float4 cl_real4;
 #endif
 
-void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_program *program, char *filename, char *addlibsource) {
+void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_program *program, char *filename, char *addlibsource) {
   printf("============== Hardware detection report ===============\n");
 
   cl_platform_id* platform;
@@ -111,7 +111,7 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_pr
     //printf("    CL_PLATFORM_EXTENSIONS : %s\n",info);
   }
    
-  *is_nvidia = 0;
+  *device_type = VENDOR_UNKNOWN;
   printf("\n");
   printf("  Device:\n");
   clGetDeviceInfo(device[0], CL_DEVICE_NAME, sizeof(info), &info, NULL);
@@ -120,8 +120,11 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_pr
   clGetDeviceInfo(device[0], CL_DEVICE_VENDOR, sizeof(info), &info, NULL);
   printf("    CL_DEVICE_VENDOR       : %s\n",info);
   
-  if (! strncmp(info,"NVIDIA",6) ) *is_nvidia = 1;
-  //printf("DEBUG -- device vendor is |%s|, is_nvidia %d\n",info,*is_nvidia);
+  char *device_string[] = {"Unknown", "Nvidia", "ATI", "MIC"};
+  if (! strncmp(info,"NVIDIA",6) ) *device_type = NVIDIA;
+  if (! strncmp(info,"ATI",5) )    *device_type = ATI;
+  if (! strncmp(info,"INTEL",5) )  *device_type = MIC;
+  printf("    device vendor type set : %s\n",device_string[*device_type]);
 
   *context = clCreateContext(0, 1, device, NULL, NULL, &error);
   if(error != CL_SUCCESS) {
@@ -183,7 +186,7 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *is_nvidia, cl_pr
   char* BuildReport;
   
   #ifdef HAVE_CL_DOUBLE
-    if (*is_nvidia) {
+    if (*device_type == NVIDIA) {
       error = clBuildProgram(*program, 1, device, "-DHAVE_CL_DOUBLE -DIS_NVIDIA", NULL, NULL);
     } else {
       error = clBuildProgram(*program, 1, device, "-DHAVE_CL_DOUBLE", NULL, NULL);

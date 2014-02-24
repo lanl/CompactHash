@@ -137,7 +137,7 @@ struct neighbor2d {
    int top;
 };
 
-int is_nvidia = 0;
+int device_type = VENDOR_UNKNOWN;
 
 #define END_CHARACTER    -1
 
@@ -323,7 +323,7 @@ int main (int argc, const char * argv[])
     char *bothsources = (char*)malloc(strlen(get_hash_kernel_source_string()) + strlen(Hash_GetKernelSourceString()) + 1);
     strcpy(bothsources, get_hash_kernel_source_string());
     strcat(bothsources, Hash_GetKernelSourceString());
-    GPUInit(&context, &queue, &is_nvidia, &program, "neigh2d_kern.cl", bothsources);
+    GPUInit(&context, &queue, &device_type, &program, "neigh2d_kern.cl", bothsources);
     hash_lib_init(context);
     uint lws = TILE_SIZE;
     CLFactory = intintHash_CreateFactory(HASH_ALL_CL_HASHES, &emptyNeighborValue, lws, &context, &queue);
