@@ -109,7 +109,7 @@
   }\
   \
   int NAME##MODIFIER##Hash_DestroyTable(NAME##Hash_Table *table){\
-    int exitCode;\
+    int exitCode=0;\
     DESTROY_EXP\
     free(table->tableData);\
     free(table);\
@@ -117,7 +117,7 @@
   }\
   \
   int NAME##MODIFIER##Hash_EmptyTable(NAME##Hash_Table *table){\
-    int exitCode;\
+    int exitCode=0;\
     EMPTY_EXP\
     return exitCode;\
   }\

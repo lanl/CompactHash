@@ -40,4 +40,4 @@
 
 char *get_hash_kernel_source_string();
 void hash_lib_init(cl_context context);
-cl_mem hash_init (int hash_size, cl_context context, cl_command_queue queue, long *gpu_time);
+cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_queue queue, long *gpu_time);
