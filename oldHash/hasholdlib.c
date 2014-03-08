@@ -108,10 +108,9 @@ void hash_lib_init(cl_context context){
    if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
 }
 
-cl_mem hash_init (int hash_size, cl_context context, cl_command_queue queue, long *gpu_time)
+cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_queue queue, long *gpu_time)
 {
    cl_int error;
-   const int TILE_SIZE = 128;
 
    long gpu_time_start, gpu_time_end;
 

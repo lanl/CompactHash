@@ -81,7 +81,8 @@ typedef cl_float4 cl_real4;
 
 #define HASH_TYPE HASH_PERFECT_HASHES
 #define HASH_LOAD_FACTOR 0.3333333
-int TILE_SIZE = 256;
+int TILE_SIZE = 128;
+int TILE_SIZE_INIT = 128;
 
 #ifndef DETAILED_TIMING
 #define DETAILED_TIMING 0
@@ -324,7 +325,10 @@ int main (int argc, const char * argv[])
     strcpy(bothsources, get_hash_kernel_source_string());
     strcat(bothsources, Hash_GetKernelSourceString());
     GPUInit(&context, &queue, &device_type, &program, "neigh2d_kern.cl", bothsources);
-    if (device_type == MIC) TILE_SIZE = 240;
+    if (device_type == MIC) {
+       TILE_SIZE      = 180;
+       TILE_SIZE_INIT = 240;
+    }
     hash_lib_init(context);
     uint lws = TILE_SIZE;
     CLFactory = intintHash_CreateFactory(HASH_ALL_CL_HASHES, &emptyNeighborValue, lws, &context, &queue);
@@ -362,7 +366,7 @@ int main (int argc, const char * argv[])
   printf("%s\n",header);
 
   printf("\nThreshold for refinement is %d\n",threshold); 
-  printf("\nWork group size is %d\n",TILE_SIZE); 
+  printf("\nWork group size is %d and init workgroup size is %d\n",TILE_SIZE,TILE_SIZE_INIT); 
   for (uint levmx = levmx_min; levmx < levmx_max; levmx++ ){
     printf("\nMax levels is %d\n",levmx); 
     if(WRITE_MEM_USAGE) fprintf(fmem,"\nMax levels is %d\n",levmx); 
@@ -1854,7 +1858,7 @@ cl_mem neighbors2d_hashgpu( uint ncells, int mesh_size, int levmx, cl_mem i_buff
   if(DETAILED_TIMING) GPUTime = 0;
 
   //Create Hash Table
-  hash_buffer = hash_init(hash_size, context, queue, &GPUTime);
+  hash_buffer = hash_init(hash_size, TILE_SIZE, context, queue, &GPUTime);
 
   if(DETAILED_TIMING) createGPUTime = (double)(GPUTime)*1.0e-9;
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -2097,7 +2101,7 @@ cl_mem neighbors2d_hashgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_mem 
   if(DETAILED_TIMING) GPUTime = 0;
 
   //Create Hash Table
-  hash_buffer = hash_init(hash_size, context, queue, &GPUTime);
+  hash_buffer = hash_init(hash_size, TILE_SIZE, context, queue, &GPUTime);
 
   if(DETAILED_TIMING) createGPUTime = (double)(GPUTime)*1.0e-9;
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -2342,7 +2346,7 @@ cl_mem neighbors2d_hashgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem 
   if(DETAILED_TIMING) GPUTime = 0;
 
   //Create Hash Table
-  hash_buffer = hash_init(hash_size, context, queue, &GPUTime);
+  hash_buffer = hash_init(hash_size, TILE_SIZE, context, queue, &GPUTime);
 
   if(DETAILED_TIMING) createGPUTime = (double)(GPUTime)*1.0e-9;
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -2588,7 +2592,7 @@ cl_mem neighbors2d_hashgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem 
   if(DETAILED_TIMING) GPUTime = 0;
 
   //Create Hash Table
-  hash_buffer = hash_init(hash_size, context, queue, &GPUTime);
+  hash_buffer = hash_init(hash_size, TILE_SIZE, context, queue, &GPUTime);
 
   if(DETAILED_TIMING) createGPUTime = (double)(GPUTime)*1.0e-9;
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -2873,7 +2877,7 @@ cl_mem neighbors2d_hasholdlibgpu_opt_3( uint ncells, int mesh_size, int levmx, c
     hash_size = gpu_perfect_hash_size;
   }
   
-  hash_buffer = hash_init(hash_size, context, queue, &GPUTime);
+  hash_buffer = hash_init(hash_size, TILE_SIZE, context, queue, &GPUTime);
 
   if(DETAILED_TIMING) createGPUTime = (double)(GPUTime)*1.0e-9;
   if(DETAILED_TIMING) cpu_timer_start(&tSection);

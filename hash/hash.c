@@ -852,13 +852,13 @@ int intintIdentityPerfectHash_DestroyFactory(intintHash_Factory * factory,
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintIdentityPerfectHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	free(table->tableData);
 	free(table);
 	return exitCode;
 }
 int intintIdentityPerfectHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	intintIdentityPerfectHash_Bucket *buckets =
 	    (intintIdentityPerfectHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentityPerfectHash_TableData)];
@@ -1281,7 +1281,7 @@ int intintIdentityPerfectCLHash_DestroyFactory(intintHash_Factory * factory,
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintIdentityPerfectCLHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	clReleaseMemObject(table->tableDataBuffer);
 	clReleaseContext(table->context);
 	clReleaseCommandQueue(table->queue);
@@ -1296,7 +1296,7 @@ int intintIdentityPerfectCLHash_DestroyTable(intintHash_Table * table) {
 	return exitCode;
 }
 int intintIdentityPerfectCLHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	cl_int err;
 	err =
 	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
@@ -1590,13 +1590,13 @@ int intintIdentitySentinelPerfectHash_DestroyFactory(intintHash_Factory *
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintIdentitySentinelPerfectHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	free(table->tableData);
 	free(table);
 	return exitCode;
 }
 int intintIdentitySentinelPerfectHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	intintIdentitySentinelPerfectHash_Bucket *buckets =
 	    (intintIdentitySentinelPerfectHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentitySentinelPerfectHash_TableData)];
@@ -2009,7 +2009,7 @@ int intintIdentitySentinelPerfectCLHash_DestroyFactory(intintHash_Factory *
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintIdentitySentinelPerfectCLHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	clReleaseMemObject(table->tableDataBuffer);
 	clReleaseContext(table->context);
 	clReleaseCommandQueue(table->queue);
@@ -2024,7 +2024,7 @@ int intintIdentitySentinelPerfectCLHash_DestroyTable(intintHash_Table * table) {
 	return exitCode;
 }
 int intintIdentitySentinelPerfectCLHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	cl_int err;
 	err =
 	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
@@ -2344,13 +2344,13 @@ int intintLCGLinearOpenCompactHash_DestroyFactory(intintHash_Factory * factory,
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintLCGLinearOpenCompactHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	free(table->tableData);
 	free(table);
 	return exitCode;
 }
 int intintLCGLinearOpenCompactHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	intintLCGLinearOpenCompactHash_Bucket *buckets =
 	    (intintLCGLinearOpenCompactHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGLinearOpenCompactHash_TableData)];
@@ -2880,7 +2880,7 @@ int intintLCGLinearOpenCompactCLHash_DestroyFactory(intintHash_Factory *
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintLCGLinearOpenCompactCLHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	clReleaseMemObject(table->tableDataBuffer);
 	clReleaseContext(table->context);
 	clReleaseCommandQueue(table->queue);
@@ -2895,7 +2895,7 @@ int intintLCGLinearOpenCompactCLHash_DestroyTable(intintHash_Table * table) {
 	return exitCode;
 }
 int intintLCGLinearOpenCompactCLHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	cl_int err;
 	err =
 	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
@@ -3211,13 +3211,13 @@ int intintLCGQuadraticOpenCompactHash_DestroyFactory(intintHash_Factory *
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintLCGQuadraticOpenCompactHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	free(table->tableData);
 	free(table);
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	intintLCGQuadraticOpenCompactHash_Bucket *buckets =
 	    (intintLCGQuadraticOpenCompactHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGQuadraticOpenCompactHash_TableData)];
@@ -3775,7 +3775,7 @@ int intintLCGQuadraticOpenCompactCLHash_DestroyFactory(intintHash_Factory *
 	return HASH_EXIT_CODE_NORMAL;
 }
 int intintLCGQuadraticOpenCompactCLHash_DestroyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	clReleaseMemObject(table->tableDataBuffer);
 	clReleaseContext(table->context);
 	clReleaseCommandQueue(table->queue);
@@ -3790,7 +3790,7 @@ int intintLCGQuadraticOpenCompactCLHash_DestroyTable(intintHash_Table * table) {
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactCLHash_EmptyTable(intintHash_Table * table) {
-	int exitCode;
+	int exitCode = 0;
 	cl_int err;
 	err =
 	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
