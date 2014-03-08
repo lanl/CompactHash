@@ -222,7 +222,7 @@ int main (int argc, const char * argv[])
   char add_string[40];
 
   int *options;
-  int threshold = 2;    
+  int threshold = 20;    
 
   uint levmx_min = 1;
   uint levmx_max = 6;
@@ -243,10 +243,6 @@ int main (int argc, const char * argv[])
       }
       if (strcmp(argv[i], "-r") == 0) {
         randomize = true; 
-      } 
-      if (strcmp(argv[i], "-w") == 0) {
-        i++;
-        threshold =(int)(atoi(argv[i])); 
       } 
       if (strcmp(argv[i], "-t") == 0) {
         i++;
@@ -2998,7 +2994,7 @@ int adaptiveMeshConstructorWij(const int n, const int l,
   srand (0);
   for(int ii = l; ii > 0; ii--) {
     for(ic = 0; ic < ncells; ic++) {
-      int jj = 1 + (int)(10.0*rand() / (RAND_MAX+1.0));
+      int jj = 1 + (int)(100.0*rand() / (RAND_MAX+1.0));
       // XXX Consider distribution across levels: Clustered at 1 level XXX
       if(jj>threshold) {level[ic] = ii;}
     }
