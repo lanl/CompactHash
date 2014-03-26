@@ -66,10 +66,10 @@ hg2
 hg3
 holg3
 
-Compact versus perfect figure (hg run on Kepler, holg3 run on various cards)
-Use the -r randomization flag
-./neigh2d -r -t 2 -L 6 -o hg3 hlg3
-hg 
+Compact versus perfect figure (run on various cards)
+with and without the -r randomization flag
+./neigh2d -r -t 2 -L 6 -o hg3 hlg3 and ./neigh2d -t 2 -L 6 -o hg3 hlg3
+hg3 
 holg3
 
 Table construction (each run on Kepler)
