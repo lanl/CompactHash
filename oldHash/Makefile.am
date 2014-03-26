@@ -22,5 +22,7 @@ hasholdlib_kern.inc:
 hashold_kern.inc:
 	./embed_source.pl hashold_kern.cl > hashold_kern.inc
 
+EXTRA_DIST = hashold_kern.cl hasholdlib_kern.cl embed_source.pl
+
 clean-local:
 	rm -f *.inc

@@ -324,6 +324,7 @@ include_HEADERS = hashit.h hasholdlib.h
 H_SRCS = hashit.h hasholdlib.h
 C_SRCS = hashit.c hasholdlib.c
 libhashold_la_SOURCES = ${C_SRCS} ${H_SRCS}
+EXTRA_DIST = hashold_kern.cl hasholdlib_kern.cl embed_source.pl
 all: all-am
 
 .SUFFIXES:

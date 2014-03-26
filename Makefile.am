@@ -11,7 +11,8 @@ neigh2d_LDADD = kdtree/libkdtree.la hash/libhash.la oldHash/libhashold.la timer/
 
 LDADD = -lm
 
-EXTRA_DIST = neigh2d_kern.cl config.h.in APACHE_LICENSE-2_0 AUTHORS README LICENSE Papers.bib NOTICE
+EXTRA_DIST = neigh2d_kern.cl config.h.in APACHE_LICENSE-2_0 AUTHORS README LICENSE \
+  Papers.bib NOTICE README.md ReleaseAuthorization.pdf Todo libtool
 
 kdtree/libkdtree.la:
 	cd kdtree

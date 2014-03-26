@@ -27,3 +27,7 @@ hash.c: hash.cp hash.cm hash.cl perfectHash.cm compactHash.cm
 
 hash.cl:	hash.clp hash.cm perfectHash.cm compactHash.cm
 	${CPREPROCESSOR} -CC -x c -imacros hash.cm hash.clp | ${INDENT} -linux -brf -o hash.cl
+
+EXTRA_DIST = perfectHash.cm perfectHash.hm primetest.c testHelper.h hash.hp \
+    hash.hm hash.cp hash.cm hash.h hash.c hash.cl hash.clp embed_source.pl \
+    compactHash.cm compactHash.hm baseHash.cm baseHash.hm

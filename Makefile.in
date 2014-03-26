@@ -370,7 +370,9 @@ neigh2d_H_SRCS = gpu.h
 neigh2d_SOURCES = ${neigh2d_C_SRCS} ${neigh2d_H_SRCS}
 neigh2d_LDADD = kdtree/libkdtree.la hash/libhash.la oldHash/libhashold.la timer/libtimer.la
 LDADD = -lm
-EXTRA_DIST = neigh2d_kern.cl config.h.in APACHE_LICENSE-2_0 AUTHORS README LICENSE Papers.bib NOTICE
+EXTRA_DIST = neigh2d_kern.cl config.h.in APACHE_LICENSE-2_0 AUTHORS README LICENSE \
+  Papers.bib NOTICE README.md ReleaseAuthorization.pdf Todo libtool
+
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

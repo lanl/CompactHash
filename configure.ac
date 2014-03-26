@@ -1,4 +1,4 @@
-AC_INIT(hash, v1.0)
+AC_INIT(CompactHash, v1.0)
 
 AC_CONFIG_AUX_DIR(./config)
 
