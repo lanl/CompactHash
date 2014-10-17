@@ -16176,8 +16176,7 @@ fi
             fi
          fi
       fi
-            opencl_inc_found=no
-      if test "$opencl_inc_found" = "yes"; then
+                  if test "$opencl_inc_found" = "yes"; then
 
 $as_echo "#define HAVE_OPENCL 1" >>confdefs.h
 

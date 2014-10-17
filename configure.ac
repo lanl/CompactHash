@@ -305,7 +305,7 @@ if test "${enable_opencl}" != "no"; then
          fi
       fi
       dnl For debugging fail
-      opencl_inc_found=no
+      dnl opencl_inc_found=no
       if test "$opencl_inc_found" = "yes"; then
          AC_DEFINE(HAVE_OPENCL,1,[Has OpenCL])
       else
