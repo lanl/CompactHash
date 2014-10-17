@@ -134,7 +134,8 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 PROGRAMS = $(bin_PROGRAMS)
-am_hashTest_OBJECTS = testHelper.$(OBJEXT) hashTest.$(OBJEXT)
+am_hashTest_OBJECTS = hashTest-testHelper.$(OBJEXT) \
+	hashTest-hashTest.$(OBJEXT)
 hashTest_OBJECTS = $(am_hashTest_OBJECTS)
 hashTest_DEPENDENCIES = libhash.la
 AM_V_P = $(am__v_P_@AM_V@)
@@ -326,6 +327,7 @@ AM_MAKEFLAGS = -j 4
 DEFAULT_INCLUDES = -I. -I..
 lib_LTLIBRARIES = libhash.la
 include_HEADERS = hash.h
+hashTest_CPPFLAGS = -DHAVE_OPENCL -DHAVE_CL_DOUBLE
 H_SRCS = hash.h CLHash_Utilities.h
 C_SRCS = hash.c CLHash_Utilities.c
 libhash_la_SOURCES = ${C_SRCS} ${H_SRCS}
@@ -469,8 +471,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CLHash_Utilities.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testHelper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashTest-hashTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashTest-testHelper.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -492,6 +494,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+hashTest-testHelper.o: testHelper.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hashTest-testHelper.o -MD -MP -MF $(DEPDIR)/hashTest-testHelper.Tpo -c -o hashTest-testHelper.o `test -f 'testHelper.c' || echo '$(srcdir)/'`testHelper.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hashTest-testHelper.Tpo $(DEPDIR)/hashTest-testHelper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testHelper.c' object='hashTest-testHelper.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hashTest-testHelper.o `test -f 'testHelper.c' || echo '$(srcdir)/'`testHelper.c
+
+hashTest-testHelper.obj: testHelper.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hashTest-testHelper.obj -MD -MP -MF $(DEPDIR)/hashTest-testHelper.Tpo -c -o hashTest-testHelper.obj `if test -f 'testHelper.c'; then $(CYGPATH_W) 'testHelper.c'; else $(CYGPATH_W) '$(srcdir)/testHelper.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hashTest-testHelper.Tpo $(DEPDIR)/hashTest-testHelper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testHelper.c' object='hashTest-testHelper.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hashTest-testHelper.obj `if test -f 'testHelper.c'; then $(CYGPATH_W) 'testHelper.c'; else $(CYGPATH_W) '$(srcdir)/testHelper.c'; fi`
+
+hashTest-hashTest.o: hashTest.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hashTest-hashTest.o -MD -MP -MF $(DEPDIR)/hashTest-hashTest.Tpo -c -o hashTest-hashTest.o `test -f 'hashTest.c' || echo '$(srcdir)/'`hashTest.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hashTest-hashTest.Tpo $(DEPDIR)/hashTest-hashTest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashTest.c' object='hashTest-hashTest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hashTest-hashTest.o `test -f 'hashTest.c' || echo '$(srcdir)/'`hashTest.c
+
+hashTest-hashTest.obj: hashTest.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hashTest-hashTest.obj -MD -MP -MF $(DEPDIR)/hashTest-hashTest.Tpo -c -o hashTest-hashTest.obj `if test -f 'hashTest.c'; then $(CYGPATH_W) 'hashTest.c'; else $(CYGPATH_W) '$(srcdir)/hashTest.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hashTest-hashTest.Tpo $(DEPDIR)/hashTest-hashTest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hashTest.c' object='hashTest-hashTest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hashTest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hashTest-hashTest.obj `if test -f 'hashTest.c'; then $(CYGPATH_W) 'hashTest.c'; else $(CYGPATH_W) '$(srcdir)/hashTest.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
