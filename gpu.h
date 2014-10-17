@@ -39,14 +39,16 @@
 #ifndef __GPU_H__
 #define __GPU_H__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+//#ifdef HAVE_CONFIG_H
+//#include "config.h"
+//#endif
 
+#ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
 #include <OpenCL/OpenCL.h>
 #else
 #include <CL/cl.h>
+#endif
 #endif
 
 enum device_vendor_type {
@@ -60,8 +62,10 @@ enum device_vendor_type {
    MIC,
 };
 
+#ifdef HAVE_OPENCL
 cl_kernel interpolate_kernel;
 
 void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_program *program, char *filename, char *addlibsource);
+#endif
 
 #endif // __GPU_H__

@@ -48,13 +48,46 @@
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
 DELAY(#include "hash.h")
+DELAY(#ifdef HAVE_OPENCL)
 DELAY(#ifdef __APPLE_CC__)
 DELAY(#include <OpenCL/OpenCL.h>)
 DELAY(#else)
 DELAY(#include <CL/cl.h>)
 DELAY(#endif)
+DELAY(#else)
+typedef int cl_kernel;
+DELAY(#define CL_CONTEXT_DEVICES   0)
+DELAY(#define CL_MEM_READ_WRITE    0)
+DELAY(#define CL_TRUE              1)
+DELAY(#define CL_MEM_READ_ONLY     0)
+DELAY(#define CL_MEM_COPY_HOST_PTR 0)
+DELAY(#define CL_MEM_WRITE_ONLY    0)
+DELAY(#define CL_KERNEL_WORK_GROUP_SIZE 128)
+int clRetainContext(int context) { return context; }
+int clRetainCommandQueue(int command_queue) { return command_queue; }
+int clGetContextInfo(int context, int param, size_t size, void *value, size_t *size_ret) { return 0; }
+int clReleaseContext(int context) { return context; }
+int clReleaseCommandQueue(int command_queue) { return command_queue; }
+int clReleaseProgram(int program) { return program; }
+int clRetainKernel(int kernel) { return kernel; }
+int clRetainProgram(int program) { return program; }
+cl_mem clCreateBuffer(int context, int flags, size_t size, void *value, int *size_ret) { return 0; }
+int clEnqueueWriteBuffer(int command_queue, void *buffer, int blocking_write, size_t offset, size_t cb, const void * ptr,
+  uint nevents, const int *wait_list, int *event) { return 0; }
+int clEnqueueReadBuffer(int command_queue, void *buffer, int blocking_write, size_t offset, size_t cb, const void * ptr,
+  uint nevents, const int *wait_list, int *event) { return 0; }
+int clCreateKernel(int program, const char *kernel_name, int *errcode_ret) { return 0; }
+int clReleaseKernel(int kernel) { return kernel; }
+int clReleaseMemObject(void * memobj) { return 0; }
+int clSetKernelArg(int kernel, uint arg_index, size_t arg_size, const void *arg_value) { return 0; }
+int clGetKernelWorkGroupInfo(int kernel, int device, int param_name, size_t size, void *value, size_t *size_ret) { return 0; }
+int clEnqueueNDRangeKernel(int command_queue, int kernel, uint work_dim, const size_t *offset, const size_t *size, const size_t *local_size,
+   uint nevents, const int *wait_list, int *event) { return 0; }
+int clFinish(int command_queue) { return 0; }
+DELAY(#endif)
 DELAY(#define PRIME_NUM_CHECKS 20)
 typedef unsigned int uint;
+
 
 DELAY(#include <math.h>)
 #include "hash.cm"

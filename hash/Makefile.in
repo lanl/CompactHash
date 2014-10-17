@@ -83,8 +83,7 @@ host_triplet = @host@
 bin_PROGRAMS = hashTest$(EXEEXT)
 subdir = hash
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(srcdir)/config.h.in $(top_srcdir)/./config/depcomp \
-	$(include_HEADERS) README
+	$(top_srcdir)/./config/depcomp $(include_HEADERS) README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -93,7 +92,6 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -180,8 +178,7 @@ am__can_run_installinfo = \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 HEADERS = $(include_HEADERS)
-am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
-	$(LISP)config.h.in
+am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
 # *not* preserved.
@@ -251,7 +248,6 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
-MPE_BIN = @MPE_BIN@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -297,7 +293,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-found = @found@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -311,6 +306,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lspci_found = @lspci_found@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -339,8 +335,7 @@ EXTRA_DIST = perfectHash.cm perfectHash.hm primetest.c testHelper.h hash.hp \
     hash.hm hash.cp hash.cm hash.h hash.c hash.cl hash.clp embed_source.pl \
     compactHash.cm compactHash.hm baseHash.cm baseHash.hm
 
-all: config.h
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -374,17 +369,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-
-config.h: stamp-h2
-	@test -f $@ || rm -f stamp-h2
-	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h2
-
-stamp-h2: $(srcdir)/config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h2
-	cd $(top_builddir) && $(SHELL) ./config.status hash/config.h
-
-distclean-hdr:
-	-rm -f config.h stamp-h2
 
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -620,7 +604,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
@@ -666,7 +650,7 @@ distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-tags
+	distclean-tags
 
 dvi: dvi-am
 
@@ -729,16 +713,16 @@ ps-am:
 uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-libLTLIBRARIES
 
-.MAKE: all install-am install-strip
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
 	clean-libtool cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am \
 	install-includeHEADERS install-info install-info-am \
 	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \

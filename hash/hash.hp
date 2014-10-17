@@ -50,19 +50,49 @@
 DELAY(#ifndef HASH_H)
 DELAY(#define HASH_H)
 //
+DELAY(#include <stdlib.h>)
+DELAY(#include <stdio.h>)
+DELAY(#include <stdarg.h>)
+DELAY(#include <string.h>)
+//
+DELAY(#ifdef HAVE_OPENCL)
 DELAY(#ifdef __APPLE_CC__)
 DELAY(#include <OpenCL/OpenCL.h>)
 DELAY(#else)
 DELAY(#include <CL/cl.h>)
 DELAY(#endif)
+DELAY(#else)
+typedef void * cl_mem;
+typedef int cl_context;
+typedef int cl_command_queue;
+typedef int cl_program;
+typedef int cl_device_id;
+typedef int cl_int;
+int clRetainContext(int context);
+int clRetainCommandQueue(int command_queue);
+int clGetContextInfo(int context, int param, size_t size, void *value, size_t *size_ret);
+int clReleaseContext(int context);
+int clReleaseCommandQueue(int command_queue);
+int clReleaseProgram(int program);
+int clRetainProgram(int program);
+int clRetainKernel(int kernel);
+cl_mem clCreateBuffer(int context, int flags, size_t size, void *value, int *size_ret);
+int clEnqueueWriteBuffer(int command_queue, void *buffer, int blocking_write, size_t offset, size_t cb, const void * ptr, 
+   uint nevents, const int *wait_list, int *event);
+int clEnqueueReadBuffer(int command_queue, void *buffer, int blocking_write, size_t offset, size_t cb, const void * ptr, 
+   uint nevents, const int *wait_list, int *event);
+int clCreateKernel(int program, const char *kernel_name, int *errcode_ret);
+int clReleaseKernel(int kernel);
+int clReleaseMemObject(void * memobj);
+int clSetKernelArg(int kernel, uint arg_index, size_t arg_size, const void *arg_value);
+int clGetKernelWorkGroupInfo(int kernel, int device, int param_name, size_t size, void *value, size_t *size_ret);
+int clEnqueueNDRangeKernel(int command_queue, int kernel, uint work_dim, const size_t *offset, const size_t *size, const size_t *local_size,
+   uint nevents, const int *wait_list, int *event);
+int clFinish(int command_queue);
+DELAY(#endif)
 //
 DELAY(#include "CLHash_Utilities.h")
 //
-//
-DELAY(#include <stdlib.h>)
-DELAY(#include <stdio.h>)
-DELAY(#include <stdarg.h>)
-DELAY(#include <string.h>)
 //
 DELAY(#include "hash.hm")
 DELAY(#include "hash.cm")

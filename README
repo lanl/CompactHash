@@ -21,6 +21,28 @@ Configure options
    --enable-detailed-timing
    --disable-write-mem-usage
 
+=================================================================
+Builds with and without OpenCL
+=================================================================
+By default, OpenCL is included in the build. This can be problematic
+on some architectures. If OpenCL is not found, it will try to complete
+the build without it and only the CPU routines will be available. You can
+build without OpenCL with a configure option:
+
+./configure --enable-opencl=no 
+   or
+./configure --disable-opencl
+
+If you want OpenCL in the build and the location of the OpenCL library
+is causing the problem, try setting the environment variables OPENCL_INCLUDE
+and OPENCL_LIBS to the locations of these files. 
+
+If the build fails, you may have to go into the hash subdirectory
+and force hash.c and hash.h to rebuild. Try "make hash.c hash.h" or
+remove the hash.c and hash.h files and make them. 
+=================================================================
+
+
 On Mac OSx install gnu-indent. The Mac version does not recognize some of the options that are used.
 
 './neigh2d -h' gives further information on option keywords.

@@ -36,6 +36,9 @@
  *           Sara Hartse             sara@lanl.gov, sara.hartse@gmail.com
  *           Rebecka Tumblin         rtumblin@lanl.gov, rebeckatumblin@gmail.com
  */
+//#ifdef HAVE_CONFIG_H
+//#include "config.h"
+//#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,27 +54,29 @@
 #include "oldHash/hasholdlib.h"
 #include "timer/timer.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
 #include <OpenCL/OpenCL.h>
 #else
 #include <CL/cl.h>
 #endif
+#endif
 
 #ifdef HAVE_CL_DOUBLE
 typedef double real;
+#ifdef HAVE_OPENCL
 typedef cl_double cl_real;
 typedef cl_double4 cl_real4;
+#endif
 #define SQRT(x) sqrt(x)
 #define ONE 1.0
 #define TWO 2.0
 #else
 typedef float real;
+#ifdef HAVE_OPENCL
 typedef cl_float cl_real;
 typedef cl_float4 cl_real4;
+#endif
 #define SQRT(x) sqrtf(x)
 #define ONE 1.0f
 #define TWO 2.0f
@@ -166,10 +171,12 @@ enum hash_type
   HASHOLDLIBGPU_3  = 19
 };
 
+#ifdef HAVE_OPENCL
 cl_context context;
 cl_command_queue queue;
 cl_program program;
 cl_kernel neighbors2d_hashwrite_kern, neighbors2d_hashwrite_opt_1_kern, neighbors2d_hashwrite_opt_2_kern, neighbors2d_hashwrite_opt_3_kern, neighbors2d_hasholdlibwrite_opt_3_kern, neighbors2d_hashread_kern, neighbors2d_hashread_opt_3_kern, neighbors2d_hasholdlibread_opt_3_kern, neighbors2d_hashlibwrite_kern, neighbors2d_hashlibread_kern, neighbors2d_hashlibwrite_opt_1_kern, neighbors2d_hashlibwrite_opt_2_kern, neighbors2d_hashlibwrite_opt_3_kern, neighbors2d_hashlibread_opt_3_kern; 
+#endif
 intintHash_Factory *factory;
 intintHash_Factory *CLFactory;
 
@@ -186,6 +193,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_3( uint ncells, int mesh_size, int le
 struct neighbor2d *neighbors2d_hashlibcpu_opt_3( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level );
 struct neighbor2d *neighbors2d_hasholdlibcpu_opt_3( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level );
 cl_mem neighbors2d_hashgpu( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
+#ifdef HAVE_OPENCL
 cl_mem neighbors2d_hashgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
 cl_mem neighbors2d_hashgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable );
 cl_mem neighbors2d_hashgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable );
@@ -195,14 +203,17 @@ cl_mem neighbors2d_hashlibgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_m
 cl_mem neighbors2d_hashlibgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
 cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
 cl_mem neighbors2d_hashlibgpu_opt_4( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
+#endif
 
 int adaptiveMeshConstructorWij(const int n, const int l, int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold);
 void genmatrixfree(void **var);
 void **genmatrix(int jnum, int inum, size_t elsize);
 FILE * fmem; 
+#ifdef HAVE_OPENCL
 void cl_error_check(int error, char *file, int line){
   if (error != CL_SUCCESS) printf("Error is %d in file %s at line %d\n",error, file, line);
 }
+#endif
    
 #ifndef bool
 typedef int bool;
@@ -321,6 +332,7 @@ int main (int argc, const char * argv[])
   int emptyNeighborValue = -1;
   factory = intintHash_CreateFactory(HASH_ALL_C_HASHES, &emptyNeighborValue, 0, NULL, NULL);
   if(haveGPU){
+#ifdef HAVE_OPENCL
     char *bothsources = (char*)malloc(strlen(get_hash_kernel_source_string()) + strlen(Hash_GetKernelSourceString()) + 1);
     strcpy(bothsources, get_hash_kernel_source_string());
     strcat(bothsources, Hash_GetKernelSourceString());
@@ -361,6 +373,10 @@ int main (int argc, const char * argv[])
     if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
     neighbors2d_hasholdlibread_opt_3_kern = clCreateKernel(program, "neighbors2d_hasholdlibread_opt_3_kern", &error);
     if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+#else
+    printf("Error -- asking for GPU test and there is no GPU\n");
+    exit(-1);
+#endif
   }
   printf("\n    2D Neighbors Performance Results\n\n");
   printf("%s\n",header);
@@ -399,6 +415,7 @@ void neigh2dTester(int ncells, int *level, struct neighbor2d *neigh2d_gold, stru
   free(neigh2d_test);
 }
 
+#ifdef HAVE_OPENCL
 void neigh2dCLTester(int ncells, int *level, struct neighbor2d *neigh2d_gold, cl_mem neigh2d_buffer){
   struct neighbor2d *neigh2d_test = (struct neighbor2d *)malloc(ncells*sizeof(struct neighbor2d));
   cl_int error = clEnqueueReadBuffer(queue, neigh2d_buffer, CL_TRUE, 0, ncells*sizeof(cl_uint4), neigh2d_test, 0, NULL, NULL);
@@ -406,6 +423,7 @@ void neigh2dCLTester(int ncells, int *level, struct neighbor2d *neigh2d_gold, cl
   neigh2dTester(ncells, level, neigh2d_gold, neigh2d_test);
   clReleaseMemObject(neigh2d_buffer);
 }
+#endif
 
 void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int haveGPU) 
 {
@@ -453,14 +471,17 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
     }
   }
 
+#ifdef HAVE_OPENCL
   cl_mem i_buffer;
   cl_mem j_buffer;
   cl_mem level_buffer;
   cl_int error;
   cl_mem levtable_buffer;
   cl_mem neigh2d_buffer;
+#endif
 
   if (haveGPU) {
+#ifdef HAVE_OPENCL
     error = 0;
     i_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, ncells*sizeof(int), NULL, &error);
     if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
@@ -483,6 +504,7 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
     if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
     error = clEnqueueWriteBuffer(queue, levtable_buffer, CL_TRUE, 0, (levmx+1)*sizeof(int), levtable, 0, NULL, NULL);
     if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+#endif
   }
 
   for(int z = 0; options[z] != END_CHARACTER; z++) {
@@ -605,6 +627,7 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
         neigh2dTester(ncells, level, neigh2d_gold, neigh2d_test);
         break;
 
+#ifdef HAVE_OPENCL
       case HASHGPU:
         cpu_timer_start(&timer);
         neigh2d_buffer = neighbors2d_hashgpu(ncells, mesh_size, levmx, i_buffer, j_buffer, level_buffer, levtable_buffer);
@@ -694,13 +717,16 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
         if(WRITE_MEM_USAGE) fprintf(fmem, "\t%8s,", "x");
         neigh2dCLTester(ncells, level, neigh2d_gold, neigh2d_buffer);
         break;
+#endif
     }
   }
   if(haveGPU){
+#ifdef HAVE_OPENCL
     clReleaseMemObject(i_buffer);
     clReleaseMemObject(j_buffer);
     clReleaseMemObject(level_buffer);
     clReleaseMemObject(levtable_buffer);
+#endif
   }
   free(neigh2d_gold);
   free(levtable);
@@ -1833,6 +1859,7 @@ struct neighbor2d *neighbors2d_hasholdlibcpu_opt_3( uint ncells, int mesh_size, 
   return(neigh2d);
 }
 
+#ifdef HAVE_OPENCL
 cl_mem neighbors2d_hashgpu( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
@@ -2960,6 +2987,7 @@ cl_mem neighbors2d_hasholdlibgpu_opt_3( uint ncells, int mesh_size, int levmx, c
 
   return(neighbor2d_buffer);
 } 
+#endif
  
 // adaptiveMeshConstructor()
 // Inputs: n (width/height of the square mesh), l (maximum level of refinement),

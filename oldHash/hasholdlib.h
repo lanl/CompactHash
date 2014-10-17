@@ -31,13 +31,20 @@
  */
 
 #include <stdio.h>
+//#ifdef HAVE_CONFIG_H
+//#include "config.h"
+//#endif
 
+#ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
 #include <OpenCL/OpenCL.h>
 #else
 #include <CL/cl.h>
 #endif
+#endif
 
 char *get_hash_kernel_source_string();
+#ifdef HAVE_OPENCL
 void hash_lib_init(cl_context context);
 cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_queue queue, long *gpu_time);
+#endif

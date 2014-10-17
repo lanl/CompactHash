@@ -38,10 +38,29 @@
 #ifndef CLHASH_UTILITIES_H
 #define CLHASH_UTILITIES_H
 
+#ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
 #include <OpenCL/OpenCL.h>
 #else
 #include <CL/cl.h>
+#endif
+#else
+typedef int cl_int;
+typedef int cl_context;
+typedef int cl_program;
+typedef int cl_command_queue;
+typedef int cl_device_id;
+typedef int cl_platform_id;
+
+int clGetPlatformIDs(uint nentries, int *platforms, uint *nplatforms);
+int clGetDeviceIDs(int platform, int device_type, uint nentries, int *devices, uint *ndevices);
+int clGetPlatformInfo(int platform, int param_name, size_t size, void *value, size_t *size_ret);
+int clGetDeviceInfo(int device, int param_name, size_t size, void *value, size_t *size_ret);
+int clCreateContext(int *properties, uint ndevices, const int *devices, void *notify, void *user_data, int *errcode_ret);
+int clCreateCommandQueue(int context, int device, int properties, int *errcode_ret);
+int clCreateProgramWithSource(int context, uint count, const char **strings, const size_t *lengths, int *errcode_ret);
+int clBuildProgram(int program, uint ndevices, const int *device_list, const char *options, void *notify, void *user_data);
+int clGetProgramBuildInfo(int program, int devices, int param_name, size_t size, void *value, size_t *size_ret);
 #endif
 
 #define CLHash_Utilities_CreateContext(   context, command_queue) \

@@ -44,14 +44,23 @@
 
 #ifdef HAVE_CL_DOUBLE
 typedef double real;
+#ifdef HAVE_OPENCL
 typedef cl_double cl_real;
 typedef cl_double4 cl_real4;
+#endif
 #else
 typedef float real;
+#ifdef HAVE_OPENCL
 typedef cl_float cl_real;
 typedef cl_float4 cl_real4;
 #endif
+#endif
 
+#ifndef DEVICE_DETECT_DEBUG
+#define DEVICE_DETECT_DEBUG 1
+#endif
+
+#ifdef HAVE_OPENCL
 void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_program *program, char *filename, char *addlibsource) {
   printf("============== Hardware detection report ===============\n");
 
@@ -63,6 +72,7 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_
   cl_int error = 0;
   
   error = clGetPlatformIDs(0, NULL, &num_platforms);
+  printf("\nGPUInit: %d opencl platform(s) detected\n",num_platforms);
   if(error != CL_SUCCESS) {
     printf("Error getting number of platforms\n");
     exit(error);
@@ -252,3 +262,4 @@ void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_
     printf("%s\n", BuildReport);
   }
 }
+#endif

@@ -82,10 +82,9 @@ bin_PROGRAMS = neigh2d$(EXEEXT)
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in $(top_srcdir)/./config/depcomp AUTHORS \
-	README ./config/compile ./config/config.guess \
-	./config/config.sub ./config/depcomp ./config/install-sh \
-	./config/missing ./config/ltmain.sh \
+	$(top_srcdir)/./config/depcomp AUTHORS README ./config/compile \
+	./config/config.guess ./config/config.sub ./config/depcomp \
+	./config/install-sh ./config/missing ./config/ltmain.sh \
 	$(top_srcdir)/./config/compile \
 	$(top_srcdir)/./config/config.guess \
 	$(top_srcdir)/./config/config.sub \
@@ -102,7 +101,6 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = config.h $(top_builddir)/hash/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
@@ -129,7 +127,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/hash
+DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/./config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -174,8 +172,7 @@ am__recursive_targets = \
   $(am__extra_recursive_targets)
 AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
 	cscope distdir dist dist-all distcheck
-am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
-	$(LISP)config.h.in
+am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
 # *not* preserved.
@@ -288,7 +285,6 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
-MPE_BIN = @MPE_BIN@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -334,7 +330,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-found = @found@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -348,6 +343,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lspci_found = @lspci_found@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -370,11 +366,10 @@ neigh2d_H_SRCS = gpu.h
 neigh2d_SOURCES = ${neigh2d_C_SRCS} ${neigh2d_H_SRCS}
 neigh2d_LDADD = kdtree/libkdtree.la hash/libhash.la oldHash/libhashold.la timer/libtimer.la
 LDADD = -lm
-EXTRA_DIST = neigh2d_kern.cl config.h.in APACHE_LICENSE-2_0 AUTHORS README LICENSE \
+EXTRA_DIST = neigh2d_kern.cl APACHE_LICENSE-2_0 AUTHORS README LICENSE \
   Papers.bib NOTICE README.md ReleaseAuthorization.pdf Todo libtool
 
-all: config.h
-	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -412,21 +407,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
-
-config.h: stamp-h1
-	@test -f $@ || rm -f stamp-h1
-	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h1
-
-stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.h.in:  $(am__configure_deps) 
-	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
-	rm -f stamp-h1
-	touch $@
-
-distclean-hdr:
-	-rm -f config.h stamp-h1
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -816,7 +796,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) config.h
+all-am: Makefile $(PROGRAMS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)"; do \
@@ -862,7 +842,7 @@ distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-local distclean-tags
+	distclean-libtool distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -926,7 +906,7 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS
 
-.MAKE: $(am__recursive_targets) all install-am install-strip
+.MAKE: $(am__recursive_targets) install-am install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-binPROGRAMS \
@@ -934,7 +914,7 @@ uninstall-am: uninstall-binPROGRAMS
 	cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
 	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
 	distcheck distclean distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-local distclean-tags \
+	distclean-libtool distclean-local distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
 	install-data install-data-am install-dvi install-dvi-am \
@@ -969,7 +949,6 @@ clean-local:
 	rm -f memory.out
 
 distclean-local:
-	rm -f config.h.in~
 	rm -f hash-v*.tar.gz
 	rm -rf build
 	rm -rf autom4te.cache

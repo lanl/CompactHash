@@ -42,8 +42,86 @@
 #include <stdlib.h>
 #include "CLHash_Utilities.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+//#ifdef HAVE_CONFIG_H
+//#include "config.h"
+//#endif
+
+#ifdef HAVE_OPENCL
+#ifdef __APPLE_CC__
+#include <OpenCL/OpenCL.h>
+#else
+#include <CL/cl.h>
+#endif
+
+#else
+int clGetPlatformIDs(uint nentries, int *platforms, uint *nplatforms) { return 0; }
+int clGetDeviceIDs(int platform, int device_type, uint nentries, int *devices, uint *ndevices) { return 0; } 
+int clGetPlatformInfo(int platform, int param_name, size_t size, void *value, size_t *size_ret) { return 0; } 
+int clGetDeviceInfo(int device, int param_name, size_t size, void *value, size_t *size_ret) { return 0; } 
+int clCreateContext(int *properties, uint ndevices, const int *devices, void *notify, void *user_data, int *errcode_ret) { return 0; }
+int clCreateCommandQueue(int context, int device, int properties, int *errcode_ret) { return 0; }
+int clCreateProgramWithSource(int context, uint count, const char **strings, const size_t *lengths, int *errcode_ret) { return 0; }
+int clBuildProgram(int program, uint ndevices, const int *device_list, const char *options, void *notify, void *user_data) { return 0; }
+int clGetProgramBuildInfo(int program, int devices, int param_name, size_t size, void *value, size_t *size_ret) { return 0; }
+
+#define CL_SUCCESS                           0
+#define CL_PROGRAM_LOG                       0
+#define CL_PROGRAM_BUILD_LOG                 0
+#define CL_DEVICE_TYPE_GPU                   0
+#define CL_DEVICE_TYPE_CPU                   0
+#define CL_DEVICE_TYPE_ACCELERATOR           0
+#define CL_DEVICE_NAME                       0
+#define CL_DEVICE_VENDOR                     0
+#define CL_PLATFORM_NAME                     0
+#define CL_PLATFORM_VENDOR                   0
+#define CL_PLATFORM_VERSION                  0
+#define CL_QUEUE_PROFILING_ENABLE            0
+
+#define CL_DEVICE_NOT_FOUND                 -1
+#define CL_DEVICE_NOT_AVAILABLE             -2
+#define CL_COMPILER_NOT_AVAILABLE           -3
+#define CL_MEM_OBJECT_ALLOCATION_FAILURE    -4
+#define CL_OUT_OF_RESOURCES                 -5
+#define CL_OUT_OF_HOST_MEMORY               -6
+#define CL_PROFILING_INFO_NOT_AVAILABLE     -7
+#define CL_MEM_COPY_OVERLAP                 -8
+#define CL_IMAGE_FORMAT_MISMATCH            -9
+#define CL_IMAGE_FORMAT_NOT_SUPPORTED       -10
+#define CL_BUILD_PROGRAM_FAILURE            -11
+#define CL_MAP_FAILURE                      -12
+#define CL_INVALID_VALUE                    -30
+#define CL_INVALID_DEVICE_TYPE              -31
+#define CL_INVALID_PLATFORM                 -32
+#define CL_INVALID_DEVICE                   -33
+#define CL_INVALID_CONTEXT                  -34
+#define CL_INVALID_QUEUE_PROPERTIES         -35
+#define CL_INVALID_COMMAND_QUEUE            -36
+#define CL_INVALID_HOST_PTR                 -37
+#define CL_INVALID_MEM_OBJECT               -38
+#define CL_INVALID_IMAGE_FORMAT_DESCRIPTOR  -39
+#define CL_INVALID_IMAGE_SIZE               -40
+#define CL_INVALID_SAMPLER                  -41
+#define CL_INVALID_BINARY                   -42
+#define CL_INVALID_BUILD_OPTIONS            -43
+#define CL_INVALID_PROGRAM                  -44
+#define CL_INVALID_PROGRAM_EXECUTABLE       -45
+#define CL_INVALID_KERNEL_NAME              -46
+#define CL_INVALID_KERNEL_DEFINITION        -47
+#define CL_INVALID_KERNEL                   -48
+#define CL_INVALID_ARG_INDEX                -49
+#define CL_INVALID_ARG_VALUE                -50
+#define CL_INVALID_ARG_SIZE                 -51
+#define CL_INVALID_KERNEL_ARGS              -52
+#define CL_INVALID_WORK_DIMENSION           -53
+#define CL_INVALID_WORK_GROUP_SIZE          -54
+#define CL_INVALID_WORK_ITEM_SIZE           -55
+#define CL_INVALID_GLOBAL_OFFSET            -56
+#define CL_INVALID_EVENT_WAIT_LIST          -57
+#define CL_INVALID_EVENT                    -58
+#define CL_INVALID_OPERATION                -59
+#define CL_INVALID_GL_OBJECT                -60
+#define CL_INVALID_BUFFER_SIZE              -61
+#define CL_INVALID_MIP_LEVEL                -62
 #endif
 
 #ifndef DEBUG

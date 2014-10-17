@@ -31,6 +31,9 @@
  */
 
 #include <stdlib.h>
+//#ifdef HAVE_CONFIG_H
+//#include "config.h"
+//#endif
 #include "hasholdlib.h"
 #include "hasholdlib_kern.inc"
 #include "hashold_kern.inc"
@@ -41,6 +44,7 @@ char *get_hash_kernel_source_string(void){
    return (char*) hashold_kern_source;
 }
 
+#ifdef HAVE_OPENCL
 cl_kernel init_kernel;
 void hash_lib_init(cl_context context){
 
@@ -149,3 +153,4 @@ cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_q
 
    return(hash_buffer);
 }
+#endif

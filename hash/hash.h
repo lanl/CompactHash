@@ -36,23 +36,60 @@
  * @date   Thu Jun 6 2013 
  */
 //
-
 #ifndef HASH_H
 #define HASH_H
-//
-#ifdef __APPLE_CC__
-#include <OpenCL/OpenCL.h>
-#else
-#include <CL/cl.h>
-#endif
-//
-#include "CLHash_Utilities.h"
-//
 //
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+//
+#ifdef HAVE_OPENCL
+#ifdef __APPLE_CC__
+#include <OpenCL/OpenCL.h>
+#else
+#include <CL/cl.h>
+#endif
+#else
+typedef void *cl_mem;
+typedef int cl_context;
+typedef int cl_command_queue;
+typedef int cl_program;
+typedef int cl_device_id;
+typedef int cl_int;
+int clRetainContext(int context);
+int clRetainCommandQueue(int command_queue);
+int clGetContextInfo(int context, int param, size_t size, void *value,
+		     size_t * size_ret);
+int clReleaseContext(int context);
+int clReleaseCommandQueue(int command_queue);
+int clReleaseProgram(int program);
+int clRetainProgram(int program);
+int clRetainKernel(int kernel);
+cl_mem clCreateBuffer(int context, int flags, size_t size, void *value,
+		      int *size_ret);
+int clEnqueueWriteBuffer(int command_queue, void *buffer, int blocking_write,
+			 size_t offset, size_t cb, const void *ptr,
+			 uint nevents, const int *wait_list, int *event);
+int clEnqueueReadBuffer(int command_queue, void *buffer, int blocking_write,
+			size_t offset, size_t cb, const void *ptr, uint nevents,
+			const int *wait_list, int *event);
+int clCreateKernel(int program, const char *kernel_name, int *errcode_ret);
+int clReleaseKernel(int kernel);
+int clReleaseMemObject(void *memobj);
+int clSetKernelArg(int kernel, uint arg_index, size_t arg_size,
+		   const void *arg_value);
+int clGetKernelWorkGroupInfo(int kernel, int device, int param_name,
+			     size_t size, void *value, size_t * size_ret);
+int clEnqueueNDRangeKernel(int command_queue, int kernel, uint work_dim,
+			   const size_t * offset, const size_t * size,
+			   const size_t * local_size, uint nevents,
+			   const int *wait_list, int *event);
+int clFinish(int command_queue);
+#endif
+//
+#include "CLHash_Utilities.h"
+//
 //
 #include "hash.hm"
 #include "hash.cm"
@@ -133,7 +170,6 @@
 #define HASH_BUCKET_STATUS_EMPTY /**/ -1
 #define HASH_BUCKET_STATUS_FULL /***/ -2
 #define HASH_BUCKET_STATUS_LOCK /***/ -3
-
 /**
  * Hash_ExitCodeString will return a string representation of the given exit
  * code.
@@ -143,7 +179,6 @@
  * @return A string representation of that exit code.
  */
 char *Hash_ExitCodeString(int exitCode);
-
 /**
  * Hash_ExitCodeDebug will print a string representation of the given exit code
  * if it is not EXIT_CODE_NORMAL.
@@ -151,7 +186,6 @@ char *Hash_ExitCodeString(int exitCode);
  * @param exitCode
  */
 void Hash_ExitCodeDebug(int exitCode);
-
 /**
  * Hash_SetReportLevel sets a static report level variable in hash.c. It should 
  * be called before hash tables are created. 
@@ -159,7 +193,6 @@ void Hash_ExitCodeDebug(int exitCode);
  * @param level The level of data collection desired.
  */
 void Hash_SetReportLevel(int level);
-
 /**
  * Hash_GetReportLevel gets this variable.
  *
@@ -175,11 +208,9 @@ void Hash_SetReportLevel(int level);
  *                       last important call.
  */
 int Hash_GetReportLevel();
-
 const char *Hash_GetKernelSourceString();
 int smallestProthPrimeAbove(int N);
 int largestProthPrimeUnder(int N);
-
 typedef struct intintHash_Table_ intintHash_Table;
 typedef struct intintCLHash_Table_ intintCLHash_Table;
 typedef struct intintHash_Factory_ intintHash_Factory;
@@ -539,5 +570,4 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 								keysBuffer,
 								cl_mem
 								valuesBuffer);
-
 #endif
