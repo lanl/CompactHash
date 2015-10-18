@@ -82,7 +82,7 @@ typedef cl_float4 cl_real4;
 #define TWO 2.0f
 #endif
 
-#define SQR(x) (( (x)*(x) ))
+#define SQ(x) (( (x)*(x) ))
 
 #define HASH_TYPE HASH_PERFECT_HASHES
 #define HASH_LOAD_FACTOR 0.3333333
@@ -205,7 +205,7 @@ cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_m
 cl_mem neighbors2d_hashlibgpu_opt_4( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
 #endif
 
-int adaptiveMeshConstructorWij(const int n, const int l, int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold);
+int adaptiveMeshConstructorWij(const int n, const int l, int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold, int target_ncells);
 void genmatrixfree(void **var);
 void **genmatrix(int jnum, int inum, size_t elsize);
 FILE * fmem; 
@@ -435,7 +435,8 @@ void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int ha
   int* i     = NULL;
   int* j     = NULL;
 
-  int ncells = adaptiveMeshConstructorWij(mesh_size, levmx, &level, &x, &y, &i, &j,threshold);
+  int target_ncells = 0;
+  int ncells = adaptiveMeshConstructorWij(mesh_size, levmx, &level, &x, &y, &i, &j,threshold, target_ncells);
   printf("\t%8d,", ncells);
   if(WRITE_MEM_USAGE) fprintf(fmem,"\t%8d,", ncells);
   
@@ -2990,13 +2991,13 @@ cl_mem neighbors2d_hasholdlibgpu_opt_3( uint ncells, int mesh_size, int levmx, c
 #endif
  
 // adaptiveMeshConstructor()
-// Inputs: n (width/height of the square mesh), l (maximum level of refinement),
+// Inputs: n (width/height of the square mesh), levmax (maximum level of refinement),
 //         pointers for the level, x, and y arrays (should be NULL for all three)
 // Output: number of cells in the adaptive mesh
 //
-int adaptiveMeshConstructorWij(const int n, const int l, 
-         int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold) {
-  int ncells = SQR(n);
+int adaptiveMeshConstructorWij(const int n, const int levmax, 
+         int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold, int target_ncells) {
+  int ncells = SQ(n);
 
   // ints used for for() loops later
   int ic, xc, yc, xlc, ylc, nlc;
@@ -3023,12 +3024,12 @@ int adaptiveMeshConstructorWij(const int n, const int l,
   // Randomly Set Level of Refinement
   //unsigned int iseed = (unsigned int)time(NULL);
   //srand (iseed);
-  srand (0);
-  for(int ii = l; ii > 0; ii--) {
+  //srand (0);
+  for(int ii = levmax; ii > 0; ii--) {
+    float lev_threshold = threshold*(float)ii/(float)levmax;
     for(ic = 0; ic < ncells; ic++) {
-      int jj = 1 + (int)(100.0*rand() / (RAND_MAX+1.0));
-      // XXX Consider distribution across levels: Clustered at 1 level XXX
-      if(jj>threshold) {level[ic] = ii;}
+      float jj = (100.0*(float)rand() / ((float)RAND_MAX));
+      if(jj<lev_threshold && level[ic] == 0) level[ic] = ii;
     }
   }
 
@@ -3076,10 +3077,97 @@ int adaptiveMeshConstructorWij(const int n, const int l,
       }
     }
   }
+
+  //printf("\nDEBUG -- ncells %d target_ncells %ld fine mesh size %ld\n",ncells,target_ncells,n*two_to_the(levmax)*n*two_to_the(levmax));
+  if (target_ncells > ncells && target_ncells < n*2<<(levmax)*n*2<<(levmax)) {
+    int icount = 0;
+    int newcount = 0;
+    for(ic = 0; ic < ncells; ic++) {newcount += (powerOfFour(level[ic]) - 1);}
+
+    while ( abs((ncells+newcount) - target_ncells) > MAX(5,target_ncells/10000) && icount < 40) {
+      icount++;
+      //printf("DEBUG -- Adjusting cell count %ld target %ld diff %ld\n",ncells+newcount, target_ncells, abs(ncells+newcount - target_ncells));
+
+      if (ncells+newcount > target_ncells){
+        int reduce_count = ((ncells+newcount) - target_ncells);
+        //printf("DEBUG -- Too many cells -- need to reduce by %d\n",reduce_count);
+        int jcount = 0;
+        while (reduce_count > 0 && jcount < ncells) {
+          int jj = 1 + (int)((float)ncells*rand() / (RAND_MAX+1.0));
+          if(jj>0 && jj<ncells && level[jj] > 0) {
+             reduce_count-=4;
+          //   printf("DEBUG reducing level for ic %d level %d reduce_count %d jj %d\n",jj,level[jj],reduce_count,jj);
+             level[jj]--;
+          }
+          jcount++;
+        }
+      } else {
+        int increase_count = (target_ncells - (ncells+newcount));
+        increase_count /= (levmax*4);
+        //printf("DEBUG -- Too few cells -- need to increase by %d\n",increase_count);
+        int jcount = 0;
+        while (increase_count > 0 && jcount < ncells) {
+          int jj = 1 + (int)((float)ncells*rand() / (RAND_MAX+1.0));
+          if(jj>0 && jj<ncells && level[jj] < levmax) {
+            increase_count-=4;
+            level[jj]++;
+          }
+          jcount++;
+        }
+      }
+
+      // Smooth the Refinement
+      newcount = -1;
+      while(newcount != 0) {
+        newcount = 0;
+        uint lev = 0;
+        for(ic = 0; ic < ncells; ic++) {
+          lev = level[ic];
+          lev++;
+          // Check bottom neighbor
+          if(ic - n >= 0) {
+            if(level[ic-n] > lev) {
+              level[ic] = lev;
+              newcount++;
+              continue;
+            }
+          }
+          // Check top neighbor
+          if(ic + n < ncells) {
+            if(level[ic+n] > lev) {
+              level[ic] = lev;
+              newcount++;
+              continue;
+            }
+          }
+          // Check left neighbor
+          if((ic%n)-1 >= 0) {
+            if(level[ic-1] > lev) {
+              level[ic] = lev;
+              newcount++;
+              continue;
+            }
+          }
+          // Check right neighbor
+          if((ic%n)+1 < n) {
+            if(level[ic+1] > lev) {
+              level[ic] = lev;
+              newcount++;
+              continue;
+            }
+          }
+        }
+      } // while(newcount != 0) {
+      newcount = 0;
+      for(ic = 0; ic < ncells; ic++) {newcount += (powerOfFour(level[ic]) - 1);}
+    } // while ( abs(ncells+newcount - target_ncells) > 10 && icount < 10) {
+
+  } //if (target_ncells > 0) {
+
   //printf("Refinement smoothed.\n");
   int small_cells = 0;
   for(ic = 0; ic < ncells; ic++) {
-    if (level[ic] == l) {
+    if (level[ic] == levmax) {
       small_cells++;
     }
   }
@@ -3099,7 +3187,7 @@ int adaptiveMeshConstructorWij(const int n, const int l,
   for(yc = 0; yc < n; yc++) {
     for(xc = 0; xc < n; xc++) {
       ic = n*yc + xc;
-      nlc = (int) SQRT( (real) powerOfFour(level[ic]) );
+      nlc = (int) sqrt( (real) powerOfFour(level[ic]) );
       for(ylc = 0; ylc < nlc; ylc++) {
         for(xlc = 0; xlc < nlc; xlc++) {
           level_temp[ic + offset + (nlc*ylc + xlc)] = level[ic];
