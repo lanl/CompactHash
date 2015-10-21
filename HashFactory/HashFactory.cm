@@ -32,7 +32,7 @@
 
 #include "perfectHash.cm"
 #include "compactHash.cm"
-#include "hash.hm"
+#include "HashFactory.hm"
 
 #define HASH_DEFINE(NAME, KEY_TYPE, VALUE_TYPE) \
   \

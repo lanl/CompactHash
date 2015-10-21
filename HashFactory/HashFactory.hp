@@ -39,7 +39,7 @@
  */
 #endif
 /**
- * @file   hash.h
+ * @file   HashFactory.h
  * @author Peter Ahrens
  * @date   Thu Jun 6 2013 
  */
@@ -94,8 +94,8 @@ DELAY(#endif)
 DELAY(#include "CLHash_Utilities.h")
 //
 //
-DELAY(#include "hash.hm")
-DELAY(#include "hash.cm")
+DELAY(#include "HashFactory.hm")
+DELAY(#include "HashFactory.cm")
 //
 DELAY(#define HASH_REPORT_NEVER /**/ 0)
 DELAY(#define HASH_REPORT_CYCLE /**/ 1)

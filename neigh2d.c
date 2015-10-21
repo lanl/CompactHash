@@ -49,7 +49,7 @@
 #include <sys/stat.h>
 #include "kdtree/KDTree2d.h"
 #include "gpu.h"
-#include "hash/hash.h"
+#include "HashFactory/HashFactory.h"
 #include "simplehash/simplehash.h"
 #include "simplehash/simplehashlib.h"
 #include "timer/timer.h"

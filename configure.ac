@@ -5,7 +5,7 @@ AC_CONFIG_AUX_DIR(./config)
 AM_INIT_AUTOMAKE([foreign])
 
 dnl AC_CONFIG_HEADERS([config.h])
-dnl AC_CONFIG_HEADERS([hash/config.h])
+dnl AC_CONFIG_HEADERS([HashFactory/config.h])
 
 dnl
 dnl Caching is usually WRONG for systems with cross-mounted file systems
@@ -314,9 +314,9 @@ if test "${enable_opencl}" != "no"; then
          AC_MSG_WARN(If it fails, try setting OPENCL_INCLUDE and OPENCL_LIBS)
          AC_MSG_WARN(to location of include directory and the OpenCL library)
          AC_MSG_WARN(or build without OpenCL with "./configure --disable-opencl".)
-         AC_MSG_WARN(If you disable opencl, you may need to go into the hash directory)
-         AC_MSG_WARN(and force the rebuild of hash.c and hash.h "make hash.c hash.h".)
-         AC_MSG_WARN(You may need to remove the hash.c and hash.h files if make gets)
+         AC_MSG_WARN(If you disable opencl, you may need to go into the HashFactory directory)
+         AC_MSG_WARN(and force the rebuild of HashFactory.c and HashFactory.h "make HashFactory.c HashFactory.h".)
+         AC_MSG_WARN(You may need to remove the HashFactory.c and HashFactory.h files if make gets)
          AC_MSG_WARN(confused by timestamps)
          AC_MSG_WARN(=================================================================)
       fi
@@ -375,7 +375,7 @@ AC_SUBST(CPREPROCESSOR)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kdtree/Makefile])
-AC_CONFIG_FILES([hash/Makefile])
+AC_CONFIG_FILES([HashFactory/Makefile])
 AC_CONFIG_FILES([simplehash/Makefile])
 AC_CONFIG_FILES([timer/Makefile])
 

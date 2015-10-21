@@ -63,7 +63,7 @@
  * @date   Thu Jun 6 2013 
  */
 //
-#include "hash.h"
+#include "HashFactory.h"
 #ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
 #include <OpenCL/OpenCL.h>
@@ -459,9 +459,9 @@ typedef unsigned int uint;
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 static int reportLevel = 0;
-const char *hash_source;
+const char *HashFactory_source;
 const char *Hash_GetKernelSourceString() {
-	return hash_source;
+	return HashFactory_source;
 }
 size_t roundUpToNearest(size_t x, size_t r) {
 	return (((x - 1) / r) + 1) * r;
@@ -4143,7 +4143,7 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 				     "clEnqueueNDRangeKernel");
 	return (0);
 }
-const char *hash_source =
+const char *HashFactory_source =
 "\n"
 "/* Copyright (C) 1991-2012 Free Software Foundation, Inc.\n"
 "   This file is part of the GNU C Library.\n"

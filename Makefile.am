@@ -2,12 +2,12 @@ bin_PROGRAMS = neigh2d # neigh2d_memopts
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = kdtree hash simplehash timer
+SUBDIRS = kdtree HashFactory simplehash timer
 
 neigh2d_C_SRCS = neigh2d.c gpu.c
 neigh2d_H_SRCS = gpu.h
 neigh2d_SOURCES = ${neigh2d_C_SRCS} ${neigh2d_H_SRCS}
-neigh2d_LDADD = kdtree/libkdtree.la hash/libhash.la simplehash/libsimplehash.la timer/libtimer.la
+neigh2d_LDADD = kdtree/libkdtree.la HashFactory/libHashFactory.la simplehash/libsimplehash.la timer/libtimer.la
 
 LDADD = -lm
 
@@ -22,8 +22,8 @@ timer/libtimer.la:
 	cd timer
 	make
 
-hash/libhash.la:
-	cd hash
+HashFactory/libHashFactory.la:
+	cd HashFactory
 	make
 
 simplehash/libsimplehash.la:

@@ -49,7 +49,7 @@
 #define DELAY(x) x
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
-DELAY(#include "hash.h")
+DELAY(#include "HashFactory.h")
 DELAY(#ifdef HAVE_OPENCL)
 DELAY(#ifdef __APPLE_CC__)
 DELAY(#include <OpenCL/OpenCL.h>)
@@ -92,7 +92,7 @@ typedef unsigned int uint;
 
 
 DELAY(#include <math.h>)
-#include "hash.cm"
+#include "HashFactory.cm"
 
 #ifdef __cplusplus
 extern "C"
@@ -101,10 +101,10 @@ extern "C"
 
 static int reportLevel = 0;
 
-const char* hash_source;
+const char* HashFactory_source;
 
 const char* Hash_GetKernelSourceString(){
-  return hash_source;
+  return HashFactory_source;
 }
 
 size_t roundUpToNearest(size_t x, size_t r){

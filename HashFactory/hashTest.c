@@ -37,7 +37,7 @@
  */
 
 #include "testHelper.h"
-#include "hash.h"
+#include "HashFactory.h"
 
 void sanityTest(int hashType, TestData *metaTest, char* subTestName){
   TestData *sanityTestData = Test_CreateTest(subTestName);

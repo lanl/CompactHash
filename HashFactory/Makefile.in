@@ -81,7 +81,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = hashTest$(EXEEXT)
-subdir = hash
+subdir = HashFactory
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/./config/depcomp $(include_HEADERS) README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -124,11 +124,11 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libhash_la_LIBADD =
-am__objects_1 = hash.lo CLHash_Utilities.lo
+libHashFactory_la_LIBADD =
+am__objects_1 = HashFactory.lo CLHash_Utilities.lo
 am__objects_2 =
-am_libhash_la_OBJECTS = $(am__objects_1) $(am__objects_2)
-libhash_la_OBJECTS = $(am_libhash_la_OBJECTS)
+am_libHashFactory_la_OBJECTS = $(am__objects_1) $(am__objects_2)
+libHashFactory_la_OBJECTS = $(am_libHashFactory_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -137,7 +137,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_hashTest_OBJECTS = hashTest-testHelper.$(OBJEXT) \
 	hashTest-hashTest.$(OBJEXT)
 hashTest_OBJECTS = $(am_hashTest_OBJECTS)
-hashTest_DEPENDENCIES = libhash.la
+hashTest_DEPENDENCIES = libHashFactory.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -171,8 +171,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libhash_la_SOURCES) $(hashTest_SOURCES)
-DIST_SOURCES = $(libhash_la_SOURCES) $(hashTest_SOURCES)
+SOURCES = $(libHashFactory_la_SOURCES) $(hashTest_SOURCES)
+DIST_SOURCES = $(libHashFactory_la_SOURCES) $(hashTest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -325,16 +325,16 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_MAKEFLAGS = -j 4
 DEFAULT_INCLUDES = -I. -I..
-lib_LTLIBRARIES = libhash.la
-include_HEADERS = hash.h
+lib_LTLIBRARIES = libHashFactory.la
+include_HEADERS = HashFactory.h
 hashTest_CPPFLAGS = -DHAVE_OPENCL -DHAVE_CL_DOUBLE -I$(OPENCL_INCLUDE)
-H_SRCS = hash.h CLHash_Utilities.h
-C_SRCS = hash.c CLHash_Utilities.c
-libhash_la_SOURCES = ${C_SRCS} ${H_SRCS}
+H_SRCS = HashFactory.h CLHash_Utilities.h
+C_SRCS = HashFactory.c CLHash_Utilities.c
+libHashFactory_la_SOURCES = ${C_SRCS} ${H_SRCS}
 hashTest_SOURCES = testHelper.c hashTest.c
-hashTest_LDADD = libhash.la
-EXTRA_DIST = perfectHash.cm perfectHash.hm primetest.c testHelper.h hash.hp \
-    hash.hm hash.cp hash.cm hash.h hash.c hash.cl hash.clp embed_source.pl \
+hashTest_LDADD = libHashFactory.la
+EXTRA_DIST = perfectHash.cm perfectHash.hm primetest.c testHelper.h HashFactory.hp \
+    HashFactory.hm HashFactory.cp HashFactory.cm HashFactory.h HashFactory.c HashFactory.cl HashFactory.clp embed_source.pl \
     compactHash.cm compactHash.hm baseHash.cm baseHash.hm
 
 all: all-am
@@ -350,9 +350,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign hash/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign HashFactory/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign hash/Makefile
+	  $(AUTOMAKE) --foreign HashFactory/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -407,8 +407,8 @@ clean-libLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libhash.la: $(libhash_la_OBJECTS) $(libhash_la_DEPENDENCIES) $(EXTRA_libhash_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(libdir) $(libhash_la_OBJECTS) $(libhash_la_LIBADD) $(LIBS)
+libHashFactory.la: $(libHashFactory_la_OBJECTS) $(libHashFactory_la_DEPENDENCIES) $(EXTRA_libHashFactory_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(libdir) $(libHashFactory_la_OBJECTS) $(libHashFactory_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -470,7 +470,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CLHash_Utilities.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HashFactory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashTest-hashTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashTest-testHelper.Po@am__quote@
 
@@ -762,19 +762,19 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
 	uninstall-includeHEADERS uninstall-libLTLIBRARIES
 
-default: hash.c CLHash_Utilities.c hash.cl libhash.la
-all: hash.c CLHash_Utilities.c hash.cl libhash.la
+default: HashFactory.c CLHash_Utilities.c HashFactory.cl libHashFactory.la
+all: HashFactory.c CLHash_Utilities.c HashFactory.cl libHashFactory.la
 test: hashTest
 
-hash.h: hash.hp hash.hm perfectHash.hm compactHash.hm
-	${CPREPROCESSOR} -CC -x c -imacros hash.hm hash.hp | ${INDENT} -linux -brf -o hash.h
+HashFactory.h: HashFactory.hp HashFactory.hm perfectHash.hm compactHash.hm
+	${CPREPROCESSOR} -CC -x c -imacros HashFactory.hm HashFactory.hp | ${INDENT} -linux -brf -o HashFactory.h
 
-hash.c: hash.cp hash.cm hash.cl perfectHash.cm compactHash.cm
-	${CPREPROCESSOR} -CC -x c -imacros hash.cm hash.cp | ${INDENT} -linux -brf -o hash.c
-	./embed_source.pl hash.cl >> hash.c
+HashFactory.c: HashFactory.cp HashFactory.cm HashFactory.cl perfectHash.cm compactHash.cm
+	${CPREPROCESSOR} -CC -x c -imacros HashFactory.cm HashFactory.cp | ${INDENT} -linux -brf -o HashFactory.c
+	./embed_source.pl HashFactory.cl >> HashFactory.c
 
-hash.cl:	hash.clp hash.cm perfectHash.cm compactHash.cm
-	${CPREPROCESSOR} -CC -x c -imacros hash.cm hash.clp | ${INDENT} -linux -brf -o hash.cl
+HashFactory.cl:	HashFactory.clp HashFactory.cm perfectHash.cm compactHash.cm
+	${CPREPROCESSOR} -CC -x c -imacros HashFactory.cm HashFactory.clp | ${INDENT} -linux -brf -o HashFactory.cl
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

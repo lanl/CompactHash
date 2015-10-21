@@ -16218,10 +16218,10 @@ $as_echo "$as_me: WARNING: to location of include directory and the OpenCL libra
 $as_echo "$as_me: WARNING: or build without OpenCL with \"./configure --disable-opencl\"." >&2;}
          { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: If you disable opencl" >&5
 $as_echo "$as_me: WARNING: If you disable opencl" >&2;}
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: and force the rebuild of hash.c and hash.h \"make hash.c hash.h\"." >&5
-$as_echo "$as_me: WARNING: and force the rebuild of hash.c and hash.h \"make hash.c hash.h\"." >&2;}
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You may need to remove the hash.c and hash.h files if make gets" >&5
-$as_echo "$as_me: WARNING: You may need to remove the hash.c and hash.h files if make gets" >&2;}
+         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: and force the rebuild of HashFactory.c and HashFactory.h \"make HashFactory.c HashFactory.h\"." >&5
+$as_echo "$as_me: WARNING: and force the rebuild of HashFactory.c and HashFactory.h \"make HashFactory.c HashFactory.h\"." >&2;}
+         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You may need to remove the HashFactory.c and HashFactory.h files if make gets" >&5
+$as_echo "$as_me: WARNING: You may need to remove the HashFactory.c and HashFactory.h files if make gets" >&2;}
          { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: confused by timestamps" >&5
 $as_echo "$as_me: WARNING: confused by timestamps" >&2;}
          { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: =================================================================" >&5
@@ -16309,7 +16309,7 @@ ac_config_files="$ac_config_files Makefile"
 
 ac_config_files="$ac_config_files kdtree/Makefile"
 
-ac_config_files="$ac_config_files hash/Makefile"
+ac_config_files="$ac_config_files HashFactory/Makefile"
 
 ac_config_files="$ac_config_files simplehash/Makefile"
 
@@ -17356,7 +17356,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "kdtree/Makefile") CONFIG_FILES="$CONFIG_FILES kdtree/Makefile" ;;
-    "hash/Makefile") CONFIG_FILES="$CONFIG_FILES hash/Makefile" ;;
+    "HashFactory/Makefile") CONFIG_FILES="$CONFIG_FILES HashFactory/Makefile" ;;
     "simplehash/Makefile") CONFIG_FILES="$CONFIG_FILES simplehash/Makefile" ;;
     "timer/Makefile") CONFIG_FILES="$CONFIG_FILES timer/Makefile" ;;
 

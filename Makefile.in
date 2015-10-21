@@ -109,8 +109,9 @@ am__objects_1 = neigh2d.$(OBJEXT) gpu.$(OBJEXT)
 am__objects_2 =
 am_neigh2d_OBJECTS = $(am__objects_1) $(am__objects_2)
 neigh2d_OBJECTS = $(am_neigh2d_OBJECTS)
-neigh2d_DEPENDENCIES = kdtree/libkdtree.la hash/libhash.la \
-	simplehash/libsimplehash.la timer/libtimer.la
+neigh2d_DEPENDENCIES = kdtree/libkdtree.la \
+	HashFactory/libHashFactory.la simplehash/libsimplehash.la \
+	timer/libtimer.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -360,11 +361,11 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = kdtree hash simplehash timer
+SUBDIRS = kdtree HashFactory simplehash timer
 neigh2d_C_SRCS = neigh2d.c gpu.c
 neigh2d_H_SRCS = gpu.h
 neigh2d_SOURCES = ${neigh2d_C_SRCS} ${neigh2d_H_SRCS}
-neigh2d_LDADD = kdtree/libkdtree.la hash/libhash.la simplehash/libsimplehash.la timer/libtimer.la
+neigh2d_LDADD = kdtree/libkdtree.la HashFactory/libHashFactory.la simplehash/libsimplehash.la timer/libtimer.la
 LDADD = -lm
 EXTRA_DIST = neigh2d_kern.cl APACHE_LICENSE-2_0 AUTHORS README LICENSE \
   Papers.bib NOTICE README.md ReleaseAuthorization.pdf Todo libtool
@@ -929,8 +930,8 @@ timer/libtimer.la:
 	cd timer
 	make
 
-hash/libhash.la:
-	cd hash
+HashFactory/libHashFactory.la:
+	cd HashFactory
 	make
 
 simplehash/libsimplehash.la:
