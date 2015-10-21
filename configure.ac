@@ -1,4 +1,4 @@
-AC_INIT(CompactHash, v1.1)
+AC_INIT(CompactHash, v1.2)
 
 AC_CONFIG_AUX_DIR(./config)
 
@@ -322,6 +322,8 @@ if test "${enable_opencl}" != "no"; then
       fi
       ;;
     *darwin*)
+      AC_MSG_NOTICE([Adding OpenCL framework])
+      AC_DEFINE(HAVE_OPENCL,1,[Has OpenCL])
       LIBS="${LIBS} -framework OpenCL"
       ;;
   esac
