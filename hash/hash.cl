@@ -1,4 +1,31 @@
 
+/* Copyright (C) 1991-2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+/* This header is separate from features.h so that the compiler can
+   include it implicitly at the start of every compilation.  It must
+   not itself include <features.h> or any other header that includes
+   <features.h> because the implicit include comes before any feature
+   test macros that may be defined in a source file before it first
+   explicitly includes a system header.  GCC knows the name of this
+   header in order to preinclude it.  */
+/* We do support the IEC 559 math functionality, real and complex.  */
+/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
+   Unicode 6.0.  */
+/* We do not support C11 <threads.h>.  */
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -1066,8 +1093,8 @@ int intintLCGLinearOpenCompactCLHash_InnerQuerySingle(__global char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
-	intintLCGLinearOpenCompactCLHash_TableData *mytableData =
-	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
+	__global intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+	    (__global intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
 	    mytableData->compressFuncData;
 	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1117,8 +1144,10 @@ int intintLCGLinearOpenCompactCLHash_InnerQuery(__global char *tableData,
 	for (i = 0; i < numKeys; i++) {
 		key = keys[i];
 		valueOutput = &valuesOutput[i];
-		intintLCGLinearOpenCompactCLHash_TableData *mytableData =
-		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
+		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData
+		    =
+		    (__global intintLCGLinearOpenCompactCLHash_TableData *)
+		    tableData;
 		intintHash_CompressLCGData compressFuncData =
 		    mytableData->compressFuncData;
 		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1163,8 +1192,8 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertSingle(__global char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
-	intintLCGLinearOpenCompactCLHash_TableData *mytableData =
-	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
+	__global intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+	    (__global intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
 	    mytableData->compressFuncData;
 	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1216,8 +1245,10 @@ int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
-		intintLCGLinearOpenCompactCLHash_TableData *mytableData =
-		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
+		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData
+		    =
+		    (__global intintLCGLinearOpenCompactCLHash_TableData *)
+		    tableData;
 		intintHash_CompressLCGData compressFuncData =
 		    mytableData->compressFuncData;
 		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1265,8 +1296,8 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global char
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
-	intintLCGLinearOpenCompactCLHash_TableData *mytableData =
-	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
+	__global intintLCGLinearOpenCompactCLHash_TableData *mytableData =
+	    (__global intintLCGLinearOpenCompactCLHash_TableData *) tableData;
 	intintHash_CompressLCGData compressFuncData =
 	    mytableData->compressFuncData;
 	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1320,8 +1351,10 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
-		intintLCGLinearOpenCompactCLHash_TableData *mytableData =
-		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;
+		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData
+		    =
+		    (__global intintLCGLinearOpenCompactCLHash_TableData *)
+		    tableData;
 		intintHash_CompressLCGData compressFuncData =
 		    mytableData->compressFuncData;
 		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1532,8 +1565,9 @@ int intintLCGQuadraticOpenCompactCLHash_InnerQuerySingle(__global char
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
-	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
-	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
+	__global intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+	    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)
+	    tableData;
 	intintHash_CompressLCGData compressFuncData =
 	    mytableData->compressFuncData;
 	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1587,8 +1621,10 @@ int intintLCGQuadraticOpenCompactCLHash_InnerQuery(__global char *tableData,
 	for (i = 0; i < numKeys; i++) {
 		key = keys[i];
 		valueOutput = &valuesOutput[i];
-		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
-		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
+		__global intintLCGQuadraticOpenCompactCLHash_TableData
+		    *mytableData =
+		    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)
+		    tableData;
 		intintHash_CompressLCGData compressFuncData =
 		    mytableData->compressFuncData;
 		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1638,8 +1674,9 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingle(__global char
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
-	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
-	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
+	__global intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+	    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)
+	    tableData;
 	intintHash_CompressLCGData compressFuncData =
 	    mytableData->compressFuncData;
 	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1695,8 +1732,10 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
-		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
-		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
+		__global intintLCGQuadraticOpenCompactCLHash_TableData
+		    *mytableData =
+		    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)
+		    tableData;
 		intintHash_CompressLCGData compressFuncData =
 		    mytableData->compressFuncData;
 		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1750,8 +1789,9 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertSingleNoOverwrite(__global
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int index;
 	int exitCode;
-	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
-	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
+	__global intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
+	    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)
+	    tableData;
 	intintHash_CompressLCGData compressFuncData =
 	    mytableData->compressFuncData;
 	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
@@ -1810,8 +1850,10 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	uint i;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
-		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =
-		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;
+		__global intintLCGQuadraticOpenCompactCLHash_TableData
+		    *mytableData =
+		    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)
+		    tableData;
 		intintHash_CompressLCGData compressFuncData =
 		    mytableData->compressFuncData;
 		unsigned int c = intintHash_CompressLCG(compressFuncData, key);

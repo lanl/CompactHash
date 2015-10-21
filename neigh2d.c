@@ -248,7 +248,7 @@ int main (int argc, const char * argv[])
   }else{
     for (int i = 0; i < argc; i++) {
       if (strcmp(argv[i], "-h") == 0) {
-        printf("Use '-t' to set threshold and '-o' to add tests: br, kd, hc, hlc, hc1, hlc1, hc2, hlc2, hc3, hlc3, holc3, hg, hg1, hg2, hg3, hg4 hlg hlg1 hlg2 hlg3 holg3\n");
+        printf("Use '-t' to set threshold and '-o' to add tests: br kd hc hlc hc1 hlc1 hc2 hlc2 hc3 hlc3 holc3 hg hg1 hg2 hg3 hlg hlg1 hlg2 hlg3 holg3\n");
         printf("Use -r for randomization of cell data to see performance without cache\n");
         printf("Use -n for min mesh size and -N for max mesh size [ default is 256 min to 256 max ]\n");
         printf("Use -l for min levmx     and -L for max levmx     [ default is 1 min to 5 max ]\n");

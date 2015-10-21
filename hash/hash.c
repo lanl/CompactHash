@@ -1,4 +1,31 @@
 
+/* Copyright (C) 1991-2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+/* This header is separate from features.h so that the compiler can
+   include it implicitly at the start of every compilation.  It must
+   not itself include <features.h> or any other header that includes
+   <features.h> because the implicit include comes before any feature
+   test macros that may be defined in a source file before it first
+   explicitly includes a system header.  GCC knows the name of this
+   header in order to preinclude it.  */
+/* We do support the IEC 559 math functionality, real and complex.  */
+/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
+   Unicode 6.0.  */
+/* We do not support C11 <threads.h>.  */
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -4118,6 +4145,33 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 }
 const char *hash_source =
 "\n"
+"/* Copyright (C) 1991-2012 Free Software Foundation, Inc.\n"
+"   This file is part of the GNU C Library.\n"
+"\n"
+"   The GNU C Library is free software; you can redistribute it and/or\n"
+"   modify it under the terms of the GNU Lesser General Public\n"
+"   License as published by the Free Software Foundation; either\n"
+"   version 2.1 of the License, or (at your option) any later version.\n"
+"\n"
+"   The GNU C Library is distributed in the hope that it will be useful,\n"
+"   but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+"   Lesser General Public License for more details.\n"
+"\n"
+"   You should have received a copy of the GNU Lesser General Public\n"
+"   License along with the GNU C Library; if not, see\n"
+"   <http://www.gnu.org/licenses/>.  */\n"
+"/* This header is separate from features.h so that the compiler can\n"
+"   include it implicitly at the start of every compilation.  It must\n"
+"   not itself include <features.h> or any other header that includes\n"
+"   <features.h> because the implicit include comes before any feature\n"
+"   test macros that may be defined in a source file before it first\n"
+"   explicitly includes a system header.  GCC knows the name of this\n"
+"   header in order to preinclude it.  */\n"
+"/* We do support the IEC 559 math functionality, real and complex.  */\n"
+"/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /\n"
+"   Unicode 6.0.  */\n"
+"/* We do not support C11 <threads.h>.  */\n"
 "/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced\n"
 " * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National \n"
 " * Laboratory (LANL), which is operated by Los Alamos National Security, LLC\n"
@@ -5185,8 +5239,8 @@ const char *hash_source =
 "	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
-"	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
+"	__global intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
+"	    (__global intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
 "	intintHash_CompressLCGData compressFuncData =\n"
 "	    mytableData->compressFuncData;\n"
 "	unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5236,8 +5290,10 @@ const char *hash_source =
 "	for (i = 0; i < numKeys; i++) {\n"
 "		key = keys[i];\n"
 "		valueOutput = &valuesOutput[i];\n"
-"		intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
-"		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
+"		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData\n"
+"		    =\n"
+"		    (__global intintLCGLinearOpenCompactCLHash_TableData *)\n"
+"		    tableData;\n"
 "		intintHash_CompressLCGData compressFuncData =\n"
 "		    mytableData->compressFuncData;\n"
 "		unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5282,8 +5338,8 @@ const char *hash_source =
 "	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
-"	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
+"	__global intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
+"	    (__global intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
 "	intintHash_CompressLCGData compressFuncData =\n"
 "	    mytableData->compressFuncData;\n"
 "	unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5335,8 +5391,10 @@ const char *hash_source =
 "	uint i;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
-"		intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
-"		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
+"		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData\n"
+"		    =\n"
+"		    (__global intintLCGLinearOpenCompactCLHash_TableData *)\n"
+"		    tableData;\n"
 "		intintHash_CompressLCGData compressFuncData =\n"
 "		    mytableData->compressFuncData;\n"
 "		unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5384,8 +5442,8 @@ const char *hash_source =
 "	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
-"	    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
+"	__global intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
+"	    (__global intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
 "	intintHash_CompressLCGData compressFuncData =\n"
 "	    mytableData->compressFuncData;\n"
 "	unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5439,8 +5497,10 @@ const char *hash_source =
 "	uint i;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
-"		intintLCGLinearOpenCompactCLHash_TableData *mytableData =\n"
-"		    (intintLCGLinearOpenCompactCLHash_TableData *) tableData;\n"
+"		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData\n"
+"		    =\n"
+"		    (__global intintLCGLinearOpenCompactCLHash_TableData *)\n"
+"		    tableData;\n"
 "		intintHash_CompressLCGData compressFuncData =\n"
 "		    mytableData->compressFuncData;\n"
 "		unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5651,8 +5711,9 @@ const char *hash_source =
 "	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
-"	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;\n"
+"	__global intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
+"	    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)\n"
+"	    tableData;\n"
 "	intintHash_CompressLCGData compressFuncData =\n"
 "	    mytableData->compressFuncData;\n"
 "	unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5706,8 +5767,10 @@ const char *hash_source =
 "	for (i = 0; i < numKeys; i++) {\n"
 "		key = keys[i];\n"
 "		valueOutput = &valuesOutput[i];\n"
-"		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
-"		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;\n"
+"		__global intintLCGQuadraticOpenCompactCLHash_TableData\n"
+"		    *mytableData =\n"
+"		    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)\n"
+"		    tableData;\n"
 "		intintHash_CompressLCGData compressFuncData =\n"
 "		    mytableData->compressFuncData;\n"
 "		unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5757,8 +5820,9 @@ const char *hash_source =
 "	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
-"	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;\n"
+"	__global intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
+"	    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)\n"
+"	    tableData;\n"
 "	intintHash_CompressLCGData compressFuncData =\n"
 "	    mytableData->compressFuncData;\n"
 "	unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5814,8 +5878,10 @@ const char *hash_source =
 "	uint i;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
-"		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
-"		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;\n"
+"		__global intintLCGQuadraticOpenCompactCLHash_TableData\n"
+"		    *mytableData =\n"
+"		    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)\n"
+"		    tableData;\n"
 "		intintHash_CompressLCGData compressFuncData =\n"
 "		    mytableData->compressFuncData;\n"
 "		unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5869,8 +5935,9 @@ const char *hash_source =
 "	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
-"	    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;\n"
+"	__global intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
+"	    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)\n"
+"	    tableData;\n"
 "	intintHash_CompressLCGData compressFuncData =\n"
 "	    mytableData->compressFuncData;\n"
 "	unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"
@@ -5929,8 +5996,10 @@ const char *hash_source =
 "	uint i;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
-"		intintLCGQuadraticOpenCompactCLHash_TableData *mytableData =\n"
-"		    (intintLCGQuadraticOpenCompactCLHash_TableData *) tableData;\n"
+"		__global intintLCGQuadraticOpenCompactCLHash_TableData\n"
+"		    *mytableData =\n"
+"		    (__global intintLCGQuadraticOpenCompactCLHash_TableData *)\n"
+"		    tableData;\n"
 "		intintHash_CompressLCGData compressFuncData =\n"
 "		    mytableData->compressFuncData;\n"
 "		unsigned int c = intintHash_CompressLCG(compressFuncData, key);\n"

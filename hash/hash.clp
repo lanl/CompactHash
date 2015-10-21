@@ -30,6 +30,8 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
+#define GLOBAL __global
+
 int intintIdentityPerfectCLHash_InsertSingle(__global char *tableData,
                                                   int key, int value);
 int intintIdentityPerfectCLHash_InnerInsertSingle(__global char *tableData,

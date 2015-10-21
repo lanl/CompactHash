@@ -30,6 +30,8 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
+#define GLOBAL 
+
 #undef UNDEFINED
 #ifdef UNDEFINED
 /**
