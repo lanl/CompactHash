@@ -61,6 +61,22 @@ void compact_hash_delete(int *hash){
 int (*read_hash)(ulong, int *);
 void (*write_hash)(uint, ulong, int *);
 
+#ifdef _OPENMP
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void (*write_hash_openmp)(uint, ulong, int *);
+#else
+void (*write_hash_openmp)(uint, ulong, int *, omp_lock_t * lock);
+#endif
+#endif
+
+int get_hash_method(void) {
+  return(hash_method);
+}
+
+long long get_hashtablesize(void) {
+  return(hashtablesize);
+}
+
 int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
 
    hash_ncells = 0;
@@ -153,6 +169,7 @@ int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
          write_hash = write_hash_primejump_report_level_3;
       }
    }
+
    return(hash);
 }
 
@@ -339,6 +356,533 @@ void write_hash_primejump_report_level_3(uint ic, ulong hashkey, int *hash){
    hash[2*hashloc] = hashkey;
    hash[2*hashloc+1] = ic;
 }
+
+#ifdef _OPENMP
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_perfect_openmp(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_perfect_openmp(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   hash[hashkey] = ic;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_linear_openmp(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_linear_openmp(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc++;
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      hashloc++;
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_linear_openmp_report_level_1(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_linear_openmp_report_level_1(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc++;
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+      icount++;
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      hashloc++;
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+      icount++;
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_linear_openmp_report_level_2(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_linear_openmp_report_level_2(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc++;
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+      icount++;
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      hashloc++;
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+      icount++;
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_linear_openmp_report_level_3(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_linear_openmp_report_level_3(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;;
+   printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc++;
+      hashloc %= hashtablesize;
+      printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+      icount++;
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      hashloc++;
+      hashloc = hashloc%hashtablesize;
+      printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+      omp_set_lock(&(lock[hashloc]));
+      icount++;
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_quadratic_openmp(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_quadratic_openmp(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*icount);
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*icount);
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_quadratic_openmp_report_level_1(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_quadratic_openmp_report_level_1(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*icount);
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*icount);
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_quadratic_openmp_report_level_2(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_quadratic_openmp_report_level_2(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*icount);
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*icount);
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_quadratic_openmp_report_level_3(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_quadratic_openmp_report_level_3(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+   printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*icount);
+      hashloc %= hashtablesize;
+      printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*icount);
+      hashloc = hashloc%hashtablesize;
+      printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_primejump_openmp(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_primejump_openmp(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint jump = 1+hashkey%hash_jump_prime;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*jump);
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*jump);
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_primejump_openmp_report_level_1(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_primejump_openmp_report_level_1(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint jump = 1+hashkey%hash_jump_prime;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*jump);
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*jump);
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_primejump_openmp_report_level_2(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_primejump_openmp_report_level_2(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint jump = 1+hashkey%hash_jump_prime;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*jump);
+      hashloc %= hashtablesize;
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*jump);
+      hashloc = hashloc%hashtablesize;
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+void write_hash_primejump_openmp_report_level_3(uint ic, ulong hashkey, int *hash){
+#else
+void write_hash_primejump_openmp_report_level_3(uint ic, ulong hashkey, int *hash, omp_lock_t *lock){
+#endif
+   int icount = 0;
+   uint jump = 1+hashkey%hash_jump_prime;
+   uint hashloc = (hashkey*AA+BB)%prime%hashtablesize;
+   printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+   int MaxTries = 1000;
+
+   int old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   //printf("old_key is %d\n",old_key);
+
+   for (icount = 1; old_key != hashkey && old_key != -1 && icount < MaxTries; icount++){
+      hashloc+=(icount*jump);
+      hashloc %= hashtablesize;
+      printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+
+      old_key = __sync_val_compare_and_swap(&hash[2*hashloc], -1, hashkey); 
+   }
+
+   if (icount < MaxTries) hash[2*hashloc+1] = ic;
+#else
+   omp_set_lock(&(lock[hashloc]));
+   while (hash[2*hashloc] != -1 && hash[2*hashloc]!= (int)hashkey){
+      omp_unset_lock(&(lock[hashloc]));
+      icount++;
+      hashloc+=(icount*jump);
+      hashloc = hashloc%hashtablesize;
+      printf("%d: cell %d hashloc is %d hash[2*hashloc] = %d hashkey %lu ii %lu jj %lu\n",icount,ic,hashloc,hash[2*hashloc],hashkey,hashkey%hash_stride,hashkey/hash_stride);
+      omp_set_lock(&(lock[hashloc]));
+   }
+
+   hash[2*hashloc] = hashkey;
+   hash[2*hashloc+1] = ic;
+   omp_unset_lock(&(lock[hashloc]));
+#endif
+
+#pragma omp atomic
+   write_hash_collisions += icount;;
+#pragma omp atomic
+   hash_ncells++;
+}
+#endif
 
 int read_hash_perfect(ulong hashkey, int *hash){
    return(hash[hashkey]);

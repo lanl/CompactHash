@@ -10,7 +10,7 @@ lib_LTLIBRARIES = libhash.la
 include_HEADERS = hash.h
 bin_PROGRAMS = hashTest
 
-hashTest_CPPFLAGS = -DHAVE_OPENCL -DHAVE_CL_DOUBLE
+hashTest_CPPFLAGS = -DHAVE_OPENCL -DHAVE_CL_DOUBLE -I$(OPENCL_INCLUDE)
 
 H_SRCS = hash.h CLHash_Utilities.h
 
