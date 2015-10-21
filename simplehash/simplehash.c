@@ -34,6 +34,12 @@
 #include <stdlib.h>
 #include "simplehash.h"
 
+#ifdef HAVE_OPENCL
+#include "simplehashlib_kern.inc"
+#include "simplehash_kern.inc"
+#endif
+
+
 static ulong AA;
 static ulong BB;
 static ulong prime=4294967291;
@@ -1287,6 +1293,122 @@ void final_hash_collision_report(void){
       printf("Final hash collision report -- write/read collisions per cell %lf/%lf\n",write_hash_collisions_runsum/(double)write_hash_collisions_count,read_hash_collisions_runsum/(double)read_hash_collisions_count);
    }
 }
+
+#ifdef HAVE_OPENCL
+char *get_hash_kernel_source_string(void){
+   return (char*) simplehash_kern_source;
+}
+
+cl_kernel init_kernel;
+void hash_lib_init(cl_context context){
+
+   cl_int error;
+
+   cl_program program =  clCreateProgramWithSource(context, 1, (const char **)&simplehashlib_kern_source, NULL, &error);
+   if (error != CL_SUCCESS){
+       printf("clCreateProgramWithSource returned an error %d at line %d in file %s\n", error,__LINE__,__FILE__);
+   }
+
+   size_t nReportSize;
+   char* BuildReport;
+   #ifdef HAVE_CL_DOUBLE
+     error = clBuildProgram(program, 0, NULL, "-DHAVE_CL_DOUBLE", NULL, NULL);
+   #else
+     error = clBuildProgram(program, 0, NULL, "-DNO_CL_DOUBLE -cl-single-precision-constant", NULL, NULL);
+   #endif
+    if (error != CL_SUCCESS){
+       printf("clBuildProgram returned an error %d at line %d in file %s\n", error,__LINE__,__FILE__);
+
+       cl_device_id device;
+
+       clGetContextInfo(context, CL_CONTEXT_DEVICES, 1, &device, NULL);
+       if (context == NULL){
+          printf("EZCL_DEVTYPE_INIT: Failed to find device and setup context in file %s at line %d\n", __FILE__, __LINE__);
+          exit(-1); // No device is available, something is wrong 
+       }
+
+       error = clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &nReportSize);
+       if (error != CL_SUCCESS) {
+           switch (error){
+               case CL_INVALID_DEVICE:
+                   printf("Invalid device in clProgramBuildInfo\n");
+                   break;
+               case CL_INVALID_VALUE:
+                   printf("Invalid value in clProgramBuildInfo\n");
+                   break;
+               case CL_INVALID_PROGRAM:
+                   printf("Invalid program in clProgramBuildInfo\n");
+                   break;
+           }
+       }
+
+       BuildReport = (char *)malloc(nReportSize);
+
+       error = clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, nReportSize, BuildReport, NULL);
+       if (error != CL_SUCCESS) {
+           switch (error){
+               case CL_INVALID_DEVICE:
+                   printf("Invalid device in clProgramBuildInfo\n");
+                   break;
+               case CL_INVALID_VALUE:
+                   printf("Invalid value in clProgramBuildInfo\n");
+                   break;
+               case CL_INVALID_PROGRAM:
+                   printf("Invalid program in clProgramBuildInfo\n");
+                   break;
+           }
+       }
+       printf("%s\n", BuildReport);
+   }
+
+
+   init_kernel = clCreateKernel(program, "init_kern", &error);
+   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+}
+
+cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_queue queue, long *gpu_time)
+{
+   cl_int error;
+
+   long gpu_time_start, gpu_time_end;
+
+   cl_mem hash_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, hash_size*sizeof(int), NULL, &error);
+   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+
+  //init to -1
+
+   error = clSetKernelArg(init_kernel, 0, sizeof(cl_uint), &hash_size);
+   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+   error = clSetKernelArg(init_kernel, 1, sizeof(cl_mem), (void*)&hash_buffer);
+   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+
+   size_t global_work_size;
+   size_t local_work_size;
+
+   local_work_size = TILE_SIZE;
+   global_work_size = ((hash_size+local_work_size-1)/local_work_size)*local_work_size;
+
+   cl_event hash_init_event;
+
+   error = clEnqueueNDRangeKernel(queue, init_kernel, 1, 0, &global_work_size, &local_work_size, 0, NULL, &hash_init_event);
+   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+
+   clWaitForEvents(1,&hash_init_event);
+
+   clGetEventProfilingInfo(hash_init_event, CL_PROFILING_COMMAND_START, sizeof(gpu_time_start), &gpu_time_start, NULL);
+   clGetEventProfilingInfo(hash_init_event, CL_PROFILING_COMMAND_END, sizeof(gpu_time_end), &gpu_time_end, NULL);
+
+
+   *gpu_time = gpu_time_end - gpu_time_start;
+
+   clReleaseEvent(hash_init_event);
+
+   //if (DETAILED_TIMING) printf("\n\tinit %.6lf,", (double)(gpu_time_end - gpu_time_start)*1.0e-9);
+
+   return(hash_buffer);
+}
+#endif
+
 int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulong hashkey, int *hash){
    //int hash_report_level = 3;
    int max_collisions_allowed = 1000;

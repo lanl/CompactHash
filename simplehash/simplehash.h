@@ -37,6 +37,13 @@
 #include <omp.h>
 #endif
 
+#ifdef HAVE_OPENCL
+#ifdef __APPLE_CC__
+#include <OpenCL/OpenCL.h>
+#else
+#include <CL/cl.h>
+#endif
+#endif
 
 enum choose_hash_method
 {  METHOD_UNSET = 0,            //  use 0 for no method set
@@ -141,6 +148,13 @@ void compact_hash_delete(int *hash);
 
 void read_hash_collision_report(void);
 void final_hash_collision_report(void);
+
+char *get_hash_kernel_source_string(void);
+#ifdef HAVE_OPENCL
+void hash_lib_init(cl_context context);
+cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_queue queue, long *gpu_time);
+#endif
+void hash_lib_terminate(void);
 
 #ifdef __cplusplus
 }

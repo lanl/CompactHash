@@ -122,7 +122,7 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libsimplehash_la_LIBADD =
-am__objects_1 = simplehash.lo simplehashlib.lo
+am__objects_1 = simplehash.lo
 am__objects_2 =
 am_libsimplehash_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsimplehash_la_OBJECTS = $(am_libsimplehash_la_OBJECTS)
@@ -318,9 +318,9 @@ top_srcdir = @top_srcdir@
 AM_MAKEFLAGS = -j 4
 DEFAULT_INCLUDES = -I. -I..
 lib_LTLIBRARIES = libsimplehash.la
-include_HEADERS = simplehash.h simplehashlib.h
-H_SRCS = simplehash.h simplehashlib.h
-C_SRCS = simplehash.c simplehashlib.c
+include_HEADERS = simplehash.h
+H_SRCS = simplehash.h
+C_SRCS = simplehash.c
 libsimplehash_la_SOURCES = ${C_SRCS} ${H_SRCS}
 EXTRA_DIST = simplehash_kern.cl simplehashlib_kern.cl embed_source.pl
 all: all-am
@@ -403,7 +403,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplehash.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplehashlib.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -661,10 +660,10 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
 	tags tags-am uninstall uninstall-am uninstall-includeHEADERS \
 	uninstall-libLTLIBRARIES
 
-default: simplehash.c simplehashlib.c libsimplehash.la
-all: simplehash.c simplehashlib.c libsimplehash.la
+default: simplehash.c libsimplehash.la
+all: simplehash.c libsimplehash.la
 
-simplehashlib.c: simplehashlib_kern.inc simplehash_kern.inc
+simplehash.c: simplehashlib_kern.inc simplehash_kern.inc
 
 simplehashlib_kern.inc:
 	./embed_source.pl simplehashlib_kern.cl > simplehashlib_kern.inc

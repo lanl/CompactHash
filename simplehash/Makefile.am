@@ -1,20 +1,20 @@
-default: simplehash.c simplehashlib.c libsimplehash.la
-all: simplehash.c simplehashlib.c libsimplehash.la
+default: simplehash.c libsimplehash.la
+all: simplehash.c libsimplehash.la
 
 AM_MAKEFLAGS = -j 4
 
 DEFAULT_INCLUDES=-I. -I..
 
 lib_LTLIBRARIES = libsimplehash.la
-include_HEADERS = simplehash.h simplehashlib.h
+include_HEADERS = simplehash.h
 
-H_SRCS = simplehash.h simplehashlib.h
+H_SRCS = simplehash.h
 
-C_SRCS = simplehash.c simplehashlib.c
+C_SRCS = simplehash.c
 
 libsimplehash_la_SOURCES = ${C_SRCS} ${H_SRCS}
 
-simplehashlib.c: simplehashlib_kern.inc simplehash_kern.inc
+simplehash.c: simplehashlib_kern.inc simplehash_kern.inc
 
 simplehashlib_kern.inc:
 	./embed_source.pl simplehashlib_kern.cl > simplehashlib_kern.inc

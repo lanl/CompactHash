@@ -51,7 +51,6 @@
 #include "gpu.h"
 #include "HashFactory/HashFactory.h"
 #include "simplehash/simplehash.h"
-#include "simplehash/simplehashlib.h"
 #include "timer/timer.h"
 
 #ifdef HAVE_OPENCL
