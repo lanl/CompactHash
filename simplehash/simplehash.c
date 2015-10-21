@@ -30,6 +30,8 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "simplehash.h"
 //#include "timer/timer.h"
 
@@ -47,16 +49,13 @@ static uint write_hash_collisions_count = 0;
 static uint read_hash_collisions_count = 0;
 static uint hash_report_level = 0;
 static uint hash_queries;
-static uint hash_method = 1;
+static uint hash_method = QUADRATIC;
 static uint hash_jump_prime = 41;
 static double hash_mult = 3.0;
 static int do_compact_hash = 0;
 
 float mem_opt_factor;
 
-void compact_hash_delete(int *hash){
-      free(hash);
-}
 
 int (*read_hash)(ulong, int *);
 void (*write_hash)(uint, ulong, int *);
@@ -78,7 +77,6 @@ long long get_hashtablesize(void) {
 }
 
 int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
-
    hash_ncells = 0;
    write_hash_collisions = 0;
    read_hash_collisions = 0;
@@ -126,7 +124,7 @@ int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
    if (! do_compact_hash) {
       read_hash  = read_hash_perfect;
       write_hash = write_hash_perfect;
-   } else if (hash_method == 0){
+   } else if (hash_method == LINEAR){
       if (hash_report_level == 0){
          read_hash  = read_hash_linear;
          write_hash = write_hash_linear;
@@ -140,7 +138,7 @@ int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
          read_hash  = read_hash_linear_report_level_3;
          write_hash = write_hash_linear_report_level_3;
       }
-   } else if (hash_method == 1){
+   } else if (hash_method == QUADRATIC){
       if (hash_report_level == 0){
          read_hash  = read_hash_quadratic;
          write_hash = write_hash_quadratic;
@@ -154,7 +152,7 @@ int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
          read_hash  = read_hash_quadratic_report_level_3;
          write_hash = write_hash_quadratic_report_level_3;
       }
-   } else if (hash_method == 2){
+   } else if (hash_method == PRIME_JUMP){
       if (hash_report_level == 0){
          read_hash  = read_hash_primejump;
          write_hash = write_hash_primejump;
@@ -187,7 +185,6 @@ void write_hash_linear(uint ic, ulong hashkey, int *hash){
 }
 
 void write_hash_linear_report_level_1(uint ic, ulong hashkey, int *hash){
-   int icount = 0;
    uint hashloc;
 
    hash_ncells++;
@@ -200,7 +197,6 @@ void write_hash_linear_report_level_1(uint ic, ulong hashkey, int *hash){
 }
 
 void write_hash_linear_report_level_2(uint ic, ulong hashkey, int *hash){
-   int icount = 0;
    uint hashloc;
 
    hash_ncells++;
@@ -1109,16 +1105,19 @@ int read_hash_primejump_report_level_3(ulong hashkey, int *hash){
    return(hashval);
 }
 
+void compact_hash_delete(int *hash){
+      free(hash);
+}
 int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulong hashkey, int *hash){
    //int hash_report_level = 3;
    int max_collisions_allowed = 1000;
    int hashval = -1;
    uint hashloc;
    int icount=0;
-   if (hash_method == -1) {
+   if (hash_method == PERFECT_HASH) {
       return(hash[hashkey]);
    }
-   if (hash_method == 0) {
+   if (hash_method == LINEAR) {
       if (hash_report_level == 0) {
          for (hashloc = (hashkey*AA+BB)%prime%hashtablesize; hash[2*hashloc] != (int)hashkey && hash[2*hashloc] != -1; hashloc++,hashloc = hashloc%hashtablesize){
             icount++;
@@ -1155,7 +1154,7 @@ int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulon
          }
          read_hash_collisions += icount;
       }
-   } else if (hash_method == 1) {
+   } else if (hash_method == QUADRATIC) {
       if (hash_report_level == 0) {
          for (hashloc = (hashkey*AA+BB)%prime%hashtablesize; hash[2*hashloc] != (int)hashkey && hash[2*hashloc] != -1; hashloc+=(icount*icount),hashloc = hashloc%hashtablesize){
             icount++;
@@ -1192,7 +1191,7 @@ int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulon
          }
          read_hash_collisions += icount;
       }
-   } else if (hash_method == 2) {
+   } else if (hash_method == PRIME_JUMP) {
       uint jump = 1+hashkey%hash_jump_prime;
       if (hash_report_level == 0) {
          for (hashloc = (hashkey*AA+BB)%prime%hashtablesize; hash[2*hashloc] != (int)hashkey && hash[2*hashloc] != -1; hashloc+=(icount*jump),hashloc = hashloc%hashtablesize){

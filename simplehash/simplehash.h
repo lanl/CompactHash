@@ -30,11 +30,20 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
-#ifndef _HASH_H
-#define _HASH_H
+#ifndef _SIMPLEHASH_H
+#define _SIMPLEHASH_H
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+
+enum choose_hash_method
+{  METHOD_UNSET = 0,            //  use 0 for no method set
+   PERFECT_HASH,                //  perfect hash 1
+   LINEAR,                      //  linear hash 2
+   QUADRATIC,                   //  quadratic hash 3
+   PRIME_JUMP  };               //  prime_jump hash 4
 
 #ifdef __cplusplus
 extern "C"
