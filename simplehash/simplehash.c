@@ -30,7 +30,7 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 
-#include "hashit.h"
+#include "simplehash.h"
 //#include "timer/timer.h"
 
 static ulong AA;

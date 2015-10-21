@@ -16311,7 +16311,7 @@ ac_config_files="$ac_config_files kdtree/Makefile"
 
 ac_config_files="$ac_config_files hash/Makefile"
 
-ac_config_files="$ac_config_files oldHash/Makefile"
+ac_config_files="$ac_config_files simplehash/Makefile"
 
 ac_config_files="$ac_config_files timer/Makefile"
 
@@ -17357,7 +17357,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "kdtree/Makefile") CONFIG_FILES="$CONFIG_FILES kdtree/Makefile" ;;
     "hash/Makefile") CONFIG_FILES="$CONFIG_FILES hash/Makefile" ;;
-    "oldHash/Makefile") CONFIG_FILES="$CONFIG_FILES oldHash/Makefile" ;;
+    "simplehash/Makefile") CONFIG_FILES="$CONFIG_FILES simplehash/Makefile" ;;
     "timer/Makefile") CONFIG_FILES="$CONFIG_FILES timer/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

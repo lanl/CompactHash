@@ -34,14 +34,14 @@
 //#ifdef HAVE_CONFIG_H
 //#include "config.h"
 //#endif
-#include "hasholdlib.h"
-#include "hasholdlib_kern.inc"
-#include "hashold_kern.inc"
+#include "simplehashlib.h"
+#include "simplehashlib_kern.inc"
+#include "simplehash_kern.inc"
 
 static int reportLevel = 0;
 
 char *get_hash_kernel_source_string(void){
-   return (char*) hashold_kern_source;
+   return (char*) simplehash_kern_source;
 }
 
 #ifdef HAVE_OPENCL
@@ -50,7 +50,7 @@ void hash_lib_init(cl_context context){
 
    cl_int error;
 
-   cl_program program =  clCreateProgramWithSource(context, 1, (const char **)&hasholdlib_kern_source, NULL, &error);
+   cl_program program =  clCreateProgramWithSource(context, 1, (const char **)&simplehashlib_kern_source, NULL, &error);
    if (error != CL_SUCCESS){
        printf("clCreateProgramWithSource returned an error %d at line %d in file %s\n", error,__LINE__,__FILE__);
    }

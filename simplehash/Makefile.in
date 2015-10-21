@@ -79,7 +79,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = oldHash
+subdir = simplehash
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/./config/depcomp $(include_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -121,11 +121,11 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libhashold_la_LIBADD =
-am__objects_1 = hashit.lo hasholdlib.lo
+libsimplehash_la_LIBADD =
+am__objects_1 = simplehash.lo simplehashlib.lo
 am__objects_2 =
-am_libhashold_la_OBJECTS = $(am__objects_1) $(am__objects_2)
-libhashold_la_OBJECTS = $(am_libhashold_la_OBJECTS)
+am_libsimplehash_la_OBJECTS = $(am__objects_1) $(am__objects_2)
+libsimplehash_la_OBJECTS = $(am_libsimplehash_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -163,8 +163,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libhashold_la_SOURCES)
-DIST_SOURCES = $(libhashold_la_SOURCES)
+SOURCES = $(libsimplehash_la_SOURCES)
+DIST_SOURCES = $(libsimplehash_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -317,12 +317,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_MAKEFLAGS = -j 4
 DEFAULT_INCLUDES = -I. -I..
-lib_LTLIBRARIES = libhashold.la
-include_HEADERS = hashit.h hasholdlib.h
-H_SRCS = hashit.h hasholdlib.h
-C_SRCS = hashit.c hasholdlib.c
-libhashold_la_SOURCES = ${C_SRCS} ${H_SRCS}
-EXTRA_DIST = hashold_kern.cl hasholdlib_kern.cl embed_source.pl
+lib_LTLIBRARIES = libsimplehash.la
+include_HEADERS = simplehash.h simplehashlib.h
+H_SRCS = simplehash.h simplehashlib.h
+C_SRCS = simplehash.c simplehashlib.c
+libsimplehash_la_SOURCES = ${C_SRCS} ${H_SRCS}
+EXTRA_DIST = simplehash_kern.cl simplehashlib_kern.cl embed_source.pl
 all: all-am
 
 .SUFFIXES:
@@ -336,9 +336,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign oldHash/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign simplehash/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign oldHash/Makefile
+	  $(AUTOMAKE) --foreign simplehash/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -393,8 +393,8 @@ clean-libLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libhashold.la: $(libhashold_la_OBJECTS) $(libhashold_la_DEPENDENCIES) $(EXTRA_libhashold_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(libdir) $(libhashold_la_OBJECTS) $(libhashold_la_LIBADD) $(LIBS)
+libsimplehash.la: $(libsimplehash_la_OBJECTS) $(libsimplehash_la_DEPENDENCIES) $(EXTRA_libsimplehash_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(libdir) $(libsimplehash_la_OBJECTS) $(libsimplehash_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -402,8 +402,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hasholdlib.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplehash.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplehashlib.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -661,16 +661,16 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
 	tags tags-am uninstall uninstall-am uninstall-includeHEADERS \
 	uninstall-libLTLIBRARIES
 
-default: hashit.c hasholdlib.c libhashold.la
-all: hashit.c hasholdlib.c libhashold.la
+default: simplehash.c simplehashlib.c libsimplehash.la
+all: simplehash.c simplehashlib.c libsimplehash.la
 
-hasholdlib.c: hasholdlib_kern.inc hashold_kern.inc
+simplehashlib.c: simplehashlib_kern.inc simplehash_kern.inc
 
-hasholdlib_kern.inc:
-	./embed_source.pl hasholdlib_kern.cl > hasholdlib_kern.inc
+simplehashlib_kern.inc:
+	./embed_source.pl simplehashlib_kern.cl > simplehashlib_kern.inc
 
-hashold_kern.inc:
-	./embed_source.pl hashold_kern.cl > hashold_kern.inc
+simplehash_kern.inc:
+	./embed_source.pl simplehash_kern.cl > simplehash_kern.inc
 
 clean-local:
 	rm -f *.inc

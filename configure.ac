@@ -376,7 +376,7 @@ AC_SUBST(CPREPROCESSOR)
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([kdtree/Makefile])
 AC_CONFIG_FILES([hash/Makefile])
-AC_CONFIG_FILES([oldHash/Makefile])
+AC_CONFIG_FILES([simplehash/Makefile])
 AC_CONFIG_FILES([timer/Makefile])
 
 AC_OUTPUT

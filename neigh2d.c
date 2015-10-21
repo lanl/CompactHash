@@ -50,8 +50,8 @@
 #include "kdtree/KDTree2d.h"
 #include "gpu.h"
 #include "hash/hash.h"
-#include "oldHash/hashit.h"
-#include "oldHash/hasholdlib.h"
+#include "simplehash/simplehash.h"
+#include "simplehash/simplehashlib.h"
 #include "timer/timer.h"
 
 #ifdef HAVE_OPENCL
