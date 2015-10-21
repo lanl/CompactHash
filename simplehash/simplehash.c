@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "simplehash.h"
-//#include "timer/timer.h"
 
 static ulong AA;
 static ulong BB;
@@ -1108,6 +1107,34 @@ int read_hash_primejump_report_level_3(ulong hashkey, int *hash){
 void compact_hash_delete(int *hash){
       free(hash);
 }
+
+void write_hash_collision_report(void){
+   if (hash_method == PERFECT_HASH) return;
+   if (hash_report_level == 1) {
+      write_hash_collisions_runsum += (double)write_hash_collisions/(double)hash_ncells;
+      write_hash_collisions_count++;
+   } else if (hash_report_level >= 2) {
+      printf("Write hash collision report -- collisions per cell %lf, collisions %d cells %d\n",(double)write_hash_collisions/(double)hash_ncells,write_hash_collisions,hash_ncells);
+   }
+}
+
+void read_hash_collision_report(void){
+   if (hash_method == PERFECT_HASH) return;
+   if (hash_report_level == 1) {
+      read_hash_collisions_runsum += (double)read_hash_collisions/(double)hash_queries;
+      read_hash_collisions_count++;
+   } else if (hash_report_level >= 2) {
+      printf("Read hash collision report -- collisions per cell %lf, collisions %d cells %d\n",(double)read_hash_collisions/(double)hash_queries,read_hash_collisions,hash_queries);
+      hash_queries = 0;
+      read_hash_collisions = 0;
+   }
+}
+
+void final_hash_collision_report(void){
+   if (hash_report_level >= 1 && read_hash_collisions_count > 0) {
+      printf("Final hash collision report -- write/read collisions per cell %lf/%lf\n",write_hash_collisions_runsum/(double)write_hash_collisions_count,read_hash_collisions_runsum/(double)read_hash_collisions_count);
+   }
+}
 int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulong hashkey, int *hash){
    //int hash_report_level = 3;
    int max_collisions_allowed = 1000;
@@ -1153,6 +1180,9 @@ int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulon
             }
          }
          read_hash_collisions += icount;
+      } else {
+         printf("Error -- Illegal value of hash_report_level %d\n",hash_report_level);
+         exit(1);
       }
    } else if (hash_method == QUADRATIC) {
       if (hash_report_level == 0) {
@@ -1190,6 +1220,9 @@ int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulon
             }
          }
          read_hash_collisions += icount;
+      } else {
+         printf("Error -- Illegal value of hash_report_level %d\n",hash_report_level);
+         exit(1);
       }
    } else if (hash_method == PRIME_JUMP) {
       uint jump = 1+hashkey%hash_jump_prime;
@@ -1228,38 +1261,16 @@ int read_dev_hash(int hash_method, ulong hashtablesize, ulong AA, ulong BB, ulon
             }
          }
          read_hash_collisions += icount;
+      } else {
+         printf("Error -- Illegal value of hash_report_level %d\n",hash_report_level);
+         exit(1);
       }
+   } else {
+      printf("Error -- Illegal value of hash_method %d\n",hash_method);
+      exit(1);
    }
 
    if (hash[2*hashloc] != -1) hashval = hash[2*hashloc+1];
    return(hashval);
-}
-
-void write_hash_collision_report(void){
-   if (! do_compact_hash) return;
-   if (hash_report_level == 1) {
-      write_hash_collisions_runsum += (double)write_hash_collisions/(double)hash_ncells;
-      write_hash_collisions_count++;
-   } else if (hash_report_level >= 2) {
-      printf("Write hash collision report -- collisions per cell %lf, collisions %d cells %d\n",(double)write_hash_collisions/(double)hash_ncells,write_hash_collisions,hash_ncells);
-   }
-}
-
-void read_hash_collision_report(void){
-   if (! do_compact_hash) return;
-   if (hash_report_level == 1) {
-      read_hash_collisions_runsum += (double)read_hash_collisions/(double)hash_queries;
-      read_hash_collisions_count++;
-   } else if (hash_report_level >= 2) {
-      printf("Read hash collision report -- collisions per cell %lf, collisions %d cells %d\n",(double)read_hash_collisions/(double)hash_queries,read_hash_collisions,hash_queries);
-      hash_queries = 0;
-      read_hash_collisions = 0;
-   }
-}
-
-void final_hash_collision_report(void){
-   if (hash_report_level >= 1 && read_hash_collisions_count > 0) {
-      printf("Final hash collision report -- write/read collisions per cell %lf/%lf\n",write_hash_collisions_runsum/(double)write_hash_collisions_count,read_hash_collisions_runsum/(double)read_hash_collisions_count);
-   }
 }
 
