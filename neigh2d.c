@@ -3315,7 +3315,7 @@ void **genmatrix(int jnum, int inum, size_t elsize)
   out[0]    = (void *)calloc(jnum*inum, elsize);
 
   for (int i = 1; i < jnum; i++) {
-    out[i] = out[i-1] + inum*elsize;
+    out[i] = (void *)((char *)out[i-1] + inum*elsize);
   }
 
   return (out);

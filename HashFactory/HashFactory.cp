@@ -41,7 +41,7 @@
  */
 #endif
 /**
- * @file   hash.c
+ * @file   HashFactory.c
  * @author Peter Ahrens
  * @date   Thu Jun 6 2013 
  */
@@ -49,6 +49,10 @@
 #define DELAY(x) x
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
+DELAY(#ifdef _OPENMP)
+DELAY(#include <omp.h>)
+DELAY(#endif)
+
 DELAY(#include "HashFactory.h")
 DELAY(#ifdef HAVE_OPENCL)
 DELAY(#ifdef __APPLE_CC__)
@@ -88,8 +92,6 @@ int clEnqueueNDRangeKernel(int command_queue, int kernel, uint work_dim, const s
 int clFinish(int command_queue) { return 0; }
 DELAY(#endif)
 DELAY(#define PRIME_NUM_CHECKS 20)
-typedef unsigned int uint;
-
 
 DELAY(#include <math.h>)
 #include "HashFactory.cm"

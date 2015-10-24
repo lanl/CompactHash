@@ -31,11 +31,15 @@
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
 /**
- * @file   hash.c
+ * @file   HashFactory.c
  * @author Peter Ahrens
  * @date   Thu Jun 6 2013 
  */
 //
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include "HashFactory.h"
 #ifdef HAVE_OPENCL
@@ -120,7 +124,6 @@ int clFinish(int command_queue) {
 }
 #endif
 #define PRIME_NUM_CHECKS 20
-typedef unsigned int uint;
 
 #include <math.h>
 
