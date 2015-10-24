@@ -55,6 +55,11 @@ DELAY(#include <stdio.h>)
 DELAY(#include <stdarg.h>)
 DELAY(#include <string.h>)
 //
+DELAY(#ifndef UINT_TYPE)
+DELAY(#define UINT_TYPE)
+typedef unsigned int uint;
+DELAY(#endif)
+//
 DELAY(#ifdef HAVE_OPENCL)
 DELAY(#ifdef __APPLE_CC__)
 DELAY(#include <OpenCL/OpenCL.h>)

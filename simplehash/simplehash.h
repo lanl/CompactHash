@@ -57,7 +57,10 @@ extern "C"
 {
 #endif
 
+#ifndef UINT_TYPE
+#define UINT_TYPE
 typedef unsigned int uint;
+#endif
 typedef unsigned long ulong;
 
 int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level);

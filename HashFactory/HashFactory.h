@@ -45,6 +45,11 @@
 #include <stdarg.h>
 #include <string.h>
 //
+#ifndef UINT_TYPE
+#define UINT_TYPE
+typedef unsigned int uint;
+#endif
+//
 #ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
 #include <OpenCL/OpenCL.h>
