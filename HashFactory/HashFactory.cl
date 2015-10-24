@@ -1,31 +1,4 @@
 
-/* Copyright (C) 1991-2012 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-/* This header is separate from features.h so that the compiler can
-   include it implicitly at the start of every compilation.  It must
-   not itself include <features.h> or any other header that includes
-   <features.h> because the implicit include comes before any feature
-   test macros that may be defined in a source file before it first
-   explicitly includes a system header.  GCC knows the name of this
-   header in order to preinclude it.  */
-/* We do support the IEC 559 math functionality, real and complex.  */
-/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
-   Unicode 6.0.  */
-/* We do not support C11 <threads.h>.  */
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -57,6 +30,7 @@
  *
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
+
 int intintIdentityPerfectCLHash_InsertSingle(__global char *tableData,
 					     int key, int value);
 int intintIdentityPerfectCLHash_InnerInsertSingle(__global char *tableData,
@@ -254,6 +228,7 @@ int intintHash_InsertNoOverwrite(__global char *tableData,
 				 __global int *values);
 int intintHash_InsertSingleNoOverwrite(__global char *tableData, int key,
 				       int value);
+
 #define HASH_REPORT_NEVER /**/ 0
 #define HASH_REPORT_CYCLE /**/ 1
 #define HASH_REPORT_END /****/ 2
@@ -391,11 +366,11 @@ int intintIdentityPerfectCLHash_InnerInsertSingle(__global char *tableData,
 	    intintHash_CompressIdentity(((__global
 					  intintIdentityPerfectCLHash_TableData
 					  *) tableData)->compressFuncData, key);
-	if (((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? ( {
-								 buckets[index].
-								 key = key;
-								 HASH_BUCKET_STATUS_EMPTY;}
- ):	     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+	if (((buckets[index].key ==
+	      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+					   key,
+					   HASH_BUCKET_STATUS_EMPTY) :
+	     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
 		if (key == buckets[index].key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 		} else {
@@ -436,13 +411,11 @@ int intintIdentityPerfectCLHash_InnerInsert(__global char *tableData,
 						  intintIdentityPerfectCLHash_TableData
 						  *) tableData)->
 						compressFuncData, key);
-		if (((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? ( {
-									 buckets
-									 [index].
-									 key =
-									 key;
-									 HASH_BUCKET_STATUS_EMPTY;}
- ):		     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
 			if (key == buckets[index].key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 			} else {
@@ -477,11 +450,11 @@ int intintIdentityPerfectCLHash_InnerInsertSingleNoOverwrite(__global char
 	    intintHash_CompressIdentity(((__global
 					  intintIdentityPerfectCLHash_TableData
 					  *) tableData)->compressFuncData, key);
-	if (((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? ( {
-								 buckets[index].
-								 key = key;
-								 HASH_BUCKET_STATUS_EMPTY;}
- ):	     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+	if (((buckets[index].key ==
+	      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+					   key,
+					   HASH_BUCKET_STATUS_EMPTY) :
+	     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
 		if (key == buckets[index].key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 		} else {
@@ -521,13 +494,11 @@ int intintIdentityPerfectCLHash_InnerInsertNoOverwrite(__global char *tableData,
 						  intintIdentityPerfectCLHash_TableData
 						  *) tableData)->
 						compressFuncData, key);
-		if (((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? ( {
-									 buckets
-									 [index].
-									 key =
-									 key;
-									 HASH_BUCKET_STATUS_EMPTY;}
- ):		     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
 			if (key == buckets[index].key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 			} else {

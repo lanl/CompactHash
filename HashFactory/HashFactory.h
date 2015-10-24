@@ -1,31 +1,4 @@
 
-/* Copyright (C) 1991-2012 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-/* This header is separate from features.h so that the compiler can
-   include it implicitly at the start of every compilation.  It must
-   not itself include <features.h> or any other header that includes
-   <features.h> because the implicit include comes before any feature
-   test macros that may be defined in a source file before it first
-   explicitly includes a system header.  GCC knows the name of this
-   header in order to preinclude it.  */
-/* We do support the IEC 559 math functionality, real and complex.  */
-/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
-   Unicode 6.0.  */
-/* We do not support C11 <threads.h>.  */
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -63,6 +36,7 @@
  * @date   Thu Jun 6 2013 
  */
 //
+
 #ifndef HASH_H
 #define HASH_H
 //
@@ -197,6 +171,7 @@ int clFinish(int command_queue);
 #define HASH_BUCKET_STATUS_EMPTY /**/ -1
 #define HASH_BUCKET_STATUS_FULL /***/ -2
 #define HASH_BUCKET_STATUS_LOCK /***/ -3
+
 /**
  * Hash_ExitCodeString will return a string representation of the given exit
  * code.
@@ -206,6 +181,7 @@ int clFinish(int command_queue);
  * @return A string representation of that exit code.
  */
 char *Hash_ExitCodeString(int exitCode);
+
 /**
  * Hash_ExitCodeDebug will print a string representation of the given exit code
  * if it is not EXIT_CODE_NORMAL.
@@ -213,6 +189,7 @@ char *Hash_ExitCodeString(int exitCode);
  * @param exitCode
  */
 void Hash_ExitCodeDebug(int exitCode);
+
 /**
  * Hash_SetReportLevel sets a static report level variable in hash.c. It should 
  * be called before hash tables are created. 
@@ -220,6 +197,7 @@ void Hash_ExitCodeDebug(int exitCode);
  * @param level The level of data collection desired.
  */
 void Hash_SetReportLevel(int level);
+
 /**
  * Hash_GetReportLevel gets this variable.
  *
@@ -235,9 +213,11 @@ void Hash_SetReportLevel(int level);
  *                       last important call.
  */
 int Hash_GetReportLevel();
+
 const char *Hash_GetKernelSourceString();
 int smallestProthPrimeAbove(int N);
 int largestProthPrimeUnder(int N);
+
 typedef struct intintHash_Table_ intintHash_Table;
 typedef struct intintCLHash_Table_ intintCLHash_Table;
 typedef struct intintHash_Factory_ intintHash_Factory;
@@ -597,4 +577,5 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 								keysBuffer,
 								cl_mem
 								valuesBuffer);
+
 #endif

@@ -125,7 +125,7 @@
 
 #define HASH_READ_KEY_EXP (buckets[index].key)
 
-#define CMPXCHG_HASH_READ_KEY_EXP ((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? ({buckets[index].key = key; HASH_BUCKET_STATUS_EMPTY;}) : buckets[index].key)\
+#define CMPXCHG_HASH_READ_KEY_EXP ((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key = key, HASH_BUCKET_STATUS_EMPTY) : buckets[index].key)\
 
 #define BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, CL_GLOBAL, ...) \
   \
