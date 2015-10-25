@@ -80,3 +80,14 @@
   int NAME##MODIFIER##CLHash_BufferInsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, cl_mem keysBuffer, cl_mem valuesBuffer);\
 \
 
+#define OPENMP_HASH_DECLARE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE)\
+  \
+  BASE_HASH_DECLARE(NAME, MODIFIER##OpenMP, KEY_TYPE, VALUE_TYPE)\
+  \
+  int NAME##MODIFIER##OpenMPHash_BufferQuery(NAME##Hash_Table *table, size_t numKeys, cl_mem keysBuffer, cl_mem valuesOutputBuffer);\
+  \
+  int NAME##MODIFIER##OpenMPHash_BufferInsert(NAME##Hash_Table *table, size_t numEntries, cl_mem keysBuffer, cl_mem valuesBuffer);\
+  \
+  int NAME##MODIFIER##OpenMPHash_BufferInsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, cl_mem keysBuffer, cl_mem valuesBuffer);\
+\
+

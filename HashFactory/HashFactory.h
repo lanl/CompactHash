@@ -354,6 +354,51 @@ int intintIdentityPerfectCLHash_BufferInsertNoOverwrite(intintHash_Table *
 							size_t numEntries,
 							cl_mem keysBuffer,
 							cl_mem valuesBuffer);
+int intintIdentityPerfectOpenMPHash_CreateFactory(intintHash_Factory * factory,
+						  int hashIndex);
+int intintIdentityPerfectOpenMPHash_DestroyFactory(intintHash_Factory * factory,
+						   int hashIndex);
+intintHash_Table *intintIdentityPerfectOpenMPHash_CreateTable(intintHash_Factory
+							      * factory,
+							      int hashIndex,
+							      size_t keyRange,
+							      size_t numEntries,
+							      float loadFactor);
+int intintIdentityPerfectOpenMPHash_InitTable(intintHash_Table * table,
+					      va_list args);
+int intintIdentityPerfectOpenMPHash_DestroyTable(intintHash_Table * table);
+char *intintIdentityPerfectOpenMPHash_Report(intintHash_Table * table);
+int intintIdentityPerfectOpenMPHash_EmptyTable(intintHash_Table * table);
+int intintIdentityPerfectOpenMPHash_Query(intintHash_Table * table,
+					  size_t numKeys, int *keys,
+					  int *valuesOutput);
+int intintIdentityPerfectOpenMPHash_QuerySingle(intintHash_Table * table,
+						int key, int *valueOutput);
+int intintIdentityPerfectOpenMPHash_Insert(intintHash_Table * table,
+					   size_t numEntries, int *keys,
+					   int *values);
+int intintIdentityPerfectOpenMPHash_InsertSingle(intintHash_Table * table,
+						 int key, int value);
+int intintIdentityPerfectOpenMPHash_InsertNoOverwrite(intintHash_Table * table,
+						      size_t numEntries,
+						      int *keys, int *values);
+int intintIdentityPerfectOpenMPHash_InsertSingleNoOverwrite(intintHash_Table *
+							    table, int key,
+							    int value);
+int intintIdentityPerfectOpenMPHash_BufferQuery(intintHash_Table * table,
+						size_t numKeys,
+						cl_mem keysBuffer,
+						cl_mem valuesOutputBuffer);
+int intintIdentityPerfectOpenMPHash_BufferInsert(intintHash_Table * table,
+						 size_t numEntries,
+						 cl_mem keysBuffer,
+						 cl_mem valuesBuffer);
+int intintIdentityPerfectOpenMPHash_BufferInsertNoOverwrite(intintHash_Table *
+							    table,
+							    size_t numEntries,
+							    cl_mem keysBuffer,
+							    cl_mem
+							    valuesBuffer);
 int intintIdentitySentinelPerfectHash_CreateFactory(intintHash_Factory *
 						    factory, int hashIndex);
 int intintIdentitySentinelPerfectHash_DestroyFactory(intintHash_Factory *
@@ -429,6 +474,66 @@ int intintIdentitySentinelPerfectCLHash_BufferInsert(intintHash_Table * table,
 						     cl_mem keysBuffer,
 						     cl_mem valuesBuffer);
 int intintIdentitySentinelPerfectCLHash_BufferInsertNoOverwrite(intintHash_Table
+								* table,
+								size_t
+								numEntries,
+								cl_mem
+								keysBuffer,
+								cl_mem
+								valuesBuffer);
+int intintIdentitySentinelPerfectOpenMPHash_CreateFactory(intintHash_Factory *
+							  factory,
+							  int hashIndex);
+int intintIdentitySentinelPerfectOpenMPHash_DestroyFactory(intintHash_Factory *
+							   factory,
+							   int hashIndex);
+intintHash_Table
+    *intintIdentitySentinelPerfectOpenMPHash_CreateTable(intintHash_Factory *
+							 factory, int hashIndex,
+							 size_t keyRange,
+							 size_t numEntries,
+							 float loadFactor);
+int intintIdentitySentinelPerfectOpenMPHash_InitTable(intintHash_Table * table,
+						      va_list args);
+int intintIdentitySentinelPerfectOpenMPHash_DestroyTable(intintHash_Table *
+							 table);
+char *intintIdentitySentinelPerfectOpenMPHash_Report(intintHash_Table * table);
+int intintIdentitySentinelPerfectOpenMPHash_EmptyTable(intintHash_Table *
+						       table);
+int intintIdentitySentinelPerfectOpenMPHash_Query(intintHash_Table * table,
+						  size_t numKeys, int *keys,
+						  int *valuesOutput);
+int intintIdentitySentinelPerfectOpenMPHash_QuerySingle(intintHash_Table *
+							table, int key,
+							int *valueOutput);
+int intintIdentitySentinelPerfectOpenMPHash_Insert(intintHash_Table * table,
+						   size_t numEntries, int *keys,
+						   int *values);
+int intintIdentitySentinelPerfectOpenMPHash_InsertSingle(intintHash_Table *
+							 table, int key,
+							 int value);
+int intintIdentitySentinelPerfectOpenMPHash_InsertNoOverwrite(intintHash_Table *
+							      table,
+							      size_t numEntries,
+							      int *keys,
+							      int *values);
+int
+intintIdentitySentinelPerfectOpenMPHash_InsertSingleNoOverwrite(intintHash_Table
+								* table,
+								int key,
+								int value);
+int intintIdentitySentinelPerfectOpenMPHash_BufferQuery(intintHash_Table *
+							table, size_t numKeys,
+							cl_mem keysBuffer,
+							cl_mem
+							valuesOutputBuffer);
+int intintIdentitySentinelPerfectOpenMPHash_BufferInsert(intintHash_Table *
+							 table,
+							 size_t numEntries,
+							 cl_mem keysBuffer,
+							 cl_mem valuesBuffer);
+int
+intintIdentitySentinelPerfectOpenMPHash_BufferInsertNoOverwrite(intintHash_Table
 								* table,
 								size_t
 								numEntries,
