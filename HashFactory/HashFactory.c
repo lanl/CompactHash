@@ -3956,6 +3956,460 @@ int intintLCGLinearOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table *
 	return (0);
 }
 
+typedef struct intintLCGLinearOpenCompactOpenMPHash_TableData {
+	int hashID;
+	unsigned int numBuckets;
+	intintHash_CompressLCGData compressFuncData;
+} intintLCGLinearOpenCompactOpenMPHash_TableData;
+typedef struct intintLCGLinearOpenCompactOpenMPHash_Bucket {
+	int key;
+	int value;
+} intintLCGLinearOpenCompactOpenMPHash_Bucket;
+intintHash_Table
+    *intintLCGLinearOpenCompactOpenMPHash_CreateTable(intintHash_Factory *
+						      factory, int hashIndex,
+						      size_t keyRange,
+						      size_t numEntries,
+						      float loadFactor) {
+	intintHash_Table *table =
+	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
+	table->destroyFunc = &intintLCGLinearOpenCompactOpenMPHash_DestroyTable;
+	table->emptyFunc = &intintLCGLinearOpenCompactOpenMPHash_EmptyTable;
+	table->queryFunc = &intintLCGLinearOpenCompactOpenMPHash_Query;
+	table->querySingleFunc =
+	    &intintLCGLinearOpenCompactOpenMPHash_QuerySingle;
+	table->insertFunc = &intintLCGLinearOpenCompactOpenMPHash_Insert;
+	table->insertSingleFunc =
+	    &intintLCGLinearOpenCompactOpenMPHash_InsertSingle;
+	table->insertNoOverwriteFunc =
+	    &intintLCGLinearOpenCompactOpenMPHash_InsertNoOverwrite;
+	table->insertSingleNoOverwriteFunc =
+	    &intintLCGLinearOpenCompactOpenMPHash_InsertSingleNoOverwrite;
+	table->tableData =
+	    (char *)
+	    malloc(sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData));
+	((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->tableData)->
+	    hashID = LCG_LINEAR_OPEN_COMPACT_OPENMP_HASH_ID;
+	((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->tableData)->
+	    numBuckets = (unsigned int)((double)numEntries / loadFactor);
+	((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->tableData)->
+	    compressFuncData.a = HASH_LCG_A;
+	((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->tableData)->
+	    compressFuncData.c = HASH_LCG_C;
+	((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->tableData)->
+	    compressFuncData.m = HASH_LCG_M;
+	((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->tableData)->
+	    compressFuncData.n =
+	    ((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->
+	     tableData)->numBuckets;
+	char *tempHashData =
+	    (char *)
+	    malloc(sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData) +
+		   ((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->
+		    tableData)->numBuckets *
+		   sizeof(intintLCGLinearOpenCompactOpenMPHash_Bucket));
+	memcpy(tempHashData, table->tableData,
+	       sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData));
+	free(table->tableData);
+	table->tableData = tempHashData;
+	return table;
+}
+int intintLCGLinearOpenCompactOpenMPHash_CreateFactory(intintHash_Factory *
+						       factory, int hashIndex) {
+	factory->createFunc[hashIndex] =
+	    &intintLCGLinearOpenCompactOpenMPHash_CreateTable;
+	factory->destroyFunc[hashIndex] =
+	    &intintLCGLinearOpenCompactOpenMPHash_DestroyFactory;;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintLCGLinearOpenCompactOpenMPHash_DestroyFactory(intintHash_Factory *
+							factory,
+							int hashIndex) {;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintLCGLinearOpenCompactOpenMPHash_DestroyTable(intintHash_Table * table) {
+	int exitCode = 0;
+	free(table->tableData);
+	free(table);
+	return exitCode;
+}
+int intintLCGLinearOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) & table->
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int index;
+	for (index = 0;
+	     index <
+	     ((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->
+	      tableData)->numBuckets; index++) {
+		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
+	return exitCode;
+}
+int intintLCGLinearOpenCompactOpenMPHash_InnerQuerySingle(char *tableData,
+							  int key,
+							  int *valueOutput) {
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
+	    (intintLCGLinearOpenCompactOpenMPHash_TableData *) tableData;
+	intintHash_CompressLCGData compressFuncData =
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+	unsigned long int iteration = 0;
+	for (;;) {
+		index =
+		    ((1 * iteration +
+		      c) %
+		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
+		      tableData)->numBuckets);
+		if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+			break;
+		} else if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+			break;
+		} else if ((index == c && iteration > 0)) {
+			exitCode = HASH_EXIT_CODE_CYCLE;
+			break;
+		}
+		iteration++;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+		*valueOutput = buckets[index].value;
+		return HASH_EXIT_CODE_NORMAL;
+	case HASH_SEARCH_CODE_MISMATCH:
+	case HASH_SEARCH_CODE_EMPTY:
+		return HASH_EXIT_CODE_KEY_DNE;
+	default:
+		return exitCode;
+	}
+}
+int intintLCGLinearOpenCompactOpenMPHash_InnerQuery(char *tableData,
+						    unsigned int numKeys,
+						    int *keys,
+						    int *valuesOutput) {
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int key;
+	int *valueOutput;
+	int index;
+	int exitCode;
+	uint i;
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	for (i = 0; i < numKeys; i++) {
+		key = keys[i];
+		valueOutput = &valuesOutput[i];
+		intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
+		    (intintLCGLinearOpenCompactOpenMPHash_TableData *)
+		    tableData;
+		intintHash_CompressLCGData compressFuncData =
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+		unsigned long int iteration = 0;
+		for (;;) {
+			index =
+			    ((1 * iteration +
+			      c) %
+			     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
+			      tableData)->numBuckets);
+			if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+				exitCode = HASH_SEARCH_CODE_EMPTY;
+				break;
+			} else if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+				break;
+			} else if ((index == c && iteration > 0)) {
+				exitCode = HASH_EXIT_CODE_CYCLE;
+				break;
+			}
+			iteration++;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+			*valueOutput = buckets[index].value;
+			break;
+		case HASH_SEARCH_CODE_MISMATCH:
+		case HASH_SEARCH_CODE_EMPTY:
+			resultExitCode = HASH_EXIT_CODE_KEY_DNE;
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintLCGLinearOpenCompactOpenMPHash_InnerInsertSingle(char *tableData,
+							   int key, int value) {
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
+	    (intintLCGLinearOpenCompactOpenMPHash_TableData *) tableData;
+	intintHash_CompressLCGData compressFuncData =
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+	unsigned long int iteration = 0;
+	for (;;) {
+		index =
+		    ((1 * iteration +
+		      c) %
+		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
+		      tableData)->numBuckets);
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+			break;
+		} else if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+			break;
+		} else if ((index == c && iteration > 0)) {
+			exitCode = HASH_EXIT_CODE_CYCLE;
+			break;
+		}
+		iteration++;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintLCGLinearOpenCompactOpenMPHash_InnerInsert(char *tableData,
+						     unsigned int numEntries,
+						     int *keys, int *values) {
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
+		    (intintLCGLinearOpenCompactOpenMPHash_TableData *)
+		    tableData;
+		intintHash_CompressLCGData compressFuncData =
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+		unsigned long int iteration = 0;
+		for (;;) {
+			index =
+			    ((1 * iteration +
+			      c) %
+			     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
+			      tableData)->numBuckets);
+			if (((buckets[index].key ==
+			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+							   key,
+							   HASH_BUCKET_STATUS_EMPTY)
+			     : buckets[index].key) ==
+			    HASH_BUCKET_STATUS_EMPTY) {
+				exitCode = HASH_SEARCH_CODE_EMPTY;
+				break;
+			} else if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+				break;
+			} else if ((index == c && iteration > 0)) {
+				exitCode = HASH_EXIT_CODE_CYCLE;
+				break;
+			}
+			iteration++;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintLCGLinearOpenCompactOpenMPHash_InnerInsertSingleNoOverwrite(char
+								      *tableData,
+								      int key,
+								      int
+								      value) {
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
+	    (intintLCGLinearOpenCompactOpenMPHash_TableData *) tableData;
+	intintHash_CompressLCGData compressFuncData =
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+	unsigned long int iteration = 0;
+	for (;;) {
+		index =
+		    ((1 * iteration +
+		      c) %
+		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
+		      tableData)->numBuckets);
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+			break;
+		} else if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+			break;
+		} else if ((index == c && iteration > 0)) {
+			exitCode = HASH_EXIT_CODE_CYCLE;
+			break;
+		}
+		iteration++;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintLCGLinearOpenCompactOpenMPHash_InnerInsertNoOverwrite(char *tableData,
+								unsigned int
+								numEntries,
+								int *keys,
+								int *values) {
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
+		    (intintLCGLinearOpenCompactOpenMPHash_TableData *)
+		    tableData;
+		intintHash_CompressLCGData compressFuncData =
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+		unsigned long int iteration = 0;
+		for (;;) {
+			index =
+			    ((1 * iteration +
+			      c) %
+			     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
+			      tableData)->numBuckets);
+			if (((buckets[index].key ==
+			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+							   key,
+							   HASH_BUCKET_STATUS_EMPTY)
+			     : buckets[index].key) ==
+			    HASH_BUCKET_STATUS_EMPTY) {
+				exitCode = HASH_SEARCH_CODE_EMPTY;
+				break;
+			} else if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+				break;
+			} else if ((index == c && iteration > 0)) {
+				exitCode = HASH_EXIT_CODE_CYCLE;
+				break;
+			}
+			iteration++;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+			break;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintLCGLinearOpenCompactOpenMPHash_QuerySingle(intintHash_Table * table,
+						     int key,
+						     int *valueOutput) {
+	return intintLCGLinearOpenCompactOpenMPHash_InnerQuerySingle(table->
+								     tableData,
+								     key,
+								     valueOutput);
+}
+int intintLCGLinearOpenCompactOpenMPHash_Query(intintHash_Table * table,
+					       size_t numKeys, int *keys,
+					       int *valuesOutput) {
+	return intintLCGLinearOpenCompactOpenMPHash_InnerQuery(table->tableData,
+							       numKeys, keys,
+							       valuesOutput);
+}
+int intintLCGLinearOpenCompactOpenMPHash_InsertSingle(intintHash_Table * table,
+						      int key, int value) {
+	return intintLCGLinearOpenCompactOpenMPHash_InnerInsertSingle(table->
+								      tableData,
+								      key,
+								      value);
+}
+int intintLCGLinearOpenCompactOpenMPHash_Insert(intintHash_Table * table,
+						size_t numEntries, int *keys,
+						int *values) {
+	return intintLCGLinearOpenCompactOpenMPHash_InnerInsert(table->
+								tableData,
+								numEntries,
+								keys, values);
+}
+int
+intintLCGLinearOpenCompactOpenMPHash_InsertSingleNoOverwrite(intintHash_Table *
+							     table, int key,
+							     int value) {
+	return
+	    intintLCGLinearOpenCompactOpenMPHash_InnerInsertSingleNoOverwrite
+	    (table->tableData, key, value);
+}
+int intintLCGLinearOpenCompactOpenMPHash_InsertNoOverwrite(intintHash_Table *
+							   table,
+							   size_t numEntries,
+							   int *keys,
+							   int *values) {
+	return
+	    intintLCGLinearOpenCompactOpenMPHash_InnerInsertNoOverwrite(table->
+									tableData,
+									numEntries,
+									keys,
+									values);
+}
+
 typedef struct intintLCGQuadraticOpenCompactHash_TableData {
 	int hashID;
 	unsigned int numBuckets;
@@ -4848,6 +5302,495 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
 				     "intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite",
 				     "clEnqueueNDRangeKernel");
 	return (0);
+}
+
+typedef struct intintLCGQuadraticOpenCompactOpenMPHash_TableData {
+	int hashID;
+	unsigned int numBuckets;
+	intintHash_CompressLCGData compressFuncData;
+} intintLCGQuadraticOpenCompactOpenMPHash_TableData;
+typedef struct intintLCGQuadraticOpenCompactOpenMPHash_Bucket {
+	int key;
+	int value;
+} intintLCGQuadraticOpenCompactOpenMPHash_Bucket;
+intintHash_Table
+    *intintLCGQuadraticOpenCompactOpenMPHash_CreateTable(intintHash_Factory *
+							 factory, int hashIndex,
+							 size_t keyRange,
+							 size_t numEntries,
+							 float loadFactor) {
+	intintHash_Table *table =
+	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
+	table->destroyFunc =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_DestroyTable;
+	table->emptyFunc = &intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable;
+	table->queryFunc = &intintLCGQuadraticOpenCompactOpenMPHash_Query;
+	table->querySingleFunc =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_QuerySingle;
+	table->insertFunc = &intintLCGQuadraticOpenCompactOpenMPHash_Insert;
+	table->insertSingleFunc =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_InsertSingle;
+	table->insertNoOverwriteFunc =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_InsertNoOverwrite;
+	table->insertSingleNoOverwriteFunc =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_InsertSingleNoOverwrite;
+	table->tableData =
+	    (char *)
+	    malloc(sizeof(intintLCGQuadraticOpenCompactOpenMPHash_TableData));
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->hashID = LCG_QUADRATIC_OPEN_COMPACT_OPENMP_HASH_ID;
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->numBuckets =
+(unsigned int)((double)numEntries / loadFactor);
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->compressFuncData.a = HASH_LCG_A;
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->compressFuncData.c = HASH_LCG_C;
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->compressFuncData.m = HASH_LCG_M;
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->compressFuncData.n =
+((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->tableData)->numBuckets;
+	((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	 tableData)->numBuckets =
+largestProthPrimeUnder(((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->tableData)->numBuckets);
+	char *tempHashData =
+	    (char *)
+	    malloc(sizeof(intintLCGQuadraticOpenCompactOpenMPHash_TableData) +
+		   ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		    table->tableData)->numBuckets *
+		   sizeof(intintLCGQuadraticOpenCompactOpenMPHash_Bucket));
+	memcpy(tempHashData, table->tableData,
+	       sizeof(intintLCGQuadraticOpenCompactOpenMPHash_TableData));
+	free(table->tableData);
+	table->tableData = tempHashData;
+	return table;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_CreateFactory(intintHash_Factory *
+							  factory,
+							  int hashIndex) {
+	factory->createFunc[hashIndex] =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_CreateTable;
+	factory->destroyFunc[hashIndex] =
+	    &intintLCGQuadraticOpenCompactOpenMPHash_DestroyFactory;;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_DestroyFactory(intintHash_Factory *
+							   factory,
+							   int hashIndex) {;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_DestroyTable(intintHash_Table *
+							 table) {
+	int exitCode = 0;
+	free(table->tableData);
+	free(table);
+	return exitCode;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) & table->
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int index;
+	for (index = 0;
+	     index <
+	     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
+	      tableData)->numBuckets; index++) {
+		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
+	return exitCode;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InnerQuerySingle(char *tableData,
+							     int key,
+							     int *valueOutput) {
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_TableData *) tableData;
+	intintHash_CompressLCGData compressFuncData =
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+	unsigned long int iteration = 0;
+	for (;;) {
+		index =
+		    ((1 * iteration * iteration + 0 * iteration +
+		      c) %
+		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		      tableData)->numBuckets);
+		if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+			break;
+		} else if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+			break;
+		} else
+		    if ((iteration >
+			 ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+			  tableData)->numBuckets)) {
+			exitCode = HASH_EXIT_CODE_CYCLE;
+			break;
+		}
+		iteration++;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+		*valueOutput = buckets[index].value;
+		return HASH_EXIT_CODE_NORMAL;
+	case HASH_SEARCH_CODE_MISMATCH:
+	case HASH_SEARCH_CODE_EMPTY:
+		return HASH_EXIT_CODE_KEY_DNE;
+	default:
+		return exitCode;
+	}
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InnerQuery(char *tableData,
+						       unsigned int numKeys,
+						       int *keys,
+						       int *valuesOutput) {
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int key;
+	int *valueOutput;
+	int index;
+	int exitCode;
+	uint i;
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	for (i = 0; i < numKeys; i++) {
+		key = keys[i];
+		valueOutput = &valuesOutput[i];
+		intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
+		    (intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		    tableData;
+		intintHash_CompressLCGData compressFuncData =
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+		unsigned long int iteration = 0;
+		for (;;) {
+			index =
+			    ((1 * iteration * iteration + 0 * iteration +
+			      c) %
+			     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData
+			       *) tableData)->numBuckets);
+			if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+				exitCode = HASH_SEARCH_CODE_EMPTY;
+				break;
+			} else if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+				break;
+			} else
+			    if ((iteration >
+				 ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) tableData)->numBuckets)) {
+				exitCode = HASH_EXIT_CODE_CYCLE;
+				break;
+			}
+			iteration++;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+			*valueOutput = buckets[index].value;
+			break;
+		case HASH_SEARCH_CODE_MISMATCH:
+		case HASH_SEARCH_CODE_EMPTY:
+			resultExitCode = HASH_EXIT_CODE_KEY_DNE;
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertSingle(char *tableData,
+							      int key,
+							      int value) {
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_TableData *) tableData;
+	intintHash_CompressLCGData compressFuncData =
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+	unsigned long int iteration = 0;
+	for (;;) {
+		index =
+		    ((1 * iteration * iteration + 0 * iteration +
+		      c) %
+		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		      tableData)->numBuckets);
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+			break;
+		} else if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+			break;
+		} else
+		    if ((iteration >
+			 ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+			  tableData)->numBuckets)) {
+			exitCode = HASH_EXIT_CODE_CYCLE;
+			break;
+		}
+		iteration++;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsert(char *tableData,
+							unsigned int numEntries,
+							int *keys,
+							int *values) {
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
+		    (intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		    tableData;
+		intintHash_CompressLCGData compressFuncData =
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+		unsigned long int iteration = 0;
+		for (;;) {
+			index =
+			    ((1 * iteration * iteration + 0 * iteration +
+			      c) %
+			     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData
+			       *) tableData)->numBuckets);
+			if (((buckets[index].key ==
+			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+							   key,
+							   HASH_BUCKET_STATUS_EMPTY)
+			     : buckets[index].key) ==
+			    HASH_BUCKET_STATUS_EMPTY) {
+				exitCode = HASH_SEARCH_CODE_EMPTY;
+				break;
+			} else if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+				break;
+			} else
+			    if ((iteration >
+				 ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) tableData)->numBuckets)) {
+				exitCode = HASH_EXIT_CODE_CYCLE;
+				break;
+			}
+			iteration++;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertSingleNoOverwrite(char
+									 *tableData,
+									 int
+									 key,
+									 int
+									 value) 
+{
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_TableData *) tableData;
+	intintHash_CompressLCGData compressFuncData =
+	    mytableData->compressFuncData;
+	unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+	unsigned long int iteration = 0;
+	for (;;) {
+		index =
+		    ((1 * iteration * iteration + 0 * iteration +
+		      c) %
+		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		      tableData)->numBuckets);
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+			break;
+		} else if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+			break;
+		} else
+		    if ((iteration >
+			 ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+			  tableData)->numBuckets)) {
+			exitCode = HASH_EXIT_CODE_CYCLE;
+			break;
+		}
+		iteration++;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertNoOverwrite(char
+								   *tableData,
+								   unsigned int
+								   numEntries,
+								   int *keys,
+								   int *values) 
+{
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
+		    (intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		    tableData;
+		intintHash_CompressLCGData compressFuncData =
+		    mytableData->compressFuncData;
+		unsigned int c = intintHash_CompressLCG(compressFuncData, key);
+		unsigned long int iteration = 0;
+		for (;;) {
+			index =
+			    ((1 * iteration * iteration + 0 * iteration +
+			      c) %
+			     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData
+			       *) tableData)->numBuckets);
+			if (((buckets[index].key ==
+			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+							   key,
+							   HASH_BUCKET_STATUS_EMPTY)
+			     : buckets[index].key) ==
+			    HASH_BUCKET_STATUS_EMPTY) {
+				exitCode = HASH_SEARCH_CODE_EMPTY;
+				break;
+			} else if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+				break;
+			} else
+			    if ((iteration >
+				 ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) tableData)->numBuckets)) {
+				exitCode = HASH_EXIT_CODE_CYCLE;
+				break;
+			}
+			iteration++;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+			break;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_QuerySingle(intintHash_Table *
+							table, int key,
+							int *valueOutput) {
+	return intintLCGQuadraticOpenCompactOpenMPHash_InnerQuerySingle(table->
+									tableData,
+									key,
+									valueOutput);
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_Query(intintHash_Table * table,
+						  size_t numKeys, int *keys,
+						  int *valuesOutput) {
+	return intintLCGQuadraticOpenCompactOpenMPHash_InnerQuery(table->
+								  tableData,
+								  numKeys, keys,
+								  valuesOutput);
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InsertSingle(intintHash_Table *
+							 table, int key,
+							 int value) {
+	return intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertSingle(table->
+									 tableData,
+									 key,
+									 value);
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_Insert(intintHash_Table * table,
+						   size_t numEntries, int *keys,
+						   int *values) {
+	return intintLCGQuadraticOpenCompactOpenMPHash_InnerInsert(table->
+								   tableData,
+								   numEntries,
+								   keys,
+								   values);
+}
+int
+intintLCGQuadraticOpenCompactOpenMPHash_InsertSingleNoOverwrite(intintHash_Table
+								* table,
+								int key,
+								int value) {
+	return
+	    intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertSingleNoOverwrite
+	    (table->tableData, key, value);
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_InsertNoOverwrite(intintHash_Table *
+							      table,
+							      size_t numEntries,
+							      int *keys,
+							      int *values) {
+	return
+	    intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertNoOverwrite
+	    (table->tableData, numEntries, keys, values);
 }
 const char *HashFactory_source =
 "\n"
