@@ -129,29 +129,38 @@
       switch(hashType & hashTypes){\
         case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_CreateFactory(factory, hashIndex); break;\
         case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_CreateFactory(factory, hashIndex); break;\
+        case IDENTITY_PERFECT_OPENMP_HASH_ID: NAME##IdentityPerfectOpenMPHash_CreateFactory(factory, hashIndex); break;\
         case IDENTITY_SENTINEL_PERFECT_HASH_ID: NAME##IdentitySentinelPerfectHash_CreateFactory(factory, hashIndex); break;\
         case IDENTITY_SENTINEL_PERFECT_CL_HASH_ID: NAME##IdentitySentinelPerfectCLHash_CreateFactory(factory, hashIndex); break;\
+        case IDENTITY_SENTINEL_PERFECT_OPENMP_HASH_ID: NAME##IdentitySentinelPerfectOpenMPHash_CreateFactory(factory, hashIndex); break;\
         case LCG_LINEAR_OPEN_COMPACT_HASH_ID: NAME##LCGLinearOpenCompactHash_CreateFactory(factory, hashIndex); break;\
         case LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID: NAME##LCGLinearOpenCompactCLHash_CreateFactory(factory, hashIndex); break;\
+        case LCG_LINEAR_OPEN_COMPACT_OPENMP_HASH_ID: NAME##LCGLinearOpenCompactOpenMPHash_CreateFactory(factory, hashIndex); break;\
         case LCG_QUADRATIC_OPEN_COMPACT_HASH_ID: NAME##LCGQuadraticOpenCompactHash_CreateFactory(factory, hashIndex); break;\
         case LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID: NAME##LCGQuadraticOpenCompactCLHash_CreateFactory(factory, hashIndex); break;\
+        case LCG_QUADRATIC_OPEN_COMPACT_OPENMP_HASH_ID: NAME##LCGQuadraticOpenCompactOpenMPHash_CreateFactory(factory, hashIndex); break;\
       }\
     }\
     return factory;\
   }\
   \
   int NAME##Hash_DestroyFactory(NAME##Hash_Factory *factory){\
-    int hashType;\
-    for(int hashIndex = 0; hashIndex < HASH_NUM_HASHES; hashType = 1 << hashIndex){\
+    int hashType = 1;\
+    for(int hashIndex = 0; hashIndex < HASH_NUM_HASHES; hashIndex++){\
+      hashType = 1 << hashIndex;\
       switch(hashType & factory->hashTypesAvailable){\
         case IDENTITY_PERFECT_HASH_ID: NAME##IdentityPerfectHash_DestroyFactory(factory, hashIndex); break;\
         case IDENTITY_PERFECT_CL_HASH_ID: NAME##IdentityPerfectCLHash_DestroyFactory(factory, hashIndex); break;\
+        case IDENTITY_PERFECT_OPENMP_HASH_ID: NAME##IdentityPerfectOpenMPHash_DestroyFactory(factory, hashIndex); break;\
         case IDENTITY_SENTINEL_PERFECT_HASH_ID: NAME##IdentitySentinelPerfectHash_DestroyFactory(factory, hashIndex); break;\
         case IDENTITY_SENTINEL_PERFECT_CL_HASH_ID: NAME##IdentitySentinelPerfectCLHash_DestroyFactory(factory, hashIndex); break;\
+        case IDENTITY_SENTINEL_PERFECT_OPENMP_HASH_ID: NAME##IdentitySentinelPerfectOpenMPHash_DestroyFactory(factory, hashIndex); break;\
         case LCG_LINEAR_OPEN_COMPACT_HASH_ID: NAME##LCGLinearOpenCompactHash_DestroyFactory(factory, hashIndex); break;\
         case LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID: NAME##LCGLinearOpenCompactCLHash_DestroyFactory(factory, hashIndex); break;\
+        case LCG_LINEAR_OPEN_COMPACT_OPENMP_HASH_ID: NAME##LCGLinearOpenCompactOpenMPHash_DestroyFactory(factory, hashIndex); break;\
         case LCG_QUADRATIC_OPEN_COMPACT_HASH_ID: NAME##LCGQuadraticOpenCompactHash_DestroyFactory(factory, hashIndex); break;\
         case LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID: NAME##LCGQuadraticOpenCompactCLHash_DestroyFactory(factory, hashIndex); break;\
+        case LCG_QUADRATIC_OPEN_COMPACT_OPENMP_HASH_ID: NAME##LCGQuadraticOpenCompactOpenMPHash_DestroyFactory(factory, hashIndex); break;\
       }\
       hashIndex++;\
     }\
@@ -170,7 +179,7 @@
     }\
     if(hashTypes == 0){\
       hashTypes = factory->hashTypesAvailable;\
-      if((hashTypes & HASH_ALL_CL_HASHES) && (hashTypes & HASH_ALL_C_HASHES)){\
+      if((hashTypes & HASH_ALL_CL_HASHES) && (hashTypes & HASH_ALL_OPENMP_HASHES) && (hashTypes & HASH_ALL_C_HASHES)){\
         hashTypes &= HASH_ALL_C_HASHES;\
       }\
     }\
@@ -179,8 +188,8 @@
       exit(1);\
     }\
     hashTypes &= factory->hashTypesAvailable;\
-    if((hashTypes & HASH_ALL_CL_HASHES) && (hashTypes & HASH_ALL_C_HASHES)){\
-      printf("Please decide between OpenCL or C hash.\n");\
+    if((hashTypes & HASH_ALL_CL_HASHES) && (hashTypes & HASH_ALL_OPENMP_HASHES) && (hashTypes & HASH_ALL_C_HASHES)){\
+      printf("Please decide between OpenCL, OpenMP or C hash.\n");\
       exit(1);\
     }\
     if((hashTypes & HASH_PERFECT_HASHES) == hashTypes && keyRange == 0){\
