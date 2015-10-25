@@ -245,10 +245,10 @@ int intintHash_InsertSingleNoOverwrite(__global char *tableData, int key,
 #define HASH_SEARCH_CODE_MISMATCH /**/ 1
 #define HASH_SEARCH_CODE_EMPTY /*****/ 2
 //
-#define LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID /**/ 8
-#define LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID /**/ 4
-#define IDENTITY_SENTINEL_PERFECT_CL_HASH_ID /*******/ 2
-#define IDENTITY_PERFECT_CL_HASH_ID /*******/ 1
+#define IDENTITY_PERFECT_CL_HASH_ID /****************/ 16
+#define IDENTITY_SENTINEL_PERFECT_CL_HASH_ID /*******/ 32
+#define LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID /*********/ 64
+#define LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID /******/ 128
 //
 #define HASH_BUCKET_STATUS_EMPTY /**/ -1
 #define HASH_BUCKET_STATUS_FULL /***/ -2
