@@ -251,6 +251,7 @@ int main (int argc, const char * argv[])
         printf("Use -r for randomization of cell data to see performance without cache\n");
         printf("Use -n for min mesh size and -N for max mesh size [ default is 256 min to 256 max ]\n");
         printf("Use -l for min levmx     and -L for max levmx     [ default is 1 min to 5 max ]\n");
+        return 0;
       }
       if (strcmp(argv[i], "-r") == 0) {
         randomize = true; 

@@ -1,4 +1,31 @@
 
+/* Copyright (C) 1991-2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+/* This header is separate from features.h so that the compiler can
+   include it implicitly at the start of every compilation.  It must
+   not itself include <features.h> or any other header that includes
+   <features.h> because the implicit include comes before any feature
+   test macros that may be defined in a source file before it first
+   explicitly includes a system header.  GCC knows the name of this
+   header in order to preinclude it.  */
+/* We do support the IEC 559 math functionality, real and complex.  */
+/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
+   Unicode 6.0.  */
+/* We do not support C11 <threads.h>.  */
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -36,11 +63,9 @@
  * @date   Thu Jun 6 2013 
  */
 //
-
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-
 #include "HashFactory.h"
 #ifdef HAVE_OPENCL
 #ifdef __APPLE_CC__
@@ -124,41 +149,7 @@ int clFinish(int command_queue) {
 }
 #endif
 #define PRIME_NUM_CHECKS 20
-
 #include <math.h>
-
-/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
- * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
- * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
- * for the U.S. Department of Energy. The U.S. Government has rights to use,
- * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
- * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
- * to produce derivative works, such modified software should be clearly marked,
- * so as not to confuse it with the version available from LANL.   
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at 
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- *
- * Under this license, it is required to include a reference to this work. We
- * request that each derivative work contain a reference to LANL Copyright 
- * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
- * measured. In addition, it is requested that a modifier is included as in
- * the following example:
- *
- * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
- *
- * This is LANL Copyright Disclosure C14043/LA-CC-14-003
- */
-
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -314,7 +305,6 @@ int clFinish(int command_queue) {
  *
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
-
 /* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
  * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
  * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
@@ -439,19 +429,45 @@ int clFinish(int command_queue) {
  *
  * This is LANL Copyright Disclosure C14043/LA-CC-14-003
  */
-
+/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced
+ * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National 
+ * Laboratory (LANL), which is operated by Los Alamos National Security, LLC
+ * for the U.S. Department of Energy. The U.S. Government has rights to use,
+ * reproduce, and distribute this software.  NEITHER THE GOVERNMENT NOR LOS
+ * ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
+ * so as not to confuse it with the version available from LANL.   
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at 
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Under this license, it is required to include a reference to this work. We
+ * request that each derivative work contain a reference to LANL Copyright 
+ * Disclosure C14043/LA-CC-14-003 so that this work's impact can be roughly
+ * measured. In addition, it is requested that a modifier is included as in
+ * the following example:
+ *
+ * //<Uses | improves on | modified from> LANL Copyright Disclosure C14043/LA-CC-14-003
+ *
+ * This is LANL Copyright Disclosure C14043/LA-CC-14-003
+ */
 static int reportLevel = 0;
-
 const char *HashFactory_source;
-
 const char *Hash_GetKernelSourceString() {
 	return HashFactory_source;
 }
-
 size_t roundUpToNearest(size_t x, size_t r) {
 	return (((x - 1) / r) + 1) * r;
 }
-
 int modularPow(int base, int exponent, int modulus) {
 	int result = 1;
 	while (exponent) {
@@ -462,7 +478,6 @@ int modularPow(int base, int exponent, int modulus) {
 	}
 	return result;
 }
-
 int largestProthPrimeUnder(int N) {
 	if (N < 4) {
 		return N;
@@ -493,7 +508,6 @@ int largestProthPrimeUnder(int N) {
 	}
 	return 3;
 }
-
 int smallestProthPrimeAbove(int N) {
 	if (N < 4) {
 		return N;
@@ -524,7 +538,6 @@ int smallestProthPrimeAbove(int N) {
 	}
 	return 3;
 }
-
 int intLog2(int n) {
 	int result = 0;
 	while (n >>= 1) {
@@ -532,15 +545,12 @@ int intLog2(int n) {
 	}
 	return result;
 }
-
 void Hash_SetReportLevel(int level) {
 	reportLevel = level;
 }
-
 int Hash_GetReportLevel() {
 	return reportLevel;
 }
-
 char *Hash_ExitCodeString(int exitCode) {
 	switch (exitCode) {
 	case HASH_EXIT_CODE_NORMAL:
@@ -559,7 +569,6 @@ char *Hash_ExitCodeString(int exitCode) {
 		return "Unknown";
 	}
 }
-
 void Hash_ExitCodeDebug(int exitCode) {
 	if (exitCode != HASH_EXIT_CODE_NORMAL) {
 		printf("HashExitCode: %s\n", Hash_ExitCodeString(exitCode));
@@ -5794,6 +5803,33 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InsertNoOverwrite(intintHash_Table *
 }
 const char *HashFactory_source =
 "\n"
+"/* Copyright (C) 1991-2012 Free Software Foundation, Inc.\n"
+"   This file is part of the GNU C Library.\n"
+"\n"
+"   The GNU C Library is free software; you can redistribute it and/or\n"
+"   modify it under the terms of the GNU Lesser General Public\n"
+"   License as published by the Free Software Foundation; either\n"
+"   version 2.1 of the License, or (at your option) any later version.\n"
+"\n"
+"   The GNU C Library is distributed in the hope that it will be useful,\n"
+"   but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+"   Lesser General Public License for more details.\n"
+"\n"
+"   You should have received a copy of the GNU Lesser General Public\n"
+"   License along with the GNU C Library; if not, see\n"
+"   <http://www.gnu.org/licenses/>.  */\n"
+"/* This header is separate from features.h so that the compiler can\n"
+"   include it implicitly at the start of every compilation.  It must\n"
+"   not itself include <features.h> or any other header that includes\n"
+"   <features.h> because the implicit include comes before any feature\n"
+"   test macros that may be defined in a source file before it first\n"
+"   explicitly includes a system header.  GCC knows the name of this\n"
+"   header in order to preinclude it.  */\n"
+"/* We do support the IEC 559 math functionality, real and complex.  */\n"
+"/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /\n"
+"   Unicode 6.0.  */\n"
+"/* We do not support C11 <threads.h>.  */\n"
 "/* Copyright 2013-14.  Los Alamos National Security, LLC. This material was produced\n"
 " * under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National \n"
 " * Laboratory (LANL), which is operated by Los Alamos National Security, LLC\n"
@@ -5825,7 +5861,6 @@ const char *HashFactory_source =
 " *\n"
 " * This is LANL Copyright Disclosure C14043/LA-CC-14-003\n"
 " */\n"
-"\n"
 "int intintIdentityPerfectCLHash_InsertSingle(__global char *tableData,\n"
 "					     int key, int value);\n"
 "int intintIdentityPerfectCLHash_InnerInsertSingle(__global char *tableData,\n"
@@ -6023,7 +6058,6 @@ const char *HashFactory_source =
 "				 __global int *values);\n"
 "int intintHash_InsertSingleNoOverwrite(__global char *tableData, int key,\n"
 "				       int value);\n"
-"\n"
 "#define HASH_REPORT_NEVER /**/ 0\n"
 "#define HASH_REPORT_CYCLE /**/ 1\n"
 "#define HASH_REPORT_END /****/ 2\n"
