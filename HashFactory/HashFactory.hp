@@ -191,10 +191,10 @@ DELAY(#define HASH_BUCKET_STATUS_EMPTY /**/ -1)
 DELAY(#define HASH_BUCKET_STATUS_FULL /***/ -2)
 DELAY(#define HASH_BUCKET_STATUS_LOCK /***/ -3)
 
-#ifdef __cplusplus
+DELAY(#ifdef __cplusplus)
 extern "C"
 {
-#endif
+DELAY(#endif)
 
 /**
  * Hash_ExitCodeString will return a string representation of the given exit
