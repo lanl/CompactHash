@@ -9,7 +9,7 @@ This code is a set of hash functions applied to a sample mesh. It supports the
 paper "Compact Hash Algorithms for Computational Meshes," submitted to the 
 SIAM Journal of Scientific Computing.
 
-hash/libhash.la
+HashFactory/libHashFactory.la
 ===============
 
 This is a hash library with a hash factory that allows multiple hash tables
@@ -19,7 +19,7 @@ in the OpenCL language for int32 and int64 datatypes from a single source.
 The auto generation uses cpp macros so that it is compatible for C++, C and
 Fortran applications.
 
-oldHash/libhashold.la
+simplehash/libsimplehash.la
 =====================
 
 A simpler hash library that autoselects between perfect and compact hash
