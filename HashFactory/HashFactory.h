@@ -617,6 +617,55 @@ int intintLCGLinearOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table *
 							     cl_mem keysBuffer,
 							     cl_mem
 							     valuesBuffer);
+int intintLCGLinearOpenCompactOpenMPHash_CreateFactory(intintHash_Factory *
+						       factory, int hashIndex);
+int intintLCGLinearOpenCompactOpenMPHash_DestroyFactory(intintHash_Factory *
+							factory, int hashIndex);
+intintHash_Table
+    *intintLCGLinearOpenCompactOpenMPHash_CreateTable(intintHash_Factory *
+						      factory, int hashIndex,
+						      size_t keyRange,
+						      size_t numEntries,
+						      float loadFactor);
+int intintLCGLinearOpenCompactOpenMPHash_InitTable(intintHash_Table * table,
+						   va_list args);
+int intintLCGLinearOpenCompactOpenMPHash_DestroyTable(intintHash_Table * table);
+char *intintLCGLinearOpenCompactOpenMPHash_Report(intintHash_Table * table);
+int intintLCGLinearOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table);
+int intintLCGLinearOpenCompactOpenMPHash_Query(intintHash_Table * table,
+					       size_t numKeys, int *keys,
+					       int *valuesOutput);
+int intintLCGLinearOpenCompactOpenMPHash_QuerySingle(intintHash_Table * table,
+						     int key, int *valueOutput);
+int intintLCGLinearOpenCompactOpenMPHash_Insert(intintHash_Table * table,
+						size_t numEntries, int *keys,
+						int *values);
+int intintLCGLinearOpenCompactOpenMPHash_InsertSingle(intintHash_Table * table,
+						      int key, int value);
+int intintLCGLinearOpenCompactOpenMPHash_InsertNoOverwrite(intintHash_Table *
+							   table,
+							   size_t numEntries,
+							   int *keys,
+							   int *values);
+int
+intintLCGLinearOpenCompactOpenMPHash_InsertSingleNoOverwrite(intintHash_Table *
+							     table, int key,
+							     int value);
+int intintLCGLinearOpenCompactOpenMPHash_BufferQuery(intintHash_Table * table,
+						     size_t numKeys,
+						     cl_mem keysBuffer,
+						     cl_mem valuesOutputBuffer);
+int intintLCGLinearOpenCompactOpenMPHash_BufferInsert(intintHash_Table * table,
+						      size_t numEntries,
+						      cl_mem keysBuffer,
+						      cl_mem valuesBuffer);
+int
+intintLCGLinearOpenCompactOpenMPHash_BufferInsertNoOverwrite(intintHash_Table *
+							     table,
+							     size_t numEntries,
+							     cl_mem keysBuffer,
+							     cl_mem
+							     valuesBuffer);
 int intintLCGQuadraticOpenCompactHash_CreateFactory(intintHash_Factory *
 						    factory, int hashIndex);
 int intintLCGQuadraticOpenCompactHash_DestroyFactory(intintHash_Factory *
@@ -692,6 +741,66 @@ int intintLCGQuadraticOpenCompactCLHash_BufferInsert(intintHash_Table * table,
 						     cl_mem keysBuffer,
 						     cl_mem valuesBuffer);
 int intintLCGQuadraticOpenCompactCLHash_BufferInsertNoOverwrite(intintHash_Table
+								* table,
+								size_t
+								numEntries,
+								cl_mem
+								keysBuffer,
+								cl_mem
+								valuesBuffer);
+int intintLCGQuadraticOpenCompactOpenMPHash_CreateFactory(intintHash_Factory *
+							  factory,
+							  int hashIndex);
+int intintLCGQuadraticOpenCompactOpenMPHash_DestroyFactory(intintHash_Factory *
+							   factory,
+							   int hashIndex);
+intintHash_Table
+    *intintLCGQuadraticOpenCompactOpenMPHash_CreateTable(intintHash_Factory *
+							 factory, int hashIndex,
+							 size_t keyRange,
+							 size_t numEntries,
+							 float loadFactor);
+int intintLCGQuadraticOpenCompactOpenMPHash_InitTable(intintHash_Table * table,
+						      va_list args);
+int intintLCGQuadraticOpenCompactOpenMPHash_DestroyTable(intintHash_Table *
+							 table);
+char *intintLCGQuadraticOpenCompactOpenMPHash_Report(intintHash_Table * table);
+int intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable(intintHash_Table *
+						       table);
+int intintLCGQuadraticOpenCompactOpenMPHash_Query(intintHash_Table * table,
+						  size_t numKeys, int *keys,
+						  int *valuesOutput);
+int intintLCGQuadraticOpenCompactOpenMPHash_QuerySingle(intintHash_Table *
+							table, int key,
+							int *valueOutput);
+int intintLCGQuadraticOpenCompactOpenMPHash_Insert(intintHash_Table * table,
+						   size_t numEntries, int *keys,
+						   int *values);
+int intintLCGQuadraticOpenCompactOpenMPHash_InsertSingle(intintHash_Table *
+							 table, int key,
+							 int value);
+int intintLCGQuadraticOpenCompactOpenMPHash_InsertNoOverwrite(intintHash_Table *
+							      table,
+							      size_t numEntries,
+							      int *keys,
+							      int *values);
+int
+intintLCGQuadraticOpenCompactOpenMPHash_InsertSingleNoOverwrite(intintHash_Table
+								* table,
+								int key,
+								int value);
+int intintLCGQuadraticOpenCompactOpenMPHash_BufferQuery(intintHash_Table *
+							table, size_t numKeys,
+							cl_mem keysBuffer,
+							cl_mem
+							valuesOutputBuffer);
+int intintLCGQuadraticOpenCompactOpenMPHash_BufferInsert(intintHash_Table *
+							 table,
+							 size_t numEntries,
+							 cl_mem keysBuffer,
+							 cl_mem valuesBuffer);
+int
+intintLCGQuadraticOpenCompactOpenMPHash_BufferInsertNoOverwrite(intintHash_Table
 								* table,
 								size_t
 								numEntries,
