@@ -1655,6 +1655,354 @@ int intintIdentityPerfectCLHash_BufferInsertNoOverwrite(intintHash_Table *
 	return (0);
 }
 
+typedef struct intintIdentityPerfectOpenMPHash_TableData {
+	int hashID;
+	unsigned int numBuckets;
+	char compressFuncData;
+} intintIdentityPerfectOpenMPHash_TableData;
+typedef struct intintIdentityPerfectOpenMPHash_Bucket {
+	int key;
+	int value;
+} intintIdentityPerfectOpenMPHash_Bucket;
+intintHash_Table *intintIdentityPerfectOpenMPHash_CreateTable(intintHash_Factory
+							      * factory,
+							      int hashIndex,
+							      size_t keyRange,
+							      size_t numEntries,
+							      float loadFactor) 
+{
+	intintHash_Table *table =
+	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
+	table->destroyFunc = &intintIdentityPerfectOpenMPHash_DestroyTable;
+	table->emptyFunc = &intintIdentityPerfectOpenMPHash_EmptyTable;
+	table->queryFunc = &intintIdentityPerfectOpenMPHash_Query;
+	table->querySingleFunc = &intintIdentityPerfectOpenMPHash_QuerySingle;
+	table->insertFunc = &intintIdentityPerfectOpenMPHash_Insert;
+	table->insertSingleFunc = &intintIdentityPerfectOpenMPHash_InsertSingle;
+	table->insertNoOverwriteFunc =
+	    &intintIdentityPerfectOpenMPHash_InsertNoOverwrite;
+	table->insertSingleNoOverwriteFunc =
+	    &intintIdentityPerfectOpenMPHash_InsertSingleNoOverwrite;
+	table->tableData =
+	    (char *)malloc(sizeof(intintIdentityPerfectOpenMPHash_TableData));
+	((intintIdentityPerfectOpenMPHash_TableData *) table->tableData)->
+	    hashID = IDENTITY_PERFECT_OPENMP_HASH_ID;
+	((intintIdentityPerfectOpenMPHash_TableData *) table->tableData)->
+	    numBuckets = keyRange + 1;
+	char *tempHashData =
+	    (char *)malloc(sizeof(intintIdentityPerfectOpenMPHash_TableData) +
+			   ((intintIdentityPerfectOpenMPHash_TableData *)
+			    table->tableData)->numBuckets *
+			   sizeof(intintIdentityPerfectOpenMPHash_Bucket));
+	memcpy(tempHashData, table->tableData,
+	       sizeof(intintIdentityPerfectOpenMPHash_TableData));
+	free(table->tableData);
+	table->tableData = tempHashData;
+	return table;
+}
+int intintIdentityPerfectOpenMPHash_CreateFactory(intintHash_Factory * factory,
+						  int hashIndex) {
+	factory->createFunc[hashIndex] =
+	    &intintIdentityPerfectOpenMPHash_CreateTable;
+	factory->destroyFunc[hashIndex] =
+	    &intintIdentityPerfectOpenMPHash_DestroyFactory;;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintIdentityPerfectOpenMPHash_DestroyFactory(intintHash_Factory * factory,
+						   int hashIndex) {;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintIdentityPerfectOpenMPHash_DestroyTable(intintHash_Table * table) {
+	int exitCode = 0;
+	free(table->tableData);
+	free(table);
+	return exitCode;
+}
+int intintIdentityPerfectOpenMPHash_EmptyTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) & table->
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int index;
+	for (index = 0;
+	     index <
+	     ((intintIdentityPerfectOpenMPHash_TableData *) table->tableData)->
+	     numBuckets; index++) {
+		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
+	return exitCode;
+}
+int intintIdentityPerfectOpenMPHash_InnerQuerySingle(char *tableData, int key,
+						     int *valueOutput) {
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	index =
+	    intintHash_CompressIdentity(((intintIdentityPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+	if ((buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+		if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+		} else {
+			exitCode = HASH_SEARCH_CODE_MISMATCH;
+		}
+	} else {
+		exitCode = HASH_SEARCH_CODE_EMPTY;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+		*valueOutput = buckets[index].value;
+		return HASH_EXIT_CODE_NORMAL;
+	case HASH_SEARCH_CODE_MISMATCH:
+	case HASH_SEARCH_CODE_EMPTY:
+		return HASH_EXIT_CODE_KEY_DNE;
+	default:
+		return exitCode;
+	}
+}
+int intintIdentityPerfectOpenMPHash_InnerQuery(char *tableData,
+					       unsigned int numKeys, int *keys,
+					       int *valuesOutput) {
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int key;
+	int *valueOutput;
+	int index;
+	int exitCode;
+	uint i;
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	for (i = 0; i < numKeys; i++) {
+		key = keys[i];
+		valueOutput = &valuesOutput[i];
+		index =
+		    intintHash_CompressIdentity(((intintIdentityPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+		if ((buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+			if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+			} else {
+				exitCode = HASH_SEARCH_CODE_MISMATCH;
+			}
+		} else {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+			*valueOutput = buckets[index].value;
+			break;
+		case HASH_SEARCH_CODE_MISMATCH:
+		case HASH_SEARCH_CODE_EMPTY:
+			resultExitCode = HASH_EXIT_CODE_KEY_DNE;
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintIdentityPerfectOpenMPHash_InnerInsertSingle(char *tableData, int key,
+						      int value) {
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	index =
+	    intintHash_CompressIdentity(((intintIdentityPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+	if (((buckets[index].key ==
+	      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+					   key,
+					   HASH_BUCKET_STATUS_EMPTY) :
+	     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+		if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+		} else {
+			exitCode = HASH_SEARCH_CODE_MISMATCH;
+		}
+	} else {
+		exitCode = HASH_SEARCH_CODE_EMPTY;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintIdentityPerfectOpenMPHash_InnerInsert(char *tableData,
+						unsigned int numEntries,
+						int *keys, int *values) {
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		index =
+		    intintHash_CompressIdentity(((intintIdentityPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+			if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+			} else {
+				exitCode = HASH_SEARCH_CODE_MISMATCH;
+			}
+		} else {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintIdentityPerfectOpenMPHash_InnerInsertSingleNoOverwrite(char
+								 *tableData,
+								 int key,
+								 int value) {
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	index =
+	    intintHash_CompressIdentity(((intintIdentityPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+	if (((buckets[index].key ==
+	      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+					   key,
+					   HASH_BUCKET_STATUS_EMPTY) :
+	     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+		if (key == buckets[index].key) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+		} else {
+			exitCode = HASH_SEARCH_CODE_MISMATCH;
+		}
+	} else {
+		exitCode = HASH_SEARCH_CODE_EMPTY;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintIdentityPerfectOpenMPHash_InnerInsertNoOverwrite(char *tableData,
+							   unsigned int
+							   numEntries,
+							   int *keys,
+							   int *values) {
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		index =
+		    intintHash_CompressIdentity(((intintIdentityPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+		if (((buckets[index].key ==
+		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
+						   key,
+						   HASH_BUCKET_STATUS_EMPTY) :
+		     buckets[index].key) != HASH_BUCKET_STATUS_EMPTY) {
+			if (key == buckets[index].key) {
+				exitCode = HASH_SEARCH_CODE_MATCH;
+			} else {
+				exitCode = HASH_SEARCH_CODE_MISMATCH;
+			}
+		} else {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+			break;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintIdentityPerfectOpenMPHash_QuerySingle(intintHash_Table * table,
+						int key, int *valueOutput) {
+	return intintIdentityPerfectOpenMPHash_InnerQuerySingle(table->
+								tableData, key,
+								valueOutput);
+}
+int intintIdentityPerfectOpenMPHash_Query(intintHash_Table * table,
+					  size_t numKeys, int *keys,
+					  int *valuesOutput) {
+	return intintIdentityPerfectOpenMPHash_InnerQuery(table->tableData,
+							  numKeys, keys,
+							  valuesOutput);
+}
+int intintIdentityPerfectOpenMPHash_InsertSingle(intintHash_Table * table,
+						 int key, int value) {
+	return intintIdentityPerfectOpenMPHash_InnerInsertSingle(table->
+								 tableData, key,
+								 value);
+}
+int intintIdentityPerfectOpenMPHash_Insert(intintHash_Table * table,
+					   size_t numEntries, int *keys,
+					   int *values) {
+	return intintIdentityPerfectOpenMPHash_InnerInsert(table->tableData,
+							   numEntries, keys,
+							   values);
+}
+int intintIdentityPerfectOpenMPHash_InsertSingleNoOverwrite(intintHash_Table *
+							    table, int key,
+							    int value) {
+	return
+	    intintIdentityPerfectOpenMPHash_InnerInsertSingleNoOverwrite(table->
+									 tableData,
+									 key,
+									 value);
+}
+int intintIdentityPerfectOpenMPHash_InsertNoOverwrite(intintHash_Table * table,
+						      size_t numEntries,
+						      int *keys, int *values) {
+	return intintIdentityPerfectOpenMPHash_InnerInsertNoOverwrite(table->
+								      tableData,
+								      numEntries,
+								      keys,
+								      values);
+}
+
 typedef struct intintIdentitySentinelPerfectHash_TableData {
 	int hashID;
 	unsigned int numBuckets;
@@ -2400,6 +2748,360 @@ int intintIdentitySentinelPerfectCLHash_BufferInsertNoOverwrite(intintHash_Table
 				     "intintIdentitySentinelPerfectCLHash_BufferInsertNoOverwrite",
 				     "clEnqueueNDRangeKernel");
 	return (0);
+}
+
+typedef struct intintIdentitySentinelPerfectOpenMPHash_TableData {
+	int hashID;
+	unsigned int numBuckets;
+	char compressFuncData;
+	int emptyValue;
+} intintIdentitySentinelPerfectOpenMPHash_TableData;
+typedef struct intintIdentitySentinelPerfectOpenMPHash_Bucket {
+	int value;
+} intintIdentitySentinelPerfectOpenMPHash_Bucket;
+intintHash_Table
+    *intintIdentitySentinelPerfectOpenMPHash_CreateTable(intintHash_Factory *
+							 factory, int hashIndex,
+							 size_t keyRange,
+							 size_t numEntries,
+							 float loadFactor) {
+	intintHash_Table *table =
+	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
+	table->destroyFunc =
+	    &intintIdentitySentinelPerfectOpenMPHash_DestroyTable;
+	table->emptyFunc = &intintIdentitySentinelPerfectOpenMPHash_EmptyTable;
+	table->queryFunc = &intintIdentitySentinelPerfectOpenMPHash_Query;
+	table->querySingleFunc =
+	    &intintIdentitySentinelPerfectOpenMPHash_QuerySingle;
+	table->insertFunc = &intintIdentitySentinelPerfectOpenMPHash_Insert;
+	table->insertSingleFunc =
+	    &intintIdentitySentinelPerfectOpenMPHash_InsertSingle;
+	table->insertNoOverwriteFunc =
+	    &intintIdentitySentinelPerfectOpenMPHash_InsertNoOverwrite;
+	table->insertSingleNoOverwriteFunc =
+	    &intintIdentitySentinelPerfectOpenMPHash_InsertSingleNoOverwrite;
+	table->tableData =
+	    (char *)
+	    malloc(sizeof(intintIdentitySentinelPerfectOpenMPHash_TableData));
+	((intintIdentitySentinelPerfectOpenMPHash_TableData *) table->
+	 tableData)->hashID = IDENTITY_SENTINEL_PERFECT_OPENMP_HASH_ID;
+	((intintIdentitySentinelPerfectOpenMPHash_TableData *) table->
+	 tableData)->emptyValue = factory->emptyValue;
+	((intintIdentitySentinelPerfectOpenMPHash_TableData *) table->
+	 tableData)->numBuckets = keyRange + 1;
+	char *tempHashData =
+	    (char *)
+	    malloc(sizeof(intintIdentitySentinelPerfectOpenMPHash_TableData) +
+		   ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
+		    table->tableData)->numBuckets *
+		   sizeof(intintIdentitySentinelPerfectOpenMPHash_Bucket));
+	memcpy(tempHashData, table->tableData,
+	       sizeof(intintIdentitySentinelPerfectOpenMPHash_TableData));
+	free(table->tableData);
+	table->tableData = tempHashData;
+	return table;
+}
+int intintIdentitySentinelPerfectOpenMPHash_CreateFactory(intintHash_Factory *
+							  factory,
+							  int hashIndex) {
+	factory->createFunc[hashIndex] =
+	    &intintIdentitySentinelPerfectOpenMPHash_CreateTable;
+	factory->destroyFunc[hashIndex] =
+	    &intintIdentitySentinelPerfectOpenMPHash_DestroyFactory;;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintIdentitySentinelPerfectOpenMPHash_DestroyFactory(intintHash_Factory *
+							   factory,
+							   int hashIndex) {;
+	return HASH_EXIT_CODE_NORMAL;
+}
+int intintIdentitySentinelPerfectOpenMPHash_DestroyTable(intintHash_Table *
+							 table) {
+	int exitCode = 0;
+	free(table->tableData);
+	free(table);
+	return exitCode;
+}
+int intintIdentitySentinelPerfectOpenMPHash_EmptyTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) & table->
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int index;
+	for (index = 0;
+	     index <
+	     ((intintIdentitySentinelPerfectOpenMPHash_TableData *) table->
+	      tableData)->numBuckets; index++) {
+		buckets[index].value =
+		    ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
+		     table->tableData)->emptyValue;
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
+	return exitCode;
+}
+int intintIdentitySentinelPerfectOpenMPHash_InnerQuerySingle(char *tableData,
+							     int key,
+							     int *valueOutput) {
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	index =
+	    intintHash_CompressIdentity(((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+	if (buckets[index].value !=
+	    ((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->
+	    emptyValue) {
+		exitCode = HASH_SEARCH_CODE_MATCH;
+	} else {
+		exitCode = HASH_SEARCH_CODE_EMPTY;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+		*valueOutput = buckets[index].value;
+		return HASH_EXIT_CODE_NORMAL;
+	case HASH_SEARCH_CODE_MISMATCH:
+	case HASH_SEARCH_CODE_EMPTY:
+		return HASH_EXIT_CODE_KEY_DNE;
+	default:
+		return exitCode;
+	}
+}
+int intintIdentitySentinelPerfectOpenMPHash_InnerQuery(char *tableData,
+						       unsigned int numKeys,
+						       int *keys,
+						       int *valuesOutput) {
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int key;
+	int *valueOutput;
+	int index;
+	int exitCode;
+	uint i;
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	for (i = 0; i < numKeys; i++) {
+		key = keys[i];
+		valueOutput = &valuesOutput[i];
+		index =
+		    intintHash_CompressIdentity(((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+		if (buckets[index].value !=
+		    ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
+		     tableData)->emptyValue) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+		} else {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+			*valueOutput = buckets[index].value;
+			break;
+		case HASH_SEARCH_CODE_MISMATCH:
+		case HASH_SEARCH_CODE_EMPTY:
+			resultExitCode = HASH_EXIT_CODE_KEY_DNE;
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintIdentitySentinelPerfectOpenMPHash_InnerInsertSingle(char *tableData,
+							      int key,
+							      int value) {
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	index =
+	    intintHash_CompressIdentity(((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+	if (buckets[index].value !=
+	    ((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->
+	    emptyValue) {
+		exitCode = HASH_SEARCH_CODE_MATCH;
+	} else {
+		exitCode = HASH_SEARCH_CODE_EMPTY;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintIdentitySentinelPerfectOpenMPHash_InnerInsert(char *tableData,
+							unsigned int numEntries,
+							int *keys,
+							int *values) {
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		index =
+		    intintHash_CompressIdentity(((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+		if (buckets[index].value !=
+		    ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
+		     tableData)->emptyValue) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+		} else {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintIdentitySentinelPerfectOpenMPHash_InnerInsertSingleNoOverwrite(char
+									 *tableData,
+									 int
+									 key,
+									 int
+									 value) 
+{
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int index;
+	int exitCode;
+	index =
+	    intintHash_CompressIdentity(((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+	if (buckets[index].value !=
+	    ((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->
+	    emptyValue) {
+		exitCode = HASH_SEARCH_CODE_MATCH;
+	} else {
+		exitCode = HASH_SEARCH_CODE_EMPTY;
+	}
+	switch (exitCode) {
+	case HASH_SEARCH_CODE_MATCH:
+	case HASH_SEARCH_CODE_MISMATCH:
+		return HASH_EXIT_CODE_OVERWRITE;
+	case HASH_SEARCH_CODE_EMPTY:
+		buckets[index].value = value;
+		return HASH_EXIT_CODE_NORMAL;
+	default:
+		return exitCode;
+	}
+}
+int intintIdentitySentinelPerfectOpenMPHash_InnerInsertNoOverwrite(char
+								   *tableData,
+								   unsigned int
+								   numEntries,
+								   int *keys,
+								   int *values) 
+{
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) &
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	int resultExitCode = HASH_EXIT_CODE_NORMAL;
+	int key;
+	int value;
+	int index;
+	int exitCode;
+	uint i;
+	for (i = 0; i < numEntries; i++) {
+		key = keys[i];
+		index =
+		    intintHash_CompressIdentity(((intintIdentitySentinelPerfectOpenMPHash_TableData *) tableData)->compressFuncData, key);
+		if (buckets[index].value !=
+		    ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
+		     tableData)->emptyValue) {
+			exitCode = HASH_SEARCH_CODE_MATCH;
+		} else {
+			exitCode = HASH_SEARCH_CODE_EMPTY;
+		}
+		switch (exitCode) {
+		case HASH_SEARCH_CODE_MATCH:
+		case HASH_SEARCH_CODE_MISMATCH:
+			resultExitCode = HASH_EXIT_CODE_OVERWRITE;
+			break;
+		case HASH_SEARCH_CODE_EMPTY:
+			buckets[index].value = values[i];
+			break;
+		default:
+			return exitCode;
+		}
+	}
+	return resultExitCode;
+}
+int intintIdentitySentinelPerfectOpenMPHash_QuerySingle(intintHash_Table *
+							table, int key,
+							int *valueOutput) {
+	return intintIdentitySentinelPerfectOpenMPHash_InnerQuerySingle(table->
+									tableData,
+									key,
+									valueOutput);
+}
+int intintIdentitySentinelPerfectOpenMPHash_Query(intintHash_Table * table,
+						  size_t numKeys, int *keys,
+						  int *valuesOutput) {
+	return intintIdentitySentinelPerfectOpenMPHash_InnerQuery(table->
+								  tableData,
+								  numKeys, keys,
+								  valuesOutput);
+}
+int intintIdentitySentinelPerfectOpenMPHash_InsertSingle(intintHash_Table *
+							 table, int key,
+							 int value) {
+	return intintIdentitySentinelPerfectOpenMPHash_InnerInsertSingle(table->
+									 tableData,
+									 key,
+									 value);
+}
+int intintIdentitySentinelPerfectOpenMPHash_Insert(intintHash_Table * table,
+						   size_t numEntries, int *keys,
+						   int *values) {
+	return intintIdentitySentinelPerfectOpenMPHash_InnerInsert(table->
+								   tableData,
+								   numEntries,
+								   keys,
+								   values);
+}
+int
+intintIdentitySentinelPerfectOpenMPHash_InsertSingleNoOverwrite(intintHash_Table
+								* table,
+								int key,
+								int value) {
+	return
+	    intintIdentitySentinelPerfectOpenMPHash_InnerInsertSingleNoOverwrite
+	    (table->tableData, key, value);
+}
+int intintIdentitySentinelPerfectOpenMPHash_InsertNoOverwrite(intintHash_Table *
+							      table,
+							      size_t numEntries,
+							      int *keys,
+							      int *values) {
+	return
+	    intintIdentitySentinelPerfectOpenMPHash_InnerInsertNoOverwrite
+	    (table->tableData, numEntries, keys, values);
 }
 
 typedef struct intintLCGLinearOpenCompactHash_TableData {

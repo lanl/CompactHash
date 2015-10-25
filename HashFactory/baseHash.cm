@@ -595,3 +595,36 @@
   }\
 \
 
+#define OPENMP_BASE_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, CREATE_EXP, INIT_EXP, SEARCH_EXP, INNER_EMPTY_EXP, ...)\
+  \
+  BASE_TYPES_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
+  \
+  BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , , HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
+  \
+  BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, ,##__VA_ARGS__)\
+  \
+  int NAME##MODIFIER##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
+    return NAME##MODIFIER##Hash_InnerQuerySingle(table->tableData, key, valueOutput);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput){\
+    return NAME##MODIFIER##Hash_InnerQuery(table->tableData, numKeys, keys, valuesOutput);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InsertSingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##Hash_InnerInsertSingle(table->tableData, key, value);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_Insert(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    return NAME##MODIFIER##Hash_InnerInsert(table->tableData, numEntries, keys, values);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InsertSingleNoOverwrite(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE value){\
+    return NAME##MODIFIER##Hash_InnerInsertSingleNoOverwrite(table->tableData, key, value);\
+  }\
+  \
+  int NAME##MODIFIER##Hash_InsertNoOverwrite(NAME##Hash_Table *table, size_t numEntries, KEY_TYPE *keys, VALUE_TYPE *values){\
+    return NAME##MODIFIER##Hash_InnerInsertNoOverwrite(table->tableData, numEntries, keys, values);\
+  }\
+\
+
