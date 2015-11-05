@@ -23,7 +23,7 @@ hashTest_LDADD = libHashFactory.la
 HashFactory.h: HashFactory.hp HashFactory.hm perfectHash.hm compactHash.hm
 	${CPREPROCESSOR} -CC -x c -imacros HashFactory.hm HashFactory.hp | ${INDENT} -linux -brf -o HashFactory.h
 
-HashFactory.c: HashFactory.cp HashFactory.cm HashFactory.cl perfectHash.cm compactHash.cm
+HashFactory.c: HashFactory.cp HashFactory.cm HashFactory.cl perfectHash.cm compactHash.cm HashFactory.h
 	${CPREPROCESSOR} -CC -x c -imacros HashFactory.cm HashFactory.cp | ${INDENT} -linux -brf -o HashFactory.c
 	./embed_source.pl HashFactory.cl >> HashFactory.c
 

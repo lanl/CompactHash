@@ -142,7 +142,7 @@ int clFinish(int command_queue);
 #define HASH_SEARCH_CODE_MISMATCH /**/ 1
 #define HASH_SEARCH_CODE_EMPTY /*****/ 2
 //
-#define HASH_NUM_HASHES /********/ 12
+#define HASH_NUM_HASHES /*********/ 12
 #define HASH_NUM_C_HASHES /*******/ 4
 #define HASH_NUM_CL_HASHES /******/ 4
 #define HASH_NUM_OPENMP_HASHES /**/ 4
@@ -157,7 +157,7 @@ int clFinish(int command_queue);
 #define LCG_LINEAR_OPEN_COMPACT_CL_HASH_ID /*********/ 64
 #define LCG_QUADRATIC_OPEN_COMPACT_CL_HASH_ID /******/ 128
 //
-#define IDENTITY_PERFECT_OPENMP_HASH_ID /***********/ 256
+#define IDENTITY_PERFECT_OPENMP_HASH_ID /************/ 256
 #define IDENTITY_SENTINEL_PERFECT_OPENMP_HASH_ID /***/ 512
 #define LCG_LINEAR_OPEN_COMPACT_OPENMP_HASH_ID /*****/ 1024
 #define LCG_QUADRATIC_OPEN_COMPACT_OPENMP_HASH_ID /**/ 2048
