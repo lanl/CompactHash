@@ -1122,7 +1122,6 @@ int intintIdentityPerfectHash_InnerInsert(char *tableData,
 	    tableData[sizeof(intintIdentityPerfectHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1198,7 +1197,6 @@ int intintIdentityPerfectHash_InnerInsertNoOverwrite(char *tableData,
 	    tableData[sizeof(intintIdentityPerfectHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1853,7 +1851,6 @@ int intintIdentityPerfectOpenMPHash_InnerInsert(char *tableData,
 	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1932,7 +1929,6 @@ int intintIdentityPerfectOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -2195,7 +2191,6 @@ int intintIdentitySentinelPerfectHash_InnerInsert(char *tableData,
 	    tableData[sizeof(intintIdentitySentinelPerfectHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -2262,7 +2257,6 @@ int intintIdentitySentinelPerfectHash_InnerInsertNoOverwrite(char *tableData,
 	    tableData[sizeof(intintIdentitySentinelPerfectHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -2958,7 +2952,6 @@ int intintIdentitySentinelPerfectOpenMPHash_InnerInsert(char *tableData,
 		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -3032,7 +3025,6 @@ int intintIdentitySentinelPerfectOpenMPHash_InnerInsertNoOverwrite(char
 		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -3350,7 +3342,6 @@ int intintLCGLinearOpenCompactHash_InnerInsert(char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -3454,7 +3445,6 @@ int intintLCGLinearOpenCompactHash_InnerInsertNoOverwrite(char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -4210,7 +4200,6 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsert(char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -4318,7 +4307,6 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -4670,7 +4658,6 @@ int intintLCGQuadraticOpenCompactHash_InnerInsert(char *tableData,
 	    tableData[sizeof(intintLCGQuadraticOpenCompactHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -4782,7 +4769,6 @@ int intintLCGQuadraticOpenCompactHash_InnerInsertNoOverwrite(char *tableData,
 	    tableData[sizeof(intintLCGQuadraticOpenCompactHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -5579,7 +5565,6 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsert(char *tableData,
 		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -5698,7 +5683,6 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertNoOverwrite(char
 		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -6229,7 +6213,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintIdentityPerfectCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -6312,7 +6295,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintIdentityPerfectCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -6609,7 +6591,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintIdentitySentinelPerfectCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -6686,7 +6667,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintIdentitySentinelPerfectCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -7039,7 +7019,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -7145,7 +7124,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -7526,7 +7504,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"
@@ -7644,7 +7621,6 @@ const char *HashFactory_source =
 "	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];\n"
 "	int resultExitCode = HASH_EXIT_CODE_NORMAL;\n"
 "	int key;\n"
-"	int value;\n"
 "	int index;\n"
 "	int exitCode;\n"
 "	uint i;\n"

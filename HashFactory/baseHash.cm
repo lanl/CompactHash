@@ -195,7 +195,6 @@
     CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
     int resultExitCode = HASH_EXIT_CODE_NORMAL;\
     KEY_TYPE key;\
-    VALUE_TYPE value;\
     int index;\
     int exitCode;\
     uint i;\
@@ -237,7 +236,6 @@
     CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
     int resultExitCode = HASH_EXIT_CODE_NORMAL;\
     KEY_TYPE key;\
-    VALUE_TYPE value;\
     int index;\
     int exitCode;\
     uint i;\

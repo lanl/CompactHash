@@ -425,7 +425,6 @@ int intintIdentityPerfectCLHash_InnerInsert(__global char *tableData,
 	    tableData[sizeof(intintIdentityPerfectCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -508,7 +507,6 @@ int intintIdentityPerfectCLHash_InnerInsertNoOverwrite(__global char *tableData,
 	    tableData[sizeof(intintIdentityPerfectCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -805,7 +803,6 @@ int intintIdentitySentinelPerfectCLHash_InnerInsert(__global char *tableData,
 	    tableData[sizeof(intintIdentitySentinelPerfectCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -882,7 +879,6 @@ int intintIdentitySentinelPerfectCLHash_InnerInsertNoOverwrite(__global char
 	    tableData[sizeof(intintIdentitySentinelPerfectCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1235,7 +1231,6 @@ int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1341,7 +1336,6 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	    tableData[sizeof(intintLCGLinearOpenCompactCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1722,7 +1716,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
@@ -1840,7 +1833,6 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	    tableData[sizeof(intintLCGQuadraticOpenCompactCLHash_TableData)];
 	int resultExitCode = HASH_EXIT_CODE_NORMAL;
 	int key;
-	int value;
 	int index;
 	int exitCode;
 	uint i;
