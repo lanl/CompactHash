@@ -72,11 +72,12 @@
   }NAME##MODIFIER##Hash_Bucket;\
 \
 
-#define BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, FACTORY_DESTROY_EXP, CREATE_EXP, INIT_EXP, ALLOC_EXP, DESTROY_EXP, EMPTY_EXP)\
+#define BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, FACTORY_DESTROY_EXP, CREATE_EXP, INIT_EXP, ALLOC_EXP, DESTROY_EXP, SETUP_EXP, EMPTY_EXP)\
   \
   NAME##Hash_Table *NAME##MODIFIER##Hash_CreateTable(NAME##Hash_Factory* factory, int hashIndex, size_t keyRange, size_t numEntries, float loadFactor){\
     NAME##Hash_Table* table = (NAME##Hash_Table*)malloc(sizeof(NAME##Hash_Table));\
     table->destroyFunc= &NAME##MODIFIER##Hash_DestroyTable;\
+    table->setupFunc = &NAME##MODIFIER##Hash_SetupTable;\
     table->emptyFunc = &NAME##MODIFIER##Hash_EmptyTable;\
     table->queryFunc = &NAME##MODIFIER##Hash_Query;\
     table->querySingleFunc = &NAME##MODIFIER##Hash_QuerySingle;\
@@ -113,6 +114,12 @@
     DESTROY_EXP\
     free(table->tableData);\
     free(table);\
+    return exitCode;\
+  }\
+  \
+  int NAME##MODIFIER##Hash_SetupTable(NAME##Hash_Table *table){\
+    int exitCode=0;\
+    SETUP_EXP\
     return exitCode;\
   }\
   \
@@ -258,6 +265,17 @@
   }\
 \
 
+#define HASH_SETUP_EXP(NAME, MODIFIER, INNER_EMPTY_EXP)\
+  NAME##MODIFIER##Hash_Bucket *buckets = (NAME##MODIFIER##Hash_Bucket*)&table->tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
+  if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {\
+     int index;\
+     for(index = 0; index < ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets; index++){\
+       INNER_EMPTY_EXP\
+     }\
+  }\
+  exitCode = HASH_EXIT_CODE_NORMAL;\
+\
+
 #define HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP)\
   NAME##MODIFIER##Hash_Bucket *buckets = (NAME##MODIFIER##Hash_Bucket*)&table->tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
   int index;\
@@ -275,7 +293,7 @@
   \
   BASE_TYPES_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
   \
-  BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , , HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
+  BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , ,HASH_SETUP_EXP(NAME, MODIFIER, INNER_EMPTY_EXP), HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
   \
   BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, ,##__VA_ARGS__)\
   \
@@ -360,6 +378,18 @@
   CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_InitTable), "clCreateBuffer");\
   err = clEnqueueWriteBuffer(table->queue, table->tableDataBuffer, CL_TRUE, 0, sizeof(NAME##MODIFIER##Hash_TableData), table->tableData, 0, NULL, NULL);\
   CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_InitTable), "clEnqueueWriteBuffer");\
+\
+
+#define CL_SETUP_EXP(NAME, MODIFIER, EMPTY_EXP)\
+  cl_int err;\
+  err = clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem), &table->tableDataBuffer);\
+  CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_EmptyTable), "clSetKernelArg");\
+  const size_t groupWorkSize = roundUpToNearest(((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets, table->emptyKernelLocalWorkSize);\
+  err = clEnqueueNDRangeKernel(table->queue, table->emptyKernel, 1, 0, &groupWorkSize, (const size_t*)&table->emptyKernelLocalWorkSize, 0, NULL, NULL);\
+  \
+  CLHash_Utilities_HandleError(err, STRINGIFY(NAME##MODIFIER##CLHash_EmptyTable), "clEnqueueNDRangeKernel");\
+  exitCode = HASH_EXIT_CODE_NORMAL;\
+  EMPTY_EXP;\
 \
 
 #define CL_EMPTY_EXP(NAME, MODIFIER, EMPTY_EXP)\
@@ -491,7 +521,7 @@
   \
   BASE_TYPES_DEFINE(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
   \
-  BASE_HASH_UTIL(NAME, MODIFIER##CL, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, CL_FACTORY_CREATE_EXP(NAME, MODIFIER, FACTORY_CREATE_EXP, STRINGIFY(CL_UTIL_PROGRAM(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC_DATA, INNER_EMPTY_EXP))), CL_FACTORY_DESTROY_EXP(NAME, MODIFIER, ), CL_CREATE_EXP(NAME, MODIFIER, CREATE_EXP), INIT_EXP, CL_ALLOC_EXP(NAME, MODIFIER), CL_DESTROY_EXP(NAME), CL_EMPTY_EXP(NAME, MODIFIER, ))\
+  BASE_HASH_UTIL(NAME, MODIFIER##CL, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, CL_FACTORY_CREATE_EXP(NAME, MODIFIER, FACTORY_CREATE_EXP, STRINGIFY(CL_UTIL_PROGRAM(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, BASE_TYPES_DEFINE, COMPRESS_FUNC_DATA, INNER_EMPTY_EXP))), CL_FACTORY_DESTROY_EXP(NAME, MODIFIER, ), CL_CREATE_EXP(NAME, MODIFIER, CREATE_EXP), INIT_EXP, CL_ALLOC_EXP(NAME, MODIFIER), CL_DESTROY_EXP(NAME), CL_SETUP_EXP(NAME, MODIFIER, ), CL_EMPTY_EXP(NAME, MODIFIER, ))\
   \
   int NAME##MODIFIER##CLHash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
     return NAME##MODIFIER##CLHash_Query(table, 1, &key, valueOutput);\
@@ -597,7 +627,7 @@
   \
   BASE_TYPES_DEFINE(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
   \
-  BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , , HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
+  BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , ,HASH_SETUP_EXP(NAME, MODIFIER, INNER_EMPTY_EXP), HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
   \
   BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, ,##__VA_ARGS__)\
   \

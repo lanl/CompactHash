@@ -54,6 +54,8 @@
   \
   char *NAME##MODIFIER##Hash_Report(NAME##Hash_Table *table);\
   \
+  int NAME##MODIFIER##Hash_SetupTable(NAME##Hash_Table *table);\
+  \
   int NAME##MODIFIER##Hash_EmptyTable(NAME##Hash_Table *table);\
   \
   int NAME##MODIFIER##Hash_Query(NAME##Hash_Table *table, size_t numKeys, KEY_TYPE *keys, VALUE_TYPE *valuesOutput);\

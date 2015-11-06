@@ -40,6 +40,7 @@
     char* tableData;\
     cl_mem tableDataBuffer;\
     int (*destroyFunc)(NAME##Hash_Table*);\
+    int (*setupFunc)(NAME##Hash_Table*);\
     int (*emptyFunc)(NAME##Hash_Table*);\
     int (*queryFunc)(NAME##Hash_Table*, size_t, KEY_TYPE*, VALUE_TYPE*);\
     int (*querySingleFunc)(NAME##Hash_Table*, KEY_TYPE, VALUE_TYPE*);\
@@ -218,6 +219,11 @@
     }\
     NAME##Hash_Table *table = factory->createFunc[hashIndex](factory, hashIndex, keyRange, numEntries, loadFactor);\
     return table;\
+  }\
+  \
+  int NAME##Hash_SetupTable(NAME##Hash_Table *table){\
+    table->setupFunc(table);\
+    return(0);\
   }\
   \
   int NAME##Hash_EmptyTable(NAME##Hash_Table *table){\

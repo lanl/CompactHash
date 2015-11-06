@@ -579,6 +579,7 @@ struct intintHash_Table_ {
 	char *tableData;
 	cl_mem tableDataBuffer;
 	int (*destroyFunc) (intintHash_Table *);
+	int (*setupFunc) (intintHash_Table *);
 	int (*emptyFunc) (intintHash_Table *);
 	int (*queryFunc) (intintHash_Table *, size_t, int *, int *);
 	int (*querySingleFunc) (intintHash_Table *, int, int *);
@@ -874,6 +875,10 @@ intintHash_Table *intintHash_CreateTable(intintHash_Factory * factory,
 					    numEntries, loadFactor);
 	return table;
 }
+int intintHash_SetupTable(intintHash_Table * table) {
+	table->setupFunc(table);
+	return (0);
+}
 int intintHash_EmptyTable(intintHash_Table * table) {
 	table->emptyFunc(table);
 	return (0);
@@ -952,6 +957,7 @@ intintHash_Table *intintIdentityPerfectHash_CreateTable(intintHash_Factory *
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintIdentityPerfectHash_DestroyTable;
+	table->setupFunc = &intintIdentityPerfectHash_SetupTable;
 	table->emptyFunc = &intintIdentityPerfectHash_EmptyTable;
 	table->queryFunc = &intintIdentityPerfectHash_Query;
 	table->querySingleFunc = &intintIdentityPerfectHash_QuerySingle;
@@ -993,6 +999,23 @@ int intintIdentityPerfectHash_DestroyTable(intintHash_Table * table) {
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintIdentityPerfectHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintIdentityPerfectHash_Bucket *buckets =
+	    (intintIdentityPerfectHash_Bucket *) & table->
+	    tableData[sizeof(intintIdentityPerfectHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintIdentityPerfectHash_TableData *) table->
+		      tableData)->numBuckets; index++) {
+			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentityPerfectHash_EmptyTable(intintHash_Table * table) {
@@ -1286,6 +1309,7 @@ intintHash_Table *intintIdentityPerfectCLHash_CreateTable(intintHash_Factory *
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintIdentityPerfectCLHash_DestroyTable;
+	table->setupFunc = &intintIdentityPerfectCLHash_SetupTable;
 	table->emptyFunc = &intintIdentityPerfectCLHash_EmptyTable;
 	table->queryFunc = &intintIdentityPerfectCLHash_Query;
 	table->querySingleFunc = &intintIdentityPerfectCLHash_QuerySingle;
@@ -1425,6 +1449,30 @@ int intintIdentityPerfectCLHash_DestroyTable(intintHash_Table * table) {
 	clReleaseKernel(table->insertSingleNoOverwriteKernel);
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintIdentityPerfectCLHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	cl_int err;
+	err =
+	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
+			   &table->tableDataBuffer);
+	CLHash_Utilities_HandleError(err,
+				     "intintIdentityPerfectCLHash_EmptyTable",
+				     "clSetKernelArg");
+	const size_t groupWorkSize =
+	    roundUpToNearest(((intintIdentityPerfectHash_TableData *) table->
+			      tableData)->numBuckets,
+			     table->emptyKernelLocalWorkSize);
+	err =
+	    clEnqueueNDRangeKernel(table->queue, table->emptyKernel, 1, 0,
+				   &groupWorkSize,
+				   (const size_t *)&table->
+				   emptyKernelLocalWorkSize, 0, NULL, NULL);
+	CLHash_Utilities_HandleError(err,
+				     "intintIdentityPerfectCLHash_EmptyTable",
+				     "clEnqueueNDRangeKernel");
+	exitCode = HASH_EXIT_CODE_NORMAL;;
 	return exitCode;
 }
 int intintIdentityPerfectCLHash_EmptyTable(intintHash_Table * table) {
@@ -1681,6 +1729,7 @@ intintHash_Table *intintIdentityPerfectOpenMPHash_CreateTable(intintHash_Factory
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintIdentityPerfectOpenMPHash_DestroyTable;
+	table->setupFunc = &intintIdentityPerfectOpenMPHash_SetupTable;
 	table->emptyFunc = &intintIdentityPerfectOpenMPHash_EmptyTable;
 	table->queryFunc = &intintIdentityPerfectOpenMPHash_Query;
 	table->querySingleFunc = &intintIdentityPerfectOpenMPHash_QuerySingle;
@@ -1723,6 +1772,23 @@ int intintIdentityPerfectOpenMPHash_DestroyTable(intintHash_Table * table) {
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintIdentityPerfectOpenMPHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintIdentityPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentityPerfectOpenMPHash_Bucket *) & table->
+	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintIdentityPerfectOpenMPHash_TableData *) table->
+		      tableData)->numBuckets; index++) {
+			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentityPerfectOpenMPHash_EmptyTable(intintHash_Table * table) {
@@ -2026,6 +2092,7 @@ intintHash_Table
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintIdentitySentinelPerfectHash_DestroyTable;
+	table->setupFunc = &intintIdentitySentinelPerfectHash_SetupTable;
 	table->emptyFunc = &intintIdentitySentinelPerfectHash_EmptyTable;
 	table->queryFunc = &intintIdentitySentinelPerfectHash_Query;
 	table->querySingleFunc = &intintIdentitySentinelPerfectHash_QuerySingle;
@@ -2071,6 +2138,25 @@ int intintIdentitySentinelPerfectHash_DestroyTable(intintHash_Table * table) {
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintIdentitySentinelPerfectHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintIdentitySentinelPerfectHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectHash_Bucket *) & table->
+	    tableData[sizeof(intintIdentitySentinelPerfectHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintIdentitySentinelPerfectHash_TableData *) table->
+		      tableData)->numBuckets; index++) {
+			buckets[index].value =
+			    ((intintIdentitySentinelPerfectHash_TableData *)
+			     table->tableData)->emptyValue;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentitySentinelPerfectHash_EmptyTable(intintHash_Table * table) {
@@ -2349,6 +2435,7 @@ intintHash_Table
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintIdentitySentinelPerfectCLHash_DestroyTable;
+	table->setupFunc = &intintIdentitySentinelPerfectCLHash_SetupTable;
 	table->emptyFunc = &intintIdentitySentinelPerfectCLHash_EmptyTable;
 	table->queryFunc = &intintIdentitySentinelPerfectCLHash_Query;
 	table->querySingleFunc =
@@ -2497,6 +2584,30 @@ int intintIdentitySentinelPerfectCLHash_DestroyTable(intintHash_Table * table) {
 	clReleaseKernel(table->insertSingleNoOverwriteKernel);
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintIdentitySentinelPerfectCLHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	cl_int err;
+	err =
+	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
+			   &table->tableDataBuffer);
+	CLHash_Utilities_HandleError(err,
+				     "intintIdentitySentinelPerfectCLHash_EmptyTable",
+				     "clSetKernelArg");
+	const size_t groupWorkSize =
+	    roundUpToNearest(((intintIdentitySentinelPerfectHash_TableData *)
+			      table->tableData)->numBuckets,
+			     table->emptyKernelLocalWorkSize);
+	err =
+	    clEnqueueNDRangeKernel(table->queue, table->emptyKernel, 1, 0,
+				   &groupWorkSize,
+				   (const size_t *)&table->
+				   emptyKernelLocalWorkSize, 0, NULL, NULL);
+	CLHash_Utilities_HandleError(err,
+				     "intintIdentitySentinelPerfectCLHash_EmptyTable",
+				     "clEnqueueNDRangeKernel");
+	exitCode = HASH_EXIT_CODE_NORMAL;;
 	return exitCode;
 }
 int intintIdentitySentinelPerfectCLHash_EmptyTable(intintHash_Table * table) {
@@ -2772,6 +2883,7 @@ intintHash_Table
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc =
 	    &intintIdentitySentinelPerfectOpenMPHash_DestroyTable;
+	table->setupFunc = &intintIdentitySentinelPerfectOpenMPHash_SetupTable;
 	table->emptyFunc = &intintIdentitySentinelPerfectOpenMPHash_EmptyTable;
 	table->queryFunc = &intintIdentitySentinelPerfectOpenMPHash_Query;
 	table->querySingleFunc =
@@ -2823,6 +2935,26 @@ int intintIdentitySentinelPerfectOpenMPHash_DestroyTable(intintHash_Table *
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintIdentitySentinelPerfectOpenMPHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintIdentitySentinelPerfectOpenMPHash_Bucket *buckets =
+	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) & table->
+	    tableData[sizeof
+		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
+		      table->tableData)->numBuckets; index++) {
+			buckets[index].value =
+			    ((intintIdentitySentinelPerfectOpenMPHash_TableData
+			      *) table->tableData)->emptyValue;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentitySentinelPerfectOpenMPHash_EmptyTable(intintHash_Table * table) {
@@ -3123,6 +3255,7 @@ intintHash_Table *intintLCGLinearOpenCompactHash_CreateTable(intintHash_Factory
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintLCGLinearOpenCompactHash_DestroyTable;
+	table->setupFunc = &intintLCGLinearOpenCompactHash_SetupTable;
 	table->emptyFunc = &intintLCGLinearOpenCompactHash_EmptyTable;
 	table->queryFunc = &intintLCGLinearOpenCompactHash_Query;
 	table->querySingleFunc = &intintLCGLinearOpenCompactHash_QuerySingle;
@@ -3175,6 +3308,23 @@ int intintLCGLinearOpenCompactHash_DestroyTable(intintHash_Table * table) {
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintLCGLinearOpenCompactHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintLCGLinearOpenCompactHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactHash_Bucket *) & table->
+	    tableData[sizeof(intintLCGLinearOpenCompactHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintLCGLinearOpenCompactHash_TableData *) table->
+		      tableData)->numBuckets; index++) {
+			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGLinearOpenCompactHash_EmptyTable(intintHash_Table * table) {
@@ -3556,6 +3706,7 @@ intintHash_Table
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintLCGLinearOpenCompactCLHash_DestroyTable;
+	table->setupFunc = &intintLCGLinearOpenCompactCLHash_SetupTable;
 	table->emptyFunc = &intintLCGLinearOpenCompactCLHash_EmptyTable;
 	table->queryFunc = &intintLCGLinearOpenCompactCLHash_Query;
 	table->querySingleFunc = &intintLCGLinearOpenCompactCLHash_QuerySingle;
@@ -3708,6 +3859,30 @@ int intintLCGLinearOpenCompactCLHash_DestroyTable(intintHash_Table * table) {
 	clReleaseKernel(table->insertSingleNoOverwriteKernel);
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintLCGLinearOpenCompactCLHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	cl_int err;
+	err =
+	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
+			   &table->tableDataBuffer);
+	CLHash_Utilities_HandleError(err,
+				     "intintLCGLinearOpenCompactCLHash_EmptyTable",
+				     "clSetKernelArg");
+	const size_t groupWorkSize =
+	    roundUpToNearest(((intintLCGLinearOpenCompactHash_TableData *)
+			      table->tableData)->numBuckets,
+			     table->emptyKernelLocalWorkSize);
+	err =
+	    clEnqueueNDRangeKernel(table->queue, table->emptyKernel, 1, 0,
+				   &groupWorkSize,
+				   (const size_t *)&table->
+				   emptyKernelLocalWorkSize, 0, NULL, NULL);
+	CLHash_Utilities_HandleError(err,
+				     "intintLCGLinearOpenCompactCLHash_EmptyTable",
+				     "clEnqueueNDRangeKernel");
+	exitCode = HASH_EXIT_CODE_NORMAL;;
 	return exitCode;
 }
 int intintLCGLinearOpenCompactCLHash_EmptyTable(intintHash_Table * table) {
@@ -3973,6 +4148,7 @@ intintHash_Table
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintLCGLinearOpenCompactOpenMPHash_DestroyTable;
+	table->setupFunc = &intintLCGLinearOpenCompactOpenMPHash_SetupTable;
 	table->emptyFunc = &intintLCGLinearOpenCompactOpenMPHash_EmptyTable;
 	table->queryFunc = &intintLCGLinearOpenCompactOpenMPHash_Query;
 	table->querySingleFunc =
@@ -4030,6 +4206,23 @@ int intintLCGLinearOpenCompactOpenMPHash_DestroyTable(intintHash_Table * table) 
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintLCGLinearOpenCompactOpenMPHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) & table->
+	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->
+		      tableData)->numBuckets; index++) {
+			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGLinearOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table) {
@@ -4425,6 +4618,7 @@ intintHash_Table
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintLCGQuadraticOpenCompactHash_DestroyTable;
+	table->setupFunc = &intintLCGQuadraticOpenCompactHash_SetupTable;
 	table->emptyFunc = &intintLCGQuadraticOpenCompactHash_EmptyTable;
 	table->queryFunc = &intintLCGQuadraticOpenCompactHash_Query;
 	table->querySingleFunc = &intintLCGQuadraticOpenCompactHash_QuerySingle;
@@ -4482,6 +4676,23 @@ int intintLCGQuadraticOpenCompactHash_DestroyTable(intintHash_Table * table) {
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintLCGQuadraticOpenCompactHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintLCGQuadraticOpenCompactHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactHash_Bucket *) & table->
+	    tableData[sizeof(intintLCGQuadraticOpenCompactHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintLCGQuadraticOpenCompactHash_TableData *) table->
+		      tableData)->numBuckets; index++) {
+			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactHash_EmptyTable(intintHash_Table * table) {
@@ -4884,6 +5095,7 @@ intintHash_Table
 	intintHash_Table *table =
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc = &intintLCGQuadraticOpenCompactCLHash_DestroyTable;
+	table->setupFunc = &intintLCGQuadraticOpenCompactCLHash_SetupTable;
 	table->emptyFunc = &intintLCGQuadraticOpenCompactCLHash_EmptyTable;
 	table->queryFunc = &intintLCGQuadraticOpenCompactCLHash_Query;
 	table->querySingleFunc =
@@ -5043,6 +5255,30 @@ int intintLCGQuadraticOpenCompactCLHash_DestroyTable(intintHash_Table * table) {
 	clReleaseKernel(table->insertSingleNoOverwriteKernel);
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintLCGQuadraticOpenCompactCLHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	cl_int err;
+	err =
+	    clSetKernelArg(table->emptyKernel, 0, sizeof(cl_mem),
+			   &table->tableDataBuffer);
+	CLHash_Utilities_HandleError(err,
+				     "intintLCGQuadraticOpenCompactCLHash_EmptyTable",
+				     "clSetKernelArg");
+	const size_t groupWorkSize =
+	    roundUpToNearest(((intintLCGQuadraticOpenCompactHash_TableData *)
+			      table->tableData)->numBuckets,
+			     table->emptyKernelLocalWorkSize);
+	err =
+	    clEnqueueNDRangeKernel(table->queue, table->emptyKernel, 1, 0,
+				   &groupWorkSize,
+				   (const size_t *)&table->
+				   emptyKernelLocalWorkSize, 0, NULL, NULL);
+	CLHash_Utilities_HandleError(err,
+				     "intintLCGQuadraticOpenCompactCLHash_EmptyTable",
+				     "clEnqueueNDRangeKernel");
+	exitCode = HASH_EXIT_CODE_NORMAL;;
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactCLHash_EmptyTable(intintHash_Table * table) {
@@ -5318,6 +5554,7 @@ intintHash_Table
 	    (intintHash_Table *) malloc(sizeof(intintHash_Table));
 	table->destroyFunc =
 	    &intintLCGQuadraticOpenCompactOpenMPHash_DestroyTable;
+	table->setupFunc = &intintLCGQuadraticOpenCompactOpenMPHash_SetupTable;
 	table->emptyFunc = &intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable;
 	table->queryFunc = &intintLCGQuadraticOpenCompactOpenMPHash_Query;
 	table->querySingleFunc =
@@ -5380,6 +5617,24 @@ int intintLCGQuadraticOpenCompactOpenMPHash_DestroyTable(intintHash_Table *
 	int exitCode = 0;
 	free(table->tableData);
 	free(table);
+	return exitCode;
+}
+int intintLCGQuadraticOpenCompactOpenMPHash_SetupTable(intintHash_Table * table) {
+	int exitCode = 0;
+	intintLCGQuadraticOpenCompactOpenMPHash_Bucket *buckets =
+	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) & table->
+	    tableData[sizeof
+		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
+	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
+		int index;
+		for (index = 0;
+		     index <
+		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
+		      table->tableData)->numBuckets; index++) {
+			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
+		}
+	}
+	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table) {

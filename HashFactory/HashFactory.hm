@@ -67,6 +67,8 @@
   \
   NAME##Hash_Table* NAME##Hash_CreateTable(NAME##Hash_Factory* factory, int hashTypes, size_t keyRange, size_t numEntries, float loadFactor);\
   \
+  int NAME##Hash_SetupTable(NAME##Hash_Table *table);\
+  \
   int NAME##Hash_EmptyTable(NAME##Hash_Table *table);\
   \
   int NAME##Hash_DestroyTable(NAME##Hash_Table *table);\

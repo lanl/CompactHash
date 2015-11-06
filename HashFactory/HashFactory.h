@@ -272,6 +272,7 @@ extern "C" {
 						 int hashTypes, size_t keyRange,
 						 size_t numEntries,
 						 float loadFactor);
+	int intintHash_SetupTable(intintHash_Table * table);
 	int intintHash_EmptyTable(intintHash_Table * table);
 	int intintHash_DestroyTable(intintHash_Table * table);
 	cl_mem intintHash_GetTableDataBuffer(intintHash_Table * table);
@@ -328,6 +329,7 @@ extern "C" {
 						va_list args);
 	int intintIdentityPerfectHash_DestroyTable(intintHash_Table * table);
 	char *intintIdentityPerfectHash_Report(intintHash_Table * table);
+	int intintIdentityPerfectHash_SetupTable(intintHash_Table * table);
 	int intintIdentityPerfectHash_EmptyTable(intintHash_Table * table);
 	int intintIdentityPerfectHash_Query(intintHash_Table * table,
 					    size_t numKeys, int *keys,
@@ -360,6 +362,7 @@ extern "C" {
 						  va_list args);
 	int intintIdentityPerfectCLHash_DestroyTable(intintHash_Table * table);
 	char *intintIdentityPerfectCLHash_Report(intintHash_Table * table);
+	int intintIdentityPerfectCLHash_SetupTable(intintHash_Table * table);
 	int intintIdentityPerfectCLHash_EmptyTable(intintHash_Table * table);
 	int intintIdentityPerfectCLHash_Query(intintHash_Table * table,
 					      size_t numKeys, int *keys,
@@ -413,6 +416,8 @@ extern "C" {
 	int intintIdentityPerfectOpenMPHash_DestroyTable(intintHash_Table *
 							 table);
 	char *intintIdentityPerfectOpenMPHash_Report(intintHash_Table * table);
+	int intintIdentityPerfectOpenMPHash_SetupTable(intintHash_Table *
+						       table);
 	int intintIdentityPerfectOpenMPHash_EmptyTable(intintHash_Table *
 						       table);
 	int intintIdentityPerfectOpenMPHash_Query(intintHash_Table * table,
@@ -466,6 +471,8 @@ extern "C" {
 							   table);
 	char *intintIdentitySentinelPerfectHash_Report(intintHash_Table *
 						       table);
+	int intintIdentitySentinelPerfectHash_SetupTable(intintHash_Table *
+							 table);
 	int intintIdentitySentinelPerfectHash_EmptyTable(intintHash_Table *
 							 table);
 	int intintIdentitySentinelPerfectHash_Query(intintHash_Table * table,
@@ -506,6 +513,8 @@ extern "C" {
 							     table);
 	char *intintIdentitySentinelPerfectCLHash_Report(intintHash_Table *
 							 table);
+	int intintIdentitySentinelPerfectCLHash_SetupTable(intintHash_Table *
+							   table);
 	int intintIdentitySentinelPerfectCLHash_EmptyTable(intintHash_Table *
 							   table);
 	int intintIdentitySentinelPerfectCLHash_Query(intintHash_Table * table,
@@ -555,6 +564,8 @@ extern "C" {
 	    (intintHash_Table * table);
 	char *intintIdentitySentinelPerfectOpenMPHash_Report(intintHash_Table *
 							     table);
+	int intintIdentitySentinelPerfectOpenMPHash_SetupTable(intintHash_Table
+							       * table);
 	int intintIdentitySentinelPerfectOpenMPHash_EmptyTable(intintHash_Table
 							       * table);
 	int intintIdentitySentinelPerfectOpenMPHash_Query(intintHash_Table *
@@ -608,6 +619,7 @@ extern "C" {
 	int intintLCGLinearOpenCompactHash_DestroyTable(intintHash_Table *
 							table);
 	char *intintLCGLinearOpenCompactHash_Report(intintHash_Table * table);
+	int intintLCGLinearOpenCompactHash_SetupTable(intintHash_Table * table);
 	int intintLCGLinearOpenCompactHash_EmptyTable(intintHash_Table * table);
 	int intintLCGLinearOpenCompactHash_Query(intintHash_Table * table,
 						 size_t numKeys, int *keys,
@@ -646,6 +658,8 @@ extern "C" {
 	int intintLCGLinearOpenCompactCLHash_DestroyTable(intintHash_Table *
 							  table);
 	char *intintLCGLinearOpenCompactCLHash_Report(intintHash_Table * table);
+	int intintLCGLinearOpenCompactCLHash_SetupTable(intintHash_Table *
+							table);
 	int intintLCGLinearOpenCompactCLHash_EmptyTable(intintHash_Table *
 							table);
 	int intintLCGLinearOpenCompactCLHash_Query(intintHash_Table * table,
@@ -698,6 +712,8 @@ extern "C" {
 							      table);
 	char *intintLCGLinearOpenCompactOpenMPHash_Report(intintHash_Table *
 							  table);
+	int intintLCGLinearOpenCompactOpenMPHash_SetupTable(intintHash_Table *
+							    table);
 	int intintLCGLinearOpenCompactOpenMPHash_EmptyTable(intintHash_Table *
 							    table);
 	int intintLCGLinearOpenCompactOpenMPHash_Query(intintHash_Table * table,
@@ -753,6 +769,8 @@ extern "C" {
 							   table);
 	char *intintLCGQuadraticOpenCompactHash_Report(intintHash_Table *
 						       table);
+	int intintLCGQuadraticOpenCompactHash_SetupTable(intintHash_Table *
+							 table);
 	int intintLCGQuadraticOpenCompactHash_EmptyTable(intintHash_Table *
 							 table);
 	int intintLCGQuadraticOpenCompactHash_Query(intintHash_Table * table,
@@ -793,6 +811,8 @@ extern "C" {
 							     table);
 	char *intintLCGQuadraticOpenCompactCLHash_Report(intintHash_Table *
 							 table);
+	int intintLCGQuadraticOpenCompactCLHash_SetupTable(intintHash_Table *
+							   table);
 	int intintLCGQuadraticOpenCompactCLHash_EmptyTable(intintHash_Table *
 							   table);
 	int intintLCGQuadraticOpenCompactCLHash_Query(intintHash_Table * table,
@@ -842,6 +862,8 @@ extern "C" {
 	    (intintHash_Table * table);
 	char *intintLCGQuadraticOpenCompactOpenMPHash_Report(intintHash_Table *
 							     table);
+	int intintLCGQuadraticOpenCompactOpenMPHash_SetupTable(intintHash_Table
+							       * table);
 	int intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable(intintHash_Table
 							       * table);
 	int intintLCGQuadraticOpenCompactOpenMPHash_Query(intintHash_Table *
