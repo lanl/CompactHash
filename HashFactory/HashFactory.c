@@ -1007,14 +1007,12 @@ int intintIdentityPerfectHash_SetupTable(intintHash_Table * table) {
 	    (intintIdentityPerfectHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentityPerfectHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintIdentityPerfectHash_TableData *) table->
 		      tableData)->numBuckets; index++) {
 			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -1023,14 +1021,12 @@ int intintIdentityPerfectHash_EmptyTable(intintHash_Table * table) {
 	intintIdentityPerfectHash_Bucket *buckets =
 	    (intintIdentityPerfectHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentityPerfectHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintIdentityPerfectHash_TableData *) table->tableData)->
 	     numBuckets; index++) {
 		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentityPerfectHash_InnerQuerySingle(char *tableData, int key,
@@ -1780,14 +1776,12 @@ int intintIdentityPerfectOpenMPHash_SetupTable(intintHash_Table * table) {
 	    (intintIdentityPerfectOpenMPHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintIdentityPerfectOpenMPHash_TableData *) table->
 		      tableData)->numBuckets; index++) {
 			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -1796,14 +1790,12 @@ int intintIdentityPerfectOpenMPHash_EmptyTable(intintHash_Table * table) {
 	intintIdentityPerfectOpenMPHash_Bucket *buckets =
 	    (intintIdentityPerfectOpenMPHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentityPerfectOpenMPHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintIdentityPerfectOpenMPHash_TableData *) table->tableData)->
 	     numBuckets; index++) {
 		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentityPerfectOpenMPHash_InnerQuerySingle(char *tableData, int key,
@@ -2146,16 +2138,14 @@ int intintIdentitySentinelPerfectHash_SetupTable(intintHash_Table * table) {
 	    (intintIdentitySentinelPerfectHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentitySentinelPerfectHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintIdentitySentinelPerfectHash_TableData *) table->
 		      tableData)->numBuckets; index++) {
 			buckets[index].value =
 			    ((intintIdentitySentinelPerfectHash_TableData *)
 			     table->tableData)->emptyValue;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -2164,16 +2154,14 @@ int intintIdentitySentinelPerfectHash_EmptyTable(intintHash_Table * table) {
 	intintIdentitySentinelPerfectHash_Bucket *buckets =
 	    (intintIdentitySentinelPerfectHash_Bucket *) & table->
 	    tableData[sizeof(intintIdentitySentinelPerfectHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintIdentitySentinelPerfectHash_TableData *) table->
 	      tableData)->numBuckets; index++) {
 		buckets[index].value =
 		    ((intintIdentitySentinelPerfectHash_TableData *) table->
 		     tableData)->emptyValue;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentitySentinelPerfectHash_InnerQuerySingle(char *tableData, int key,
@@ -2944,16 +2932,14 @@ int intintIdentitySentinelPerfectOpenMPHash_SetupTable(intintHash_Table * table)
 	    tableData[sizeof
 		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
 		      table->tableData)->numBuckets; index++) {
 			buckets[index].value =
 			    ((intintIdentitySentinelPerfectOpenMPHash_TableData
 			      *) table->tableData)->emptyValue;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -2963,16 +2949,14 @@ int intintIdentitySentinelPerfectOpenMPHash_EmptyTable(intintHash_Table * table)
 	    (intintIdentitySentinelPerfectOpenMPHash_Bucket *) & table->
 	    tableData[sizeof
 		      (intintIdentitySentinelPerfectOpenMPHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintIdentitySentinelPerfectOpenMPHash_TableData *) table->
 	      tableData)->numBuckets; index++) {
 		buckets[index].value =
 		    ((intintIdentitySentinelPerfectOpenMPHash_TableData *)
 		     table->tableData)->emptyValue;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintIdentitySentinelPerfectOpenMPHash_InnerQuerySingle(char *tableData,
@@ -3316,14 +3300,12 @@ int intintLCGLinearOpenCompactHash_SetupTable(intintHash_Table * table) {
 	    (intintLCGLinearOpenCompactHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGLinearOpenCompactHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintLCGLinearOpenCompactHash_TableData *) table->
 		      tableData)->numBuckets; index++) {
 			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -3332,14 +3314,12 @@ int intintLCGLinearOpenCompactHash_EmptyTable(intintHash_Table * table) {
 	intintLCGLinearOpenCompactHash_Bucket *buckets =
 	    (intintLCGLinearOpenCompactHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGLinearOpenCompactHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintLCGLinearOpenCompactHash_TableData *) table->tableData)->
 	     numBuckets; index++) {
 		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGLinearOpenCompactHash_InnerQuerySingle(char *tableData, int key,
@@ -4214,14 +4194,12 @@ int intintLCGLinearOpenCompactOpenMPHash_SetupTable(intintHash_Table * table) {
 	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->
 		      tableData)->numBuckets; index++) {
 			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -4230,14 +4208,12 @@ int intintLCGLinearOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table) {
 	intintLCGLinearOpenCompactOpenMPHash_Bucket *buckets =
 	    (intintLCGLinearOpenCompactOpenMPHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGLinearOpenCompactOpenMPHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintLCGLinearOpenCompactOpenMPHash_TableData *) table->
 	      tableData)->numBuckets; index++) {
 		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGLinearOpenCompactOpenMPHash_InnerQuerySingle(char *tableData,
@@ -4684,14 +4660,12 @@ int intintLCGQuadraticOpenCompactHash_SetupTable(intintHash_Table * table) {
 	    (intintLCGQuadraticOpenCompactHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGQuadraticOpenCompactHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintLCGQuadraticOpenCompactHash_TableData *) table->
 		      tableData)->numBuckets; index++) {
 			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -4700,14 +4674,12 @@ int intintLCGQuadraticOpenCompactHash_EmptyTable(intintHash_Table * table) {
 	intintLCGQuadraticOpenCompactHash_Bucket *buckets =
 	    (intintLCGQuadraticOpenCompactHash_Bucket *) & table->
 	    tableData[sizeof(intintLCGQuadraticOpenCompactHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintLCGQuadraticOpenCompactHash_TableData *) table->
 	      tableData)->numBuckets; index++) {
 		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactHash_InnerQuerySingle(char *tableData, int key,
@@ -5626,14 +5598,12 @@ int intintLCGQuadraticOpenCompactOpenMPHash_SetupTable(intintHash_Table * table)
 	    tableData[sizeof
 		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
 	if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {
-		int index;
-		for (index = 0;
+		for (int index = 0;
 		     index <
 		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
 		      table->tableData)->numBuckets; index++) {
 			buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-		}
-	}
+	}}
 	exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
@@ -5643,14 +5613,12 @@ int intintLCGQuadraticOpenCompactOpenMPHash_EmptyTable(intintHash_Table * table)
 	    (intintLCGQuadraticOpenCompactOpenMPHash_Bucket *) & table->
 	    tableData[sizeof
 		      (intintLCGQuadraticOpenCompactOpenMPHash_TableData)];
-	int index;
-	for (index = 0;
+	for (int index = 0;
 	     index <
 	     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *) table->
 	      tableData)->numBuckets; index++) {
 		buckets[index].key = HASH_BUCKET_STATUS_EMPTY;
-	}
-	exitCode = HASH_EXIT_CODE_NORMAL;
+	} exitCode = HASH_EXIT_CODE_NORMAL;
 	return exitCode;
 }
 int intintLCGQuadraticOpenCompactOpenMPHash_InnerQuerySingle(char *tableData,

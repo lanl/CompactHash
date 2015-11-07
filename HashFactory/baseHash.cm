@@ -268,8 +268,7 @@
 #define HASH_SETUP_EXP(NAME, MODIFIER, INNER_EMPTY_EXP)\
   NAME##MODIFIER##Hash_Bucket *buckets = (NAME##MODIFIER##Hash_Bucket*)&table->tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
   if (intintHash_GetTableType(table) & ~HASH_SENTINEL_PERFECT_HASHES) {\
-     int index;\
-     for(index = 0; index < ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets; index++){\
+     for(int index = 0; index < ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets; index++){\
        INNER_EMPTY_EXP\
      }\
   }\
@@ -278,8 +277,7 @@
 
 #define HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP)\
   NAME##MODIFIER##Hash_Bucket *buckets = (NAME##MODIFIER##Hash_Bucket*)&table->tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
-  int index;\
-  for(index = 0; index < ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets; index++){\
+  for(int index = 0; index < ((NAME##MODIFIER##Hash_TableData*)table->tableData)->numBuckets; index++){\
     INNER_EMPTY_EXP\
   }\
   exitCode = HASH_EXIT_CODE_NORMAL;\
