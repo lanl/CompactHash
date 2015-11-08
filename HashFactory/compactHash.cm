@@ -91,6 +91,28 @@ unsigned int c = COMPRESS_FUNC(((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)table
   }\
 \
 
+#define OPEN_COMPACT_OPENMP_HASH_SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, JUMP_EXP, CYCLE_EXP) \
+  GLOBAL NAME##MODIFIER##Hash_TableData* mytableData = (GLOBAL NAME##MODIFIER##Hash_TableData*)tableData;\
+  NAME##Hash_CompressLCGData compressFuncData = mytableData->compressFuncData;\
+  unsigned int c = COMPRESS_FUNC(compressFuncData, key);\
+  unsigned long int iteration = 0;\
+  for(;;){\
+    index = JUMP_EXP;\
+    int old_key = __sync_val_compare_and_swap(&buckets[index].key, -1, key);\
+    if(old_key == HASH_BUCKET_STATUS_EMPTY){\
+      exitCode = HASH_SEARCH_CODE_EMPTY;\
+      break;\
+    }else if(old_key == key){\
+      exitCode = HASH_SEARCH_CODE_MATCH;\
+      break;\
+    }else if(CYCLE_EXP){\
+      exitCode = HASH_EXIT_CODE_CYCLE;\
+      break;\
+    }\
+    iteration++;\
+  }\
+\
+
 #define OPEN_COMPACT_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, INIT_EXP, ...)\
   \
   COMPACT_HASH_DEFINE(NAME, MODIFIER##Open, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, OPEN_COMPACT_HASH_INIT_EXP(NAME, MODIFIER##OpenCompact, INIT_EXP), OPEN_COMPACT_HASH_SEARCH_EXP, ##__VA_ARGS__)\
@@ -107,7 +129,7 @@ unsigned int c = COMPRESS_FUNC(((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)table
 
 #define OPEN_COMPACT_OPENMP_HASH_DEFINE(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, INIT_EXP, ...)\
   \
-  COMPACT_OPENMP_HASH_DEFINE(NAME, MODIFIER##Open, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, OPEN_COMPACT_HASH_INIT_EXP(NAME, MODIFIER##OpenCompactOpenMP, INIT_EXP), OPEN_COMPACT_HASH_SEARCH_EXP, ##__VA_ARGS__)\
+  COMPACT_OPENMP_HASH_DEFINE(NAME, MODIFIER##Open, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, OPEN_COMPACT_HASH_INIT_EXP(NAME, MODIFIER##OpenCompactOpenMP, INIT_EXP), OPEN_COMPACT_OPENMP_HASH_SEARCH_EXP, ##__VA_ARGS__)\
 
 #define LINEAR_OPEN_COMPACT_HASH_JUMP_EXP(NAME, MODIFIER, B, CL_GLOBAL) ((B * iteration + c) % ((CL_GLOBAL NAME##MODIFIER##Hash_TableData*)tableData)->numBuckets)
 

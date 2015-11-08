@@ -4242,10 +4242,12 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerQuerySingle(char *tableData,
 		      c) %
 		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
 		      tableData)->numBuckets);
-		if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+		int old_key =
+		    __sync_val_compare_and_swap(&buckets[index].key, -1, key);
+		if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 			exitCode = HASH_SEARCH_CODE_EMPTY;
 			break;
-		} else if (key == buckets[index].key) {
+		} else if (old_key == key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 			break;
 		} else if ((index == c && iteration > 0)) {
@@ -4294,10 +4296,13 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerQuery(char *tableData,
 			      c) %
 			     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
 			      tableData)->numBuckets);
-			if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			int old_key =
+			    __sync_val_compare_and_swap(&buckets[index].key, -1,
+							key);
+			if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 				exitCode = HASH_SEARCH_CODE_EMPTY;
 				break;
-			} else if (key == buckets[index].key) {
+			} else if (old_key == key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 				break;
 			} else if ((index == c && iteration > 0)) {
@@ -4339,14 +4344,12 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsertSingle(char *tableData,
 		      c) %
 		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
 		      tableData)->numBuckets);
-		if (((buckets[index].key ==
-		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-						   key,
-						   HASH_BUCKET_STATUS_EMPTY) :
-		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+		int old_key =
+		    __sync_val_compare_and_swap(&buckets[index].key, -1, key);
+		if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 			exitCode = HASH_SEARCH_CODE_EMPTY;
 			break;
-		} else if (key == buckets[index].key) {
+		} else if (old_key == key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 			break;
 		} else if ((index == c && iteration > 0)) {
@@ -4393,15 +4396,13 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsert(char *tableData,
 			      c) %
 			     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
 			      tableData)->numBuckets);
-			if (((buckets[index].key ==
-			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-							   key,
-							   HASH_BUCKET_STATUS_EMPTY)
-			     : buckets[index].key) ==
-			    HASH_BUCKET_STATUS_EMPTY) {
+			int old_key =
+			    __sync_val_compare_and_swap(&buckets[index].key, -1,
+							key);
+			if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 				exitCode = HASH_SEARCH_CODE_EMPTY;
 				break;
-			} else if (key == buckets[index].key) {
+			} else if (old_key == key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 				break;
 			} else if ((index == c && iteration > 0)) {
@@ -4445,14 +4446,12 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsertSingleNoOverwrite(char
 		      c) %
 		     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
 		      tableData)->numBuckets);
-		if (((buckets[index].key ==
-		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-						   key,
-						   HASH_BUCKET_STATUS_EMPTY) :
-		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+		int old_key =
+		    __sync_val_compare_and_swap(&buckets[index].key, -1, key);
+		if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 			exitCode = HASH_SEARCH_CODE_EMPTY;
 			break;
-		} else if (key == buckets[index].key) {
+		} else if (old_key == key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 			break;
 		} else if ((index == c && iteration > 0)) {
@@ -4500,15 +4499,13 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 			      c) %
 			     ((intintLCGLinearOpenCompactOpenMPHash_TableData *)
 			      tableData)->numBuckets);
-			if (((buckets[index].key ==
-			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-							   key,
-							   HASH_BUCKET_STATUS_EMPTY)
-			     : buckets[index].key) ==
-			    HASH_BUCKET_STATUS_EMPTY) {
+			int old_key =
+			    __sync_val_compare_and_swap(&buckets[index].key, -1,
+							key);
+			if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 				exitCode = HASH_SEARCH_CODE_EMPTY;
 				break;
-			} else if (key == buckets[index].key) {
+			} else if (old_key == key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 				break;
 			} else if ((index == c && iteration > 0)) {
@@ -5650,10 +5647,12 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerQuerySingle(char *tableData,
 		      c) %
 		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
 		      tableData)->numBuckets);
-		if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+		int old_key =
+		    __sync_val_compare_and_swap(&buckets[index].key, -1, key);
+		if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 			exitCode = HASH_SEARCH_CODE_EMPTY;
 			break;
-		} else if (key == buckets[index].key) {
+		} else if (old_key == key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 			break;
 		} else
@@ -5706,10 +5705,13 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerQuery(char *tableData,
 			      c) %
 			     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData
 			       *) tableData)->numBuckets);
-			if ((buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+			int old_key =
+			    __sync_val_compare_and_swap(&buckets[index].key, -1,
+							key);
+			if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 				exitCode = HASH_SEARCH_CODE_EMPTY;
 				break;
-			} else if (key == buckets[index].key) {
+			} else if (old_key == key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 				break;
 			} else
@@ -5755,14 +5757,12 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertSingle(char *tableData,
 		      c) %
 		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
 		      tableData)->numBuckets);
-		if (((buckets[index].key ==
-		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-						   key,
-						   HASH_BUCKET_STATUS_EMPTY) :
-		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+		int old_key =
+		    __sync_val_compare_and_swap(&buckets[index].key, -1, key);
+		if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 			exitCode = HASH_SEARCH_CODE_EMPTY;
 			break;
-		} else if (key == buckets[index].key) {
+		} else if (old_key == key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 			break;
 		} else
@@ -5814,15 +5814,13 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsert(char *tableData,
 			      c) %
 			     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData
 			       *) tableData)->numBuckets);
-			if (((buckets[index].key ==
-			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-							   key,
-							   HASH_BUCKET_STATUS_EMPTY)
-			     : buckets[index].key) ==
-			    HASH_BUCKET_STATUS_EMPTY) {
+			int old_key =
+			    __sync_val_compare_and_swap(&buckets[index].key, -1,
+							key);
+			if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 				exitCode = HASH_SEARCH_CODE_EMPTY;
 				break;
-			} else if (key == buckets[index].key) {
+			} else if (old_key == key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 				break;
 			} else
@@ -5871,14 +5869,12 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertSingleNoOverwrite(char
 		      c) %
 		     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData *)
 		      tableData)->numBuckets);
-		if (((buckets[index].key ==
-		      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-						   key,
-						   HASH_BUCKET_STATUS_EMPTY) :
-		     buckets[index].key) == HASH_BUCKET_STATUS_EMPTY) {
+		int old_key =
+		    __sync_val_compare_and_swap(&buckets[index].key, -1, key);
+		if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 			exitCode = HASH_SEARCH_CODE_EMPTY;
 			break;
-		} else if (key == buckets[index].key) {
+		} else if (old_key == key) {
 			exitCode = HASH_SEARCH_CODE_MATCH;
 			break;
 		} else
@@ -5932,15 +5928,13 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertNoOverwrite(char
 			      c) %
 			     ((intintLCGQuadraticOpenCompactOpenMPHash_TableData
 			       *) tableData)->numBuckets);
-			if (((buckets[index].key ==
-			      HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key =
-							   key,
-							   HASH_BUCKET_STATUS_EMPTY)
-			     : buckets[index].key) ==
-			    HASH_BUCKET_STATUS_EMPTY) {
+			int old_key =
+			    __sync_val_compare_and_swap(&buckets[index].key, -1,
+							key);
+			if (old_key == HASH_BUCKET_STATUS_EMPTY) {
 				exitCode = HASH_SEARCH_CODE_EMPTY;
 				break;
-			} else if (key == buckets[index].key) {
+			} else if (old_key == key) {
 				exitCode = HASH_SEARCH_CODE_MATCH;
 				break;
 			} else
