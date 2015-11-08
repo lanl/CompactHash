@@ -45,6 +45,7 @@
 #include <CL/cl.h>
 #endif
 #else
+typedef unsigned int uint;
 typedef int cl_int;
 typedef int cl_context;
 typedef int cl_program;

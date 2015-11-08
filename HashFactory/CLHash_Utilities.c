@@ -36,11 +36,14 @@
  * @date   Sun Aug 4 2013 
  */
 
+#define _XOPEN_SOURCE 500
+
 #include <execinfo.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "CLHash_Utilities.h"
+
 
 //#ifdef HAVE_CONFIG_H
 //#include "config.h"
