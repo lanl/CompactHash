@@ -1143,7 +1143,7 @@ int intintIdentityPerfectHash_InnerInsert(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -1169,7 +1169,7 @@ int intintIdentityPerfectHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1218,7 +1218,7 @@ int intintIdentityPerfectHash_InnerInsertNoOverwrite(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -1245,7 +1245,7 @@ int intintIdentityPerfectHash_InnerInsertNoOverwrite(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1914,6 +1914,7 @@ int intintIdentityPerfectOpenMPHash_InnerInsert(char *tableData,
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -1939,7 +1940,7 @@ int intintIdentityPerfectOpenMPHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1992,6 +1993,7 @@ int intintIdentityPerfectOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -2018,7 +2020,7 @@ int intintIdentityPerfectOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -2269,7 +2271,7 @@ int intintIdentitySentinelPerfectHash_InnerInsert(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -2289,7 +2291,7 @@ int intintIdentitySentinelPerfectHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -2335,7 +2337,7 @@ int intintIdentitySentinelPerfectHash_InnerInsertNoOverwrite(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -2356,7 +2358,7 @@ int intintIdentitySentinelPerfectHash_InnerInsertNoOverwrite(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -3075,6 +3077,7 @@ int intintIdentitySentinelPerfectOpenMPHash_InnerInsert(char *tableData,
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -3094,7 +3097,7 @@ int intintIdentitySentinelPerfectOpenMPHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -3148,6 +3151,7 @@ int intintIdentitySentinelPerfectOpenMPHash_InnerInsertNoOverwrite(char
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -3168,7 +3172,7 @@ int intintIdentitySentinelPerfectOpenMPHash_InnerInsertNoOverwrite(char
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -3478,7 +3482,7 @@ int intintLCGLinearOpenCompactHash_InnerInsert(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGLinearOpenCompactHash_TableData *mytableData =
@@ -3518,7 +3522,7 @@ int intintLCGLinearOpenCompactHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -3581,7 +3585,7 @@ int intintLCGLinearOpenCompactHash_InnerInsertNoOverwrite(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGLinearOpenCompactHash_TableData *mytableData =
@@ -3622,7 +3626,7 @@ int intintLCGLinearOpenCompactHash_InnerInsertNoOverwrite(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -4381,6 +4385,7 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsert(char *tableData,
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
@@ -4419,7 +4424,7 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -4484,6 +4489,7 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGLinearOpenCompactOpenMPHash_TableData *mytableData =
@@ -4523,7 +4529,7 @@ int intintLCGLinearOpenCompactOpenMPHash_InnerInsertNoOverwrite(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -4846,7 +4852,7 @@ int intintLCGQuadraticOpenCompactHash_InnerInsert(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGQuadraticOpenCompactHash_TableData *mytableData =
@@ -4889,7 +4895,7 @@ int intintLCGQuadraticOpenCompactHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -4957,7 +4963,7 @@ int intintLCGQuadraticOpenCompactHash_InnerInsertNoOverwrite(char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGQuadraticOpenCompactHash_TableData *mytableData =
@@ -5001,7 +5007,7 @@ int intintLCGQuadraticOpenCompactHash_InnerInsertNoOverwrite(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -5799,6 +5805,7 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsert(char *tableData,
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
@@ -5839,7 +5846,7 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsert(char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -5913,6 +5920,7 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertNoOverwrite(char
 	int index;
 	int exitCode;
 	uint i;
+#pragma omp parallel for
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		intintLCGQuadraticOpenCompactOpenMPHash_TableData *mytableData =
@@ -5954,7 +5962,7 @@ int intintLCGQuadraticOpenCompactOpenMPHash_InnerInsertNoOverwrite(char
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -6440,7 +6448,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		index =\n"
@@ -6469,7 +6477,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -6522,7 +6530,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		index =\n"
@@ -6552,7 +6560,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -6818,7 +6826,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		index =\n"
@@ -6841,7 +6849,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -6894,7 +6902,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		index =\n"
@@ -6918,7 +6926,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -7246,7 +7254,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData\n"
@@ -7286,7 +7294,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -7351,7 +7359,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData\n"
@@ -7392,7 +7400,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -7731,7 +7739,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		__global intintLCGQuadraticOpenCompactCLHash_TableData\n"
@@ -7775,7 +7783,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"
@@ -7848,7 +7856,7 @@ const char *HashFactory_source =
 "	int key;\n"
 "	int index;\n"
 "	int exitCode;\n"
-"	uint i;\n"
+"	uint i;;\n"
 "	for (i = 0; i < numEntries; i++) {\n"
 "		key = keys[i];\n"
 "		__global intintLCGQuadraticOpenCompactCLHash_TableData\n"
@@ -7893,7 +7901,7 @@ const char *HashFactory_source =
 "			buckets[index].value = values[i];\n"
 "			break;\n"
 "		default:\n"
-"			return exitCode;\n"
+"			resultExitCode = exitCode;\n"
 "		}\n"
 "	}\n"
 "	return resultExitCode;\n"

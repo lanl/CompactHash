@@ -136,7 +136,7 @@
 
 #define CMPXCHG_HASH_READ_KEY_EXP ((buckets[index].key == HASH_BUCKET_STATUS_EMPTY) ? (buckets[index].key = key, HASH_BUCKET_STATUS_EMPTY) : buckets[index].key)\
 
-#define BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, CL_GLOBAL, ...) \
+#define BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, PRAGMA_PARALLEL_FOR, CL_GLOBAL, ...) \
   \
   int NAME##MODIFIER##Hash_InnerQuerySingle(CL_GLOBAL char *tableData, KEY_TYPE key, CL_GLOBAL VALUE_TYPE *valueOutput){\
     CL_GLOBAL NAME##MODIFIER##Hash_Bucket *buckets = (CL_GLOBAL NAME##MODIFIER##Hash_Bucket*)&tableData[sizeof(NAME##MODIFIER##Hash_TableData)];\
@@ -207,6 +207,7 @@
     int index;\
     int exitCode;\
     uint i;\
+    PRAGMA_PARALLEL_FOR;\
     for(i = 0; i < numEntries; i++){\
       key = keys[i];\
       SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
@@ -218,7 +219,7 @@
           buckets[index].value = values[i];\
           break;\
         default:\
-          return exitCode;\
+          resultExitCode = exitCode;\
       }\
     }\
     return resultExitCode;\
@@ -248,6 +249,7 @@
     int index;\
     int exitCode;\
     uint i;\
+    PRAGMA_PARALLEL_FOR;\
     for(i = 0; i < numEntries; i++){\
       key = keys[i];\
       SEARCH_EXP(NAME, MODIFIER, COMPRESS_FUNC, COMPRESS_FUNC_DATA, READ_KEY_EXP, CL_GLOBAL, ##__VA_ARGS__)\
@@ -260,7 +262,7 @@
           buckets[index].value = values[i];\
           break;\
         default:\
-          return exitCode;\
+          resultExitCode = exitCode;\
       }\
     }\
     return resultExitCode;\
@@ -317,7 +319,7 @@
   BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , ,\
      HASH_SETUP_EXP(NAME, MODIFIER, INNER_EMPTY_EXP), HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
   \
-  BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, ,##__VA_ARGS__)\
+  BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, , ,##__VA_ARGS__)\
   \
   int NAME##MODIFIER##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
     return NAME##MODIFIER##Hash_InnerQuerySingle(table->tableData, key, valueOutput);\
@@ -464,7 +466,7 @@
   \
   BASE_TYPES_DEFINE(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC_DATA)\
   \
-  BASE_HASH_METHODS(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, __global, ##__VA_ARGS__) \
+  BASE_HASH_METHODS(NAME, MODIFIER##CL, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, READ_KEY_EXP, , __global, ##__VA_ARGS__) \
   \
   int NAME##MODIFIER##CLHash_QuerySingle(__global char *tableData, KEY_TYPE key, __global VALUE_TYPE *valueOutput){\
     return NAME##MODIFIER##CLHash_InnerQuerySingle(tableData, key, valueOutput);\
@@ -654,7 +656,7 @@
   BASE_HASH_UTIL(NAME, MODIFIER, HASH_ID, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, FACTORY_CREATE_EXP, , CREATE_EXP, INIT_EXP, , ,\
      OPENMP_HASH_SETUP_EXP(NAME, MODIFIER, INNER_EMPTY_EXP), OPENMP_HASH_EMPTY_EXP(NAME, MODIFIER, INNER_EMPTY_EXP))\
   \
-  BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, ,##__VA_ARGS__)\
+  BASE_HASH_METHODS(NAME, MODIFIER, KEY_TYPE, VALUE_TYPE, COMPRESS_FUNC, COMPRESS_FUNC_DATA, SEARCH_EXP, CMPXCHG_HASH_READ_KEY_EXP, OMP_PRAGMA_PARALLEL_FOR, ,##__VA_ARGS__)\
   \
   int NAME##MODIFIER##Hash_QuerySingle(NAME##Hash_Table *table, KEY_TYPE key, VALUE_TYPE *valueOutput){\
     return NAME##MODIFIER##Hash_InnerQuerySingle(table->tableData, key, valueOutput);\

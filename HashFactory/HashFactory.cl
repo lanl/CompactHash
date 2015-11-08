@@ -427,7 +427,7 @@ int intintIdentityPerfectCLHash_InnerInsert(__global char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -456,7 +456,7 @@ int intintIdentityPerfectCLHash_InnerInsert(__global char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -509,7 +509,7 @@ int intintIdentityPerfectCLHash_InnerInsertNoOverwrite(__global char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -539,7 +539,7 @@ int intintIdentityPerfectCLHash_InnerInsertNoOverwrite(__global char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -805,7 +805,7 @@ int intintIdentitySentinelPerfectCLHash_InnerInsert(__global char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -828,7 +828,7 @@ int intintIdentitySentinelPerfectCLHash_InnerInsert(__global char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -881,7 +881,7 @@ int intintIdentitySentinelPerfectCLHash_InnerInsertNoOverwrite(__global char
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		index =
@@ -905,7 +905,7 @@ int intintIdentitySentinelPerfectCLHash_InnerInsertNoOverwrite(__global char
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1233,7 +1233,7 @@ int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData
@@ -1273,7 +1273,7 @@ int intintLCGLinearOpenCompactCLHash_InnerInsert(__global char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1338,7 +1338,7 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		__global intintLCGLinearOpenCompactCLHash_TableData *mytableData
@@ -1379,7 +1379,7 @@ int intintLCGLinearOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1718,7 +1718,7 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		__global intintLCGQuadraticOpenCompactCLHash_TableData
@@ -1762,7 +1762,7 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsert(__global char *tableData,
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
@@ -1835,7 +1835,7 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 	int key;
 	int index;
 	int exitCode;
-	uint i;
+	uint i;;
 	for (i = 0; i < numEntries; i++) {
 		key = keys[i];
 		__global intintLCGQuadraticOpenCompactCLHash_TableData
@@ -1880,7 +1880,7 @@ int intintLCGQuadraticOpenCompactCLHash_InnerInsertNoOverwrite(__global char
 			buckets[index].value = values[i];
 			break;
 		default:
-			return exitCode;
+			resultExitCode = exitCode;
 		}
 	}
 	return resultExitCode;
