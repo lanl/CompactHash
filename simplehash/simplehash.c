@@ -81,7 +81,7 @@ long long get_hashtablesize(void) {
   return(hashtablesize);
 }
 
-int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
+int *compact_hash_init(int ncells, uint isize, uint jsize, int do_init, uint report_level){
    hash_ncells = 0;
    write_hash_collisions = 0;
    read_hash_collisions = 0;
@@ -159,8 +159,10 @@ int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
       hashtablesize = perfect_hash_size;
 
       hash = (int *)malloc(hashtablesize*sizeof(int));
-      for (uint ii = 0; ii<hashtablesize; ii++){
-         hash[ii] = -1;
+      if (do_init) {
+         for (uint ii = 0; ii<hashtablesize; ii++){
+            hash[ii] = -1;
+         }
       }
 
       read_hash  = read_hash_perfect;
@@ -179,9 +181,9 @@ int *compact_hash_init(int ncells, uint isize, uint jsize, uint report_level){
 #ifdef _OPENMP
 
 #ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
-int *compact_hash_init_openmp(int ncells, uint isize, uint jsize, uint report_level){
+int *compact_hash_init_openmp(int ncells, uint isize, uint jsize, int do_init, uint report_level){
 #else
-int *compact_hash_init_openmp(int ncells, uint isize, uint jsize, uint report_level, omp_lock_t **lock){
+int *compact_hash_init_openmp(int ncells, uint isize, uint jsize, int do_init, uint report_level, omp_lock_t **lock){
 #endif
 
    hash_ncells = 0;
@@ -287,8 +289,10 @@ int *compact_hash_init_openmp(int ncells, uint isize, uint jsize, uint report_le
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-      for (uint ii = 0; ii<hashtablesize; ii++){
-         hash[ii] = -1;
+      if (do_init) {
+         for (uint ii = 0; ii<hashtablesize; ii++){
+            hash[ii] = -1;
+         }
       }
 
       read_hash  = read_hash_perfect;
@@ -1366,7 +1370,7 @@ void hash_lib_init(cl_context context){
    if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
 }
 
-cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_queue queue, long *gpu_time)
+cl_mem hash_init (int hash_size, int TILE_SIZE, int do_init, cl_context context, cl_command_queue queue, long *gpu_time)
 {
    cl_int error;
 
@@ -1377,31 +1381,34 @@ cl_mem hash_init (int hash_size, int TILE_SIZE, cl_context context, cl_command_q
 
   //init to -1
 
-   error = clSetKernelArg(init_kernel, 0, sizeof(cl_uint), &hash_size);
-   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
-   error = clSetKernelArg(init_kernel, 1, sizeof(cl_mem), (void*)&hash_buffer);
-   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+   if (do_init) {
 
-   size_t global_work_size;
-   size_t local_work_size;
+      error = clSetKernelArg(init_kernel, 0, sizeof(cl_uint), &hash_size);
+      if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+      error = clSetKernelArg(init_kernel, 1, sizeof(cl_mem), (void*)&hash_buffer);
+      if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
 
-   local_work_size = TILE_SIZE;
-   global_work_size = ((hash_size+local_work_size-1)/local_work_size)*local_work_size;
+      size_t global_work_size;
+      size_t local_work_size;
 
-   cl_event hash_init_event;
+      local_work_size = TILE_SIZE;
+      global_work_size = ((hash_size+local_work_size-1)/local_work_size)*local_work_size;
 
-   error = clEnqueueNDRangeKernel(queue, init_kernel, 1, 0, &global_work_size, &local_work_size, 0, NULL, &hash_init_event);
-   if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
+      cl_event hash_init_event;
 
-   clWaitForEvents(1,&hash_init_event);
+      error = clEnqueueNDRangeKernel(queue, init_kernel, 1, 0, &global_work_size, &local_work_size, 0, NULL, &hash_init_event);
+      if (error != CL_SUCCESS) printf("Error is %d at line %d\n",error,__LINE__);
 
-   clGetEventProfilingInfo(hash_init_event, CL_PROFILING_COMMAND_START, sizeof(gpu_time_start), &gpu_time_start, NULL);
-   clGetEventProfilingInfo(hash_init_event, CL_PROFILING_COMMAND_END, sizeof(gpu_time_end), &gpu_time_end, NULL);
+      clWaitForEvents(1,&hash_init_event);
+
+      clGetEventProfilingInfo(hash_init_event, CL_PROFILING_COMMAND_START, sizeof(gpu_time_start), &gpu_time_start, NULL);
+      clGetEventProfilingInfo(hash_init_event, CL_PROFILING_COMMAND_END, sizeof(gpu_time_end), &gpu_time_end, NULL);
 
 
-   *gpu_time = gpu_time_end - gpu_time_start;
+      *gpu_time = gpu_time_end - gpu_time_start;
 
-   clReleaseEvent(hash_init_event);
+      clReleaseEvent(hash_init_event);
+   }
 
    //if (DETAILED_TIMING) printf("\n\tinit %.6lf,", (double)(gpu_time_end - gpu_time_start)*1.0e-9);
 
