@@ -894,11 +894,11 @@ struct neighbor2d *neighbors2d_hashcpu( uint ncells, int mesh_size, int levmx, i
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  for (int jj = 0; jj<jmaxsize; jj++){
-    for (int ii = 0; ii<imaxsize; ii++){
-      hash[jj][ii]=-1;
-    }
-  }
+//for (int jj = 0; jj<jmaxsize; jj++){
+//  for (int ii = 0; ii<imaxsize; ii++){
+//    hash[jj][ii]=-1;
+//  }
+//}
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -1068,11 +1068,11 @@ struct neighbor2d *neighbors2d_hashcpu_opt_1(uint ncells, int mesh_size, int lev
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
    
   //Empty Hash Table
-  for (int jj = 0; jj<jmaxsize; jj++){
-    for (int ii = 0; ii<imaxsize; ii++){
-      hash[jj][ii]=-1;
-    }
-  }
+//for (int jj = 0; jj<jmaxsize; jj++){
+//  for (int ii = 0; ii<imaxsize; ii++){
+//    hash[jj][ii]=-1;
+//  }
+//}
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -1168,7 +1168,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_1( uint ncells, int mesh_size, int
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  intintHash_EmptyTable(hashTable);
+  intintHash_SetupTable(hashTable);
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -1257,11 +1257,11 @@ struct neighbor2d *neighbors2d_hashcpu_opt_2( uint ncells, int mesh_size, int le
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  for (int jj = 0; jj<jmaxsize; jj++){
-    for (int ii = 0; ii<imaxsize; ii++){
-      hash[jj][ii]=-1;
-    }
-  }
+//for (int jj = 0; jj<jmaxsize; jj++){
+//  for (int ii = 0; ii<imaxsize; ii++){
+//    hash[jj][ii]=-1;
+//  }
+//}
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -1368,7 +1368,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_2( uint ncells, int mesh_size, int
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  intintHash_EmptyTable(hashTable);
+  intintHash_SetupTable(hashTable);
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -2012,7 +2012,7 @@ cl_mem neighbors2d_hashlibgpu( uint ncells, int mesh_size, int levmx, cl_mem i_b
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  intintHash_EmptyTable(hashTable);
+  intintHash_SetupTable(hashTable);
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -2257,7 +2257,7 @@ cl_mem neighbors2d_hashlibgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_m
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  intintHash_EmptyTable(hashTable);
+  intintHash_SetupTable(hashTable);
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -2503,7 +2503,7 @@ cl_mem neighbors2d_hashlibgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_m
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  intintHash_EmptyTable(hashTable);
+  intintHash_SetupTable(hashTable);
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
@@ -2748,7 +2748,7 @@ cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_m
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
 
   //Empty Hash Table
-  intintHash_EmptyTable(hashTable);
+  intintHash_SetupTable(hashTable);
 
   if(DETAILED_TIMING) emptyCPUTime = cpu_timer_stop(tSection);
 
