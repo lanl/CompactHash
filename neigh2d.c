@@ -179,7 +179,7 @@ cl_kernel neighbors2d_hashwrite_kern, neighbors2d_hashwrite_opt_1_kern, neighbor
 intintHash_Factory *factory;
 intintHash_Factory *CLFactory;
 
-void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int haveGPU);
+void neighbors2d( uint mesh_size, int levmx, float threshold, int *options, int haveGPU);
 struct neighbor2d *neighbors2d_bruteforce( uint ncells, int *i, int *j, int *level );
 struct neighbor2d *neighbors2d_kdtree( uint ncells, int mesh_size, double *x, double *y, int *level );
 struct neighbor2d *neighbors2d_hashcpu( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level );
@@ -204,7 +204,7 @@ cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_m
 cl_mem neighbors2d_hashlibgpu_opt_4( uint ncells, int mesh_size, int levmx, cl_mem i, cl_mem j, cl_mem level, cl_mem levtable);
 #endif
 
-int adaptiveMeshConstructorWij(const int n, const int l, int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold, int target_ncells);
+int adaptiveMeshConstructorWij(const int n, const int l, int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, float threshold, int target_ncells);
 void genmatrixfree(void **var);
 void **genmatrix(int jnum, int inum, size_t elsize);
 FILE * fmem; 
@@ -233,7 +233,7 @@ int main (int argc, const char * argv[])
   char add_string[40];
 
   int *options;
-  int threshold = 20;    
+  float threshold = 1.0;   
 
   uint levmx_min = 1;
   uint levmx_max = 6;
@@ -258,7 +258,7 @@ int main (int argc, const char * argv[])
       } 
       if (strcmp(argv[i], "-t") == 0) {
         i++;
-        threshold =(int)(atoi(argv[i])); 
+        threshold =(atof(argv[i])); 
       } 
       if (strcmp(argv[i], "-l") == 0) {
         i++;
@@ -381,7 +381,7 @@ int main (int argc, const char * argv[])
   printf("\n    2D Neighbors Performance Results\n\n");
   printf("%s\n",header);
 
-  printf("\nThreshold for refinement is %d\n",threshold); 
+  printf("\nThreshold for refinement is %f\n",threshold); 
   printf("\nWork group size is %d and init workgroup size is %d\n",TILE_SIZE,TILE_SIZE_INIT); 
   for (uint levmx = levmx_min; levmx < levmx_max; levmx++ ){
     printf("\nMax levels is %d\n",levmx); 
@@ -425,7 +425,7 @@ void neigh2dCLTester(int ncells, int *level, struct neighbor2d *neigh2d_gold, cl
 }
 #endif
 
-void neighbors2d( uint mesh_size, int levmx, int threshold, int *options, int haveGPU) 
+void neighbors2d( uint mesh_size, int levmx, float threshold, int *options, int haveGPU) 
 {
   struct neighbor2d *neigh2d_gold, *neigh2d_test;
 
@@ -2996,7 +2996,7 @@ cl_mem neighbors2d_hasholdlibgpu_opt_3( uint ncells, int mesh_size, int levmx, c
 // Output: number of cells in the adaptive mesh
 //
 int adaptiveMeshConstructorWij(const int n, const int levmax, 
-         int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, int threshold, int target_ncells) {
+         int** level_ptr, double** x_ptr, double** y_ptr, int **i_ptr, int **j_ptr, float threshold, int target_ncells) {
   int ncells = SQ(n);
 
   // ints used for for() loops later
