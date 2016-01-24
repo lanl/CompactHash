@@ -33,10 +33,6 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
    # using Visual Studio C++
 endif()
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -g -O0 -Wextra")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELDEBINFO} -g -O3")
-
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
    # using Clang
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize")
@@ -56,10 +52,6 @@ endif()
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -g -O0 -Wextra")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELDEBINFO} -g -O3")
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -O0 -Wextra")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELDEBINFO} -g -O3")
 
 if (MIC_NATIVE)
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-intel -mmic")
@@ -82,6 +74,9 @@ endif (MIC_NATIVE)
 #if (MPI_FOUND)
 #   include_directories(${MPI_INCLUDE_PATH})
 #endif (MPI_FOUND)
+
+# to get rid of gcc compiler complaining about implicit declaration of drand48
+add_definitions(-D_SVID_SOURCE)
 
 add_subdirectory(HashFactory)
 add_subdirectory(kdtree)
@@ -107,7 +102,9 @@ set (NEIGH2D_HDRS gpu.h)
 add_executable(neigh2d ${NEIGH2D_SRCS} ${NEIGH2D_HDRS})
 target_link_libraries(neigh2d HashFactory simplehash kdtree timer m)
 if (OPENCL_FOUND)
+# Setting default in code to off, so set WRITE_MEM_USAGE to 1 if memory use output is wanted (cmake -DWRITE_MEM_USAGE=1)
    set_target_properties(neigh2d PROPERTIES COMPILE_DEFINITIONS "HAVE_OPENCL")
+#   set_target_properties(neigh2d PROPERTIES COMPILE_DEFINITIONS "HAVE_OPENCL;WRITE_MEM_USAGE=0")
    target_link_libraries(neigh2d ${OPENCL_LIBRARIES})
 #   add_dependencies(neigh2d neigh2d_kernel_source)
 endif(OPENCL_FOUND)

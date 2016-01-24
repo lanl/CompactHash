@@ -93,7 +93,7 @@ int TILE_SIZE_INIT = 128;
 #endif
 
 #ifndef WRITE_MEM_USAGE
-#define WRITE_MEM_USAGE 1
+#define WRITE_MEM_USAGE 0
 #endif
 
 #define CHECK 1
