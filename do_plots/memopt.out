@@ -1,0 +1,45 @@
+============== Hardware detection report ===============
+
+GPUInit: 1 opencl platform(s) detected
+  Platform 1:
+    CL_PLATFORM_VERSION    : OpenCL 1.2 CUDA 7.5.23
+    CL_PLATFORM_NAME       : NVIDIA CUDA
+    CL_PLATFORM_VENDOR     : NVIDIA Corporation
+
+  Device:
+    CL_DEVICE_NAME         : Tesla K40c
+    CL_DEVICE_VENDOR       : NVIDIA Corporation
+    CL_DEVICE_MAX_WORK_GROUP_SIZE : 1024
+
+    device vendor type set : Nvidia
+============== Hardware detection report ===============
+
+    2D Neighbors Performance Results
+
+Size,   	ncells,  	compression,	kdtree,	Hash CPU,	Hash CPU 2,	Hash CPU 3,	Hash OldLib CPU 3,	Hash GPU,	Hash GPU 2,	Hash GPU 3,	Hash OldLib GPU 3,
+
+
+Threshold for refinement is 0.100000
+
+Work group size is 128 and init workgroup size is 128
+
+Max levels is 1
+256,     	   65722,	3.99,        	0.251647,	0.002868,	0.001216,	0.001980,	0.014171,	0.000551,	0.000474,	0.000470,	0.000655,
+
+Max levels is 2
+256,     	   67945,	15.43,        	0.268928,	0.005148,	0.002267,	0.003234,	0.012614,	0.000516,	0.000499,	0.000487,	0.000694,
+
+Max levels is 3
+256,     	   75271,	55.72,        	0.269705,	0.008293,	0.003828,	0.005873,	0.011060,	0.001254,	0.000431,	0.000442,	0.000695,
+
+Max levels is 4
+256,     	  117430,	142.87,        	0.353413,	0.031700,	0.015437,	0.019370,	0.021290,	0.006743,	0.000739,	0.000557,	0.001405,
+
+Max levels is 5
+256,     	  309400,	216.90,        	1.024119,	0.113314,	0.060498,	0.076122,	0.061894,	0.063554,	0.001397,	0.000818,	0.002240,
+
+Max levels is 6
+256,     	  956230,	280.72,        	3.483111,	0.363132,	0.230282,	0.291987,	0.219155,	0.183847,	0.002839,	0.002135,	0.005224,
+
+Max levels is 7
+256,     	 3562666,	301.39,        	13.961482,	1.419305,	0.929720,	1.154947,	0.842066,	0.584546,	0.008580,	0.006682,	0.018177,
