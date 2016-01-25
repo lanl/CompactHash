@@ -34,6 +34,17 @@ for i in range(0,7):
    Y9[i]  = float(value[9])
    Y10[i] = float(value[10])
    Y11[i] = float(value[11])
+   # Convert from secs to milliseconds
+   Y3[i]  *= 1000
+   Y4[i]  *= 1000
+   Y5[i]  *= 1000
+   Y6[i]  *= 1000
+   Y7[i]  *= 1000
+   Y8[i]  *= 1000
+   Y9[i]  *= 1000
+   Y10[i] *= 1000
+   Y11[i] *= 1000
+   # Normalize by number of cells
    Y3[i]  /= Y1[i]
    Y4[i]  /= Y1[i]
    Y5[i]  /= Y1[i]
@@ -49,7 +60,7 @@ fig = pyplot.figure()
 
 fig.patch.set_facecolor('white')
 pyplot.xlabel("Compressibility",fontdict={'fontsize':16})
-pyplot.ylabel("Runtime (millisecs)/numcells",fontdict={'fontsize':16})
+pyplot.ylabel("Runtime/numcells (millisecs/cell)",fontdict={'fontsize':16})
 
 pyplot.semilogy()
 
