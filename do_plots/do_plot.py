@@ -75,7 +75,7 @@ pyplot.plot(Y2, Y10, color = 'blue',    linestyle='--', linewidth=1.0, marker='D
 pyplot.plot(Y2, Y11, color = 'red',     linestyle='--', linewidth=1.0, marker='D', label='Compact GPU')
 
 pyplot.grid()
-pyplot.legend(loc = 2)
+pyplot.legend(loc = 2, fontsize = 'small')
 pyplot.suptitle("Comparison of Neighbor Finding Algorithms on the CPU and GPU",fontdict={'fontsize':16})
 
 pyplot.savefig('neighbors_all.pdf',format='pdf')
