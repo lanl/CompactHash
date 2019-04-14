@@ -387,7 +387,7 @@ int main (int argc, const char * argv[])
     //printf("\nMax levels is %d\n",levmx); 
     if(WRITE_MEM_USAGE) fprintf(fmem,"\nMax levels is %d\n",levmx); 
     for( uint i = n_min; i <= n_max; i*=2 ) {
-      if (levmx > 3 && i > 512) continue;
+      //if (levmx > 3 && i > 512) continue;
       printf("%d, \t%d: ", i,levmx);
       if(WRITE_MEM_USAGE) fprintf(fmem,"%d,     ", i);
       neighbors2d(i, levmx, threshold, options, haveGPU);
