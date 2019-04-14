@@ -66,6 +66,8 @@ enum device_vendor_type {
 cl_kernel interpolate_kernel;
 
 void GPUInit(cl_context *context, cl_command_queue *queue, int *device_type, cl_program *program, char *filename, char *addlibsource);
+int device_double_support(cl_device_id device);
+void device_info(cl_device_id device);
 #endif
 
 #endif // __GPU_H__
