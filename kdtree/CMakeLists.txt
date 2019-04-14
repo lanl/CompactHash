@@ -1,3 +1,6 @@
+# enable @rpath in the install name for any shared library being built
+set(CMAKE_MACOSX_RPATH 1)
+
 ########### global settings ###############
 set(H_SRCS Bounds1d.h Bounds2d.h Globals1d.h Globals2d.h KDTree1d.h KDTree2d.h)
 
