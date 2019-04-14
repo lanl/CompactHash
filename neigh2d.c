@@ -2620,7 +2620,7 @@ cl_mem neighbors2d_hashgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem 
   if(DETAILED_TIMING) GPUTime = 0;
 
   //Create Hash Table
-  hash_buffer = hash_init(hash_size, TILE_SIZE, 0, context, queue, &GPUTime);
+  hash_buffer = hash_init(hash_size, TILE_SIZE, 1, context, queue, &GPUTime);
 
   if(DETAILED_TIMING) createGPUTime = (double)(GPUTime)*1.0e-9;
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
