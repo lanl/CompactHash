@@ -1,28 +1,28 @@
 set(libHashFactory_LIB_SRCS CLHash_Utilities.c  HashFactory.c CLHash_Utilities.h HashFactory.h)
 
-set(INDENT indent)
-set(CPREPROCESSOR cpp)
+#set(INDENT indent)
+#set(CPREPROCESSOR cpp)
 
 #COMMAND ${CPREPROCESSOR} -CC -x c -imacros HashFactory.hm HashFactory.hp | ${INDENT} -linux -brf -o HashFactory.h
 
 ########### generate sources target ###############
-add_custom_target(HashFactory.h ALL 
-                  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.hm ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.hp
-                          ${CMAKE_CURRENT_SOURCE_DIR}/perfectHash.hm ${CMAKE_CURRENT_SOURCE_DIR}/compactHash.hm
-                  COMMAND cpp -P -CC -x c -imacros HashFactory.hm HashFactory.hp | indent -linux -brf -o HashFactory.h)
-
-add_custom_target(HashFactory.c ALL
-                  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.cm ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.cp 
-                          ${CMAKE_CURRENT_SOURCE_DIR}/perfectHash.cm ${CMAKE_CURRENT_SOURCE_DIR}/compactHash.cm
-                          HashFactory.cl HashFactory.h
-                  COMMAND cpp -P -CC -x c -imacros HashFactory.cm HashFactory.cp | indent -linux -brf |
-                     sed -e '/OMP_PRAGMA_PARALLEL_FOR/s/[[:space:]]*OMP_PRAGMA_PARALLEL_FOR\;/\#pragma omp parallel for/' > HashFactory.c &&
-                      ${CMAKE_CURRENT_SOURCE_DIR}/embed_source.pl HashFactory.cl >> ${CMAKE_CURRENT_BINARY_DIR}/HashFactory.c)
-
-add_custom_target(HashFactory.cl ALL
-                  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.clp ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.cm
-                          ${CMAKE_CURRENT_SOURCE_DIR}/perfectHash.cm ${CMAKE_CURRENT_SOURCE_DIR}/compactHash.cm
-                  COMMAND cpp -P -CC -x c -imacros HashFactory.cm HashFactory.clp | indent -linux -brf -o HashFactory.cl)
+#add_custom_target(HashFactory.h ALL 
+#                  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.hm ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.hp
+#                          ${CMAKE_CURRENT_SOURCE_DIR}/perfectHash.hm ${CMAKE_CURRENT_SOURCE_DIR}/compactHash.hm
+#                  COMMAND cpp -P -CC -x c -imacros HashFactory.hm HashFactory.hp | indent -linux -brf -o HashFactory.h)
+#
+#add_custom_target(HashFactory.c ALL
+#                  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.cm ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.cp 
+#                          ${CMAKE_CURRENT_SOURCE_DIR}/perfectHash.cm ${CMAKE_CURRENT_SOURCE_DIR}/compactHash.cm
+#                          HashFactory.cl HashFactory.h
+#                  COMMAND cpp -P -CC -x c -imacros HashFactory.cm HashFactory.cp | indent -linux -brf |
+#                     sed -e '/OMP_PRAGMA_PARALLEL_FOR/s/[[:space:]]*OMP_PRAGMA_PARALLEL_FOR\;/\#pragma omp parallel for/' > HashFactory.c &&
+#                      ${CMAKE_CURRENT_SOURCE_DIR}/embed_source.pl HashFactory.cl >> ${CMAKE_CURRENT_BINARY_DIR}/HashFactory.c)
+#
+#add_custom_target(HashFactory.cl ALL
+#                  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.clp ${CMAKE_CURRENT_SOURCE_DIR}/HashFactory.cm
+#                          ${CMAKE_CURRENT_SOURCE_DIR}/perfectHash.cm ${CMAKE_CURRENT_SOURCE_DIR}/compactHash.cm
+#                  COMMAND cpp -P -CC -x c -imacros HashFactory.cm HashFactory.clp | indent -linux -brf -o HashFactory.cl)
 
 ########### embed source target ###############
 add_custom_target(HashFactory_source.inc ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/HashFactory.cl

@@ -276,7 +276,7 @@ int main (int argc, const char * argv[])
       if (strcmp(argv[i], "-N") == 0) {
         i++;
         n_max =(int)(atoi(argv[i])); 
-      } 
+      }
       if (strcmp(argv[i], "-o") == 0) {
         i++;
         int option_size =  0; 
@@ -287,7 +287,7 @@ int main (int argc, const char * argv[])
           printf("Please add tests: br, kd, hc, hlc, hc1, hlc1, hc2, hlc2, hc3, hlc3, holc3, hg, hg1, hg2, hg3, hg4\n");
           return 0;
         }
-        sprintf(header,"Size,   \tncells,  \tcompression,");
+        sprintf(header,"Size, \tlevmx: \tncells,  \tcompression,");
         if(WRITE_MEM_USAGE) fprintf(fmem,"Size,   \tncells,   ");
         fflush(stdout);
         options = (int*)malloc((option_size+2)*sizeof(int));
@@ -298,7 +298,7 @@ int main (int argc, const char * argv[])
           for (int iopt = 0; iopt < nopts; iopt++){
             if (strcmp(argv[i], inputopt[iopt]) == 0) { 
               option = inputkey[iopt];
-              sprintf(add_string,"\t%s,",descriptor[iopt]);
+              sprintf(add_string," \t%s,",descriptor[iopt]);
               strcat(header,add_string);
               if(WRITE_MEM_USAGE) fprintf(fmem,"\t%s,",descriptor[iopt]);
               break;
@@ -313,7 +313,7 @@ int main (int argc, const char * argv[])
           i++;
         }
         options[j] = END_CHARACTER;
-        strcat(header,"\n");
+        //strcat(header,"\n");
         if(WRITE_MEM_USAGE) fprintf(fmem,"\n");
       }
     }
@@ -381,14 +381,14 @@ int main (int argc, const char * argv[])
   printf("\n    2D Neighbors Performance Results\n\n");
   printf("%s\n",header);
 
-  printf("\nThreshold for refinement is %f\n",threshold); 
-  printf("\nWork group size is %d and init workgroup size is %d\n",TILE_SIZE,TILE_SIZE_INIT); 
+  //printf("\nThreshold for refinement is %f\n",threshold); 
+  //printf("\nWork group size is %d and init workgroup size is %d\n",TILE_SIZE,TILE_SIZE_INIT); 
   for (uint levmx = levmx_min; levmx < levmx_max; levmx++ ){
-    printf("\nMax levels is %d\n",levmx); 
+    //printf("\nMax levels is %d\n",levmx); 
     if(WRITE_MEM_USAGE) fprintf(fmem,"\nMax levels is %d\n",levmx); 
     for( uint i = n_min; i <= n_max; i*=2 ) {
       if (levmx > 3 && i > 512) continue;
-      printf("%d,     ", i);
+      printf("%d, \t%d: ", i,levmx);
       if(WRITE_MEM_USAGE) fprintf(fmem,"%d,     ", i);
       neighbors2d(i, levmx, threshold, options, haveGPU);
       printf("\n");
