@@ -385,7 +385,7 @@ int main (int argc, const char * argv[])
     //printf("\nMax levels is %d\n",levmx); 
     if(WRITE_MEM_USAGE) fprintf(fmem,"\nMax levels is %d\n",levmx); 
     for( uint i = n_min; i <= n_max; i*=2 ) {
-      if (levmx > 3 && i > 512) continue;
+      //if (levmx > 3 && i > 512) continue;
       printf("%d, \t%d: ", i,levmx);
       if(WRITE_MEM_USAGE) fprintf(fmem,"%d,     ", i);
       neighbors2d(i, levmx, threshold, options, haveGPU);
@@ -454,7 +454,7 @@ void neighbors2d( uint mesh_size, int levmx, float threshold, int *options, int 
     }
   }
   
-  struct timeval timer;
+  struct timespec timer;
   double time;
   cpu_timer_start(&timer);
   switch(options[0]){
@@ -868,7 +868,7 @@ struct neighbor2d *neighbors2d_kdtree( uint ncells, int mesh_size, double *x, do
  */
 struct neighbor2d *neighbors2d_hashcpu( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -957,7 +957,7 @@ struct neighbor2d *neighbors2d_hashcpu( uint ncells, int mesh_size, int levmx, i
  */
 struct neighbor2d *neighbors2d_hashlibcpu( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1042,7 +1042,7 @@ struct neighbor2d *neighbors2d_hashlibcpu( uint ncells, int mesh_size, int levmx
  */
 struct neighbor2d *neighbors2d_hashcpu_opt_1(uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1141,7 +1141,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_1(uint ncells, int mesh_size, int lev
  */
 struct neighbor2d *neighbors2d_hashlibcpu_opt_1( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1231,7 +1231,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_1( uint ncells, int mesh_size, int
  */
 struct neighbor2d *neighbors2d_hashcpu_opt_2( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1340,7 +1340,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_2( uint ncells, int mesh_size, int le
  */
 struct neighbor2d *neighbors2d_hashlibcpu_opt_2( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1447,7 +1447,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_2( uint ncells, int mesh_size, int
  */
 struct neighbor2d *neighbors2d_hashcpu_opt_3(uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1589,7 +1589,7 @@ struct neighbor2d *neighbors2d_hashcpu_opt_3(uint ncells, int mesh_size, int lev
  */
 struct neighbor2d *neighbors2d_hashlibcpu_opt_3( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1728,7 +1728,7 @@ struct neighbor2d *neighbors2d_hashlibcpu_opt_3( uint ncells, int mesh_size, int
 
 struct neighbor2d *neighbors2d_hasholdlibcpu_opt_3( uint ncells, int mesh_size, int levmx, int *i, int *j, int *level )
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeCPUTime, readCPUTime, cleanupCPUTime, totalCPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
   if(DETAILED_TIMING) cpu_timer_start(&tSection);
@@ -1862,7 +1862,7 @@ struct neighbor2d *neighbors2d_hasholdlibcpu_opt_3( uint ncells, int mesh_size, 
 cl_mem neighbors2d_hashgpu( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createGPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -1982,7 +1982,7 @@ cl_mem neighbors2d_hashgpu( uint ncells, int mesh_size, int levmx, cl_mem i_buff
 cl_mem neighbors2d_hashlibgpu( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2104,7 +2104,7 @@ cl_mem neighbors2d_hashlibgpu( uint ncells, int mesh_size, int levmx, cl_mem i_b
 cl_mem neighbors2d_hashgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createGPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2226,7 +2226,7 @@ cl_mem neighbors2d_hashgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_mem 
 cl_mem neighbors2d_hashlibgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2349,7 +2349,7 @@ cl_mem neighbors2d_hashlibgpu_opt_1( uint ncells, int mesh_size, int levmx, cl_m
 cl_mem neighbors2d_hashgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createGPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2472,7 +2472,7 @@ cl_mem neighbors2d_hashgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem 
 cl_mem neighbors2d_hashlibgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2595,7 +2595,7 @@ cl_mem neighbors2d_hashlibgpu_opt_2( uint ncells, int mesh_size, int levmx, cl_m
 cl_mem neighbors2d_hashgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createGPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2717,7 +2717,7 @@ cl_mem neighbors2d_hashgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem 
 cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createCPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
@@ -2845,7 +2845,7 @@ cl_mem neighbors2d_hashlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_m
 cl_mem neighbors2d_hasholdlibgpu_opt_3( uint ncells, int mesh_size, int levmx, cl_mem i_buffer, cl_mem j_buffer,
       cl_mem level_buffer, cl_mem levtable_buffer)
 {
-  struct timeval tSection, tTotal;
+  struct timespec tSection, tTotal;
   double setupCPUTime, createGPUTime, emptyCPUTime, writeGPUTime, readGPUTime, cleanupCPUTime, totalCPUTime;
   long startGPUTime, endGPUTime, GPUTime;
   if(DETAILED_TIMING) cpu_timer_start(&tTotal);
