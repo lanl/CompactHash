@@ -12,7 +12,7 @@ Rebecka Tumblin (rtumblin@lanl.gov, rebeckatumblin@gmail.com)
 On a machine with at least one OpenCL compliant device:
 
 Enter the 'parallel_hash' directory
-run:
+
    ./configure
    make 
    ./neigh2d -o <trial options>
